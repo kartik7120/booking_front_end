@@ -1,10 +1,11 @@
 import './App.css'
 import { Route, Routes } from 'react-router'
+import Index from "./components/Index"
 
 function App() {
   return (
     <Routes>
-      <Route index element={<div>This is the index page</div>} />
+      <Route index element={<Index />} />
     </Routes>
   )
 }
