@@ -1,6 +1,6 @@
 import { IoTicketOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
-import { Button } from './Button';
+import { FaUser } from "react-icons/fa";
 import './header.css';
 
 type User = {
@@ -44,16 +44,19 @@ export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps
             </p>
           </button>
           {user ? (
-            <>
-              <span className="welcome">
-                Welcome, <b>{user.name}</b>!
-              </span>
-              <Button size="small" onClick={onLogout} label="Log out" />
-            </>
+            <div className="dropdown dropdown-center">
+              <div tabIndex={0} role="button" className="btn btn-btn-circle m-1">
+                <FaUser onClick={onLogout} />
+              </div>
+              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                <li><a>Item 1</a></li>
+                <li><a>Item 2</a></li>
+              </ul>
+            </div>
           ) : (
             <>
-              <Button size="small" onClick={onLogin} label="Log in" />
-              <Button primary size="small" onClick={onCreateAccount} label="Sign up" />
+              <button className="btn-outline btn" onClick={onLogin}>Log in</button>
+              <button className="btn-outline btn" onClick={onCreateAccount}>Sign up</button>
             </>
           )}
         </div>
