@@ -17,12 +17,10 @@ export interface HeaderProps {
 export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps) => (
   <header>
     <div className="storybook-header">
-      {/* <div className="flex flex-row justify-between w-max"> */}
       <div className="flex items-center">
         <IoTicketOutline size={30} color="#FEE505" />
         <h1 className='antialiased'>GoWatch</h1>
       </div>
-      {/* </div> */}
       <div>
         <div className="flex flex-row items-center">
           <button className="btn btn-circle">

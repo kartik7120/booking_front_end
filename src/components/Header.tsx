@@ -1,14 +1,9 @@
+import { Header as HeaderCom } from "../stories/Header"
+
 export default function Header() {
   return (
-    <div>
-      <div className='navbar'>
-        <div>
-          {/* Logo plus Text */}
-          <p className="antialiased text-center">
-            GoWatch
-          </p>
-        </div>
-      </div>
-    </div>
+    <HeaderCom onCreateAccount={() => { }} onLogin={() => { }} onLogout={() => { }} user={{
+      name: ""
+    }} />
   )
 }
