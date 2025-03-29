@@ -1,5 +1,5 @@
 import Carousel, { CarouselProps } from "../Carousel";
-import CarouselLayover, { CarouselLayoverProps } from "./CarouselLayover";
+import { CarouselLayoverProps } from "./CarouselLayover";
 
 export interface TopProps extends CarouselLayoverProps, CarouselProps {
 
@@ -7,29 +7,44 @@ export interface TopProps extends CarouselLayoverProps, CarouselProps {
 
 export default function Top(props: TopProps) {
   return (
-    <div className="relative">
-      {/* Carousel */}
-      <div>
-        <Carousel
-          imageURLs={props.imageURLs} 
-          shouldAutoScroll={props.shouldAutoScroll} 
-          scrollInterval={props.scrollInterval} 
-        />
-      </div>
-
-      {/* CarouselLayover */}
-      <div className="absolute bottom-0 left-0 w-full z-10 bg-opacity-75 text-white">
-        <CarouselLayover 
-          director={props.director} 
-          duration={props.duration}
-          genreTags={props.genreTags} 
-          rating={props.rating}
-          releaseYear={props.releaseYear} 
-          stars={props.stars}
-          summary={props.summary} 
-          title={props.title} 
-        />
-      </div>
+    <div>
+      <Carousel
+        imageURLs={props.imageURLs}
+        shouldAutoScroll={props.shouldAutoScroll}
+        scrollInterval={props.scrollInterval}
+        CarouselLayoverProps={[
+          {
+            title: "Inception",
+            genreTags: ["Action", "Drama", "Sci-fi"],
+            rating: 4,
+            director: "Chris Nolan",
+            stars: ["abc", "def", "try"],
+            summary: props.summary,
+            releaseYear: props.releaseYear,
+            duration: props.duration // in milliseconds
+          },
+          {
+            title: "Intersteller",
+            genreTags: ["Action", "Drama", "Sci-fi"],
+            rating: 4,
+            director: "Chris Nolan",
+            stars: ["abc", "def", "try"],
+            summary: props.summary,
+            releaseYear: props.releaseYear,
+            duration: props.duration // in milliseconds
+          },
+          {
+            title: "The Batman",
+            genreTags: ["Action", "Drama", "Sci-fi"],
+            rating: 4,
+            director: "Chris Nolan",
+            stars: ["abc", "def", "try"],
+            summary: props.summary,
+            releaseYear: props.releaseYear,
+            duration: props.duration // in milliseconds
+          }
+        ]}
+      />
     </div>
   )
 }
