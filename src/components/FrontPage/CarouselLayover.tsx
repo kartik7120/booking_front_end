@@ -83,12 +83,12 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
       </div>
       <div className="flex flex-col gap-y-2 self-end p-2">
         {/* Right side of CarouselLayover*/}
-        <div className="flex flex-row gap-x-2">
+        <div className="flex flex-row gap-x-2 justify-end">
           {/* Director name */}
           <p>{props.director}</p>
           <p className="text-yellow-500">: Director</p>
         </div>
-        <div className="flex flex-row gap-x-2">
+        <div className="flex flex-row gap-x-2 justify-end">
           <div className="flex flex-row gap-x-2">
             {
               props.stars.map((val, idx) => {
@@ -99,7 +99,7 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
           <p className="text-yellow-500">: Stars</p>
         </div>
         <div>
-          <p className="line-clamp-3">{props.summary}</p>
+          <p className="line-clamp-3 justify-end text-justify break-words w-96">{props.summary}</p>
         </div>
       </div>
     </div>
