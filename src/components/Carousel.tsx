@@ -30,8 +30,8 @@ export default function Carousel(props: CarouselProps) {
     };
 
     return (
-        <div className="relative">
-            <div className="carousel w-full">
+        <div className="relative w-full max-w-screen overflow-hidden">
+            <div className="carousel w-full relative">
                 {props.imageURLs.map((url, idx) => (
                     <div
                         key={idx}
@@ -45,7 +45,8 @@ export default function Carousel(props: CarouselProps) {
                     <button onClick={goToNextSlide} className="btn btn-circle">❯</button>
                 </div>
             </div>
-            <div className="absolute bottom-0 left-0 w-full z-10 bg-opacity-75 text-white">
+            <div
+                className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 via-black/50 to-transparent text-white p-4">
                 {/* Render layover for the current slide */}
                 <CarouselLayover
                     {...props.CarouselLayoverProps[currentSlide]} // Pass layover props for the current slide

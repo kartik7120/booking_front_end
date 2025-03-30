@@ -26,7 +26,7 @@ export default function Top(props: TopProps) {
           {
             title: "Intersteller",
             genreTags: ["Action", "Drama", "Sci-fi"],
-            rating: 4,
+            rating: 5,
             director: "Chris Nolan",
             stars: ["abc", "def", "try"],
             summary: props.summary,
@@ -36,7 +36,7 @@ export default function Top(props: TopProps) {
           {
             title: "The Batman",
             genreTags: ["Action", "Drama", "Sci-fi"],
-            rating: 4,
+            rating: 2,
             director: "Chris Nolan",
             stars: ["abc", "def", "try"],
             summary: props.summary,

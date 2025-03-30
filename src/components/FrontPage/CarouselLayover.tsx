@@ -29,7 +29,7 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
   }
 
   return (
-    <div className="flex flex-row justify-between items-center m-2 gap-x-3 w-full">
+    <div className="flex flex-row justify-between items-center m-2 gap-x-3 w-full p-4">
       <div className="flex flex-col items-start gap-y-3 p-2">
         {/* Left side of Carousel Layover */}
         <Title title={props.title} />
@@ -63,14 +63,9 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
             <div className="rating">
               {
                 ratings.map((val, idx) => {
-                  return <div className="mask mask-star bg-orange-400" aria-label={`${idx + 1} start`}>{val}</div>
+                  return <div className="mask mask-star bg-orange-200" aria-label={`${idx + 1} start`}>{val}</div>
                 })
               }
-              {/* <div className="mask mask-star bg-orange-400" aria-label="1 star"></div>
-              <div className="mask mask-star bg-orange-400" aria-label="2 star"></div>
-              <div className="mask mask-star bg-orange-400" aria-label="3 star" aria-current="true"></div>
-              <div className="mask mask-star bg-orange-400" aria-label="4 star"></div>
-              <div className="mask mask-star bg-orange-400" aria-label="5 star"></div> */}
             </div>
             <div className="flex flex-row gap-x-3 m-2">
               {/* Buttons */}
