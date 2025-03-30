@@ -14,7 +14,7 @@ export default function MovieCard(props: MovieCardProps) {
     }
 
     return (
-        <div className="card bg-base-100 w-96 shadow-sm" onClick={handleOnClick}>
+        <div className="card bg-base-100 w-48 shadow-sm" onClick={handleOnClick}>
             <figure>
                 <img
                     src={props.imageURL}
@@ -28,11 +28,13 @@ export default function MovieCard(props: MovieCardProps) {
                         <div className="rating">
                             <div className="mask mask-star bg-orange-400" aria-label="1 star" aria-current="true"></div>
                         </div>
-                        <p className="text-lg">{`${props.rating}/5`}</p>
+                        <p className="text-sm">{`${props.rating}/5`}</p>
                     </div>
                     <div>
-                        <p className="text-lg">
-                            {props.votes !== undefined && props.votes >= 1000 ? `${props.votes / 1000}k` : `${props.votes}`} votes
+                        <p className="text-sm">
+                            {props.votes !== undefined && props.votes >= 1000
+                                ? `${(props.votes / 1000).toFixed(1)}k`
+                                : `${props.votes}`} votes
                         </p>
                     </div>
                 </div>
