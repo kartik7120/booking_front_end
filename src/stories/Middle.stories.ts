@@ -21,43 +21,91 @@ export const Primary: Story = {
                 movie_id: 27,
                 movie_name: "Fast X",
                 rating: 2,
-                votes: 102934
+                votes: 102934,
+                comingSoon: false
             },
             {
                 imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
                 movie_id: 27,
                 movie_name: "Fast X",
                 rating: 2,
-                votes: 102934
+                votes: 102934,
+                comingSoon: false
             },
             {
                 imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
                 movie_id: 27,
                 movie_name: "Fast X",
                 rating: 2,
-                votes: 102934
+                votes: 102934,
+                comingSoon: false
             },
             {
                 imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
                 movie_id: 27,
                 movie_name: "Fast X",
                 rating: 2,
-                votes: 102934
+                votes: 102934,
+                comingSoon: false
             },
             {
                 imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
                 movie_id: 27,
                 movie_name: "Fast X",
                 rating: 2,
-                votes: 102934
+                votes: 102934,
+                comingSoon: false
             },
             {
                 imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
                 movie_id: 27,
                 movie_name: "Fast X",
                 rating: 2,
-                votes: 102934
-            }
+                votes: 102934,
+                comingSoon: false
+            },
+            {
+                imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+                movie_id: 27,
+                movie_name: "Fast X",
+                rating: 2,
+                votes: 102934,
+                comingSoon: false
+            },
+        ],
+        ComingSoon: [
+            {
+                imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+                movie_id: 27,
+                movie_name: "Fast X",
+                rating: 2,
+                votes: 102934,
+                comingSoon: true
+            },
+            {
+                imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+                movie_id: 27,
+                movie_name: "Fast X",
+                rating: 2,
+                votes: 102934,
+                comingSoon: true
+            },
+            {
+                imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+                movie_id: 27,
+                movie_name: "Fast X",
+                rating: 2,
+                votes: 102934,
+                comingSoon: true
+            },
+            {
+                imageURL: "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+                movie_id: 27,
+                movie_name: "Fast X",
+                rating: 2,
+                votes: 102934,
+                comingSoon: true
+            },
         ]
     }
 }

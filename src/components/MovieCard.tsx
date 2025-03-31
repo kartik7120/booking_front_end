@@ -3,7 +3,8 @@ export interface MovieCardProps {
     imageURL: string,
     movie_id: number,
     movie_name: string,
-    votes: number
+    votes: number,
+    comingSoon: boolean
 }
 
 export default function MovieCard(props: MovieCardProps) {
@@ -24,12 +25,12 @@ export default function MovieCard(props: MovieCardProps) {
             <div className="card-body">
                 <h2 className="card-title w-fit gap-y-4 text-2xl">Fast X</h2>
                 <div className="flex flex-row items-center justify-between">
-                    <div className='flex flex-row gap-x-2 items-center'>
+                    {!props.comingSoon && <div className='flex flex-row gap-x-2 items-center'>
                         <div className="rating">
                             <div className="mask mask-star bg-orange-400" aria-label="1 star" aria-current="true"></div>
                         </div>
                         <p className="text-sm">{`${props.rating}/5`}</p>
-                    </div>
+                    </div>}
                     <div>
                         <p className="text-sm">
                             {props.votes !== undefined && props.votes >= 1000
