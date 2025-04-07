@@ -3,21 +3,21 @@ import { SlCalender } from "react-icons/sl";
 import { FaRegClock } from "react-icons/fa6";
 
 export interface CarouselLayoverProps {
-  title: string,
-  genreTags: string[],
-  rating: number,
-  director: string,
-  stars: string[],
-  summary: string,
-  releaseYear: number,
-  duration: number // in milliseconds
+  title?: string,
+  genreTags?: string[],
+  rating?: number,
+  director?: string,
+  stars?: string[],
+  summary?: string,
+  releaseYear?: number,
+  duration?: number // in milliseconds
 }
 
 export default function CarouselLayover(props: CarouselLayoverProps) {
 
   const ratings = new Array();
 
-  for (let i = 0; i < props.rating; i++) {
+  for (let i = 0; i < (props.rating ?? 0); i++) {
     ratings.push(<div className="mask mask-star bg-orange-400" aria-label={(i + 1) + " star"}></div>)
   }
 
@@ -32,16 +32,16 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
     <div className="flex flex-row justify-between items-center m-2 gap-x-3 w-full p-4">
       <div className="flex flex-col items-start gap-y-3 p-2">
         {/* Left side of Carousel Layover */}
-        <Title title={props.title} />
+        <Title title={props.title || ""} />
         <div className="flex flex-col items-start gap-y-3"> {/* This dev is used to hold tags, year and duration */}
           <div className="flex flex-row items-start gap-x-3">
             {/* genreTags */}
             <div>
-              {props.genreTags.map((val, idx) => {
-                if (idx !== props.genreTags.length - 1) {
-                  return <span>{val + ", "}</span>
+              {props.genreTags && props.genreTags.length > 0 && props.genreTags.map((val, idx) => {
+                if (idx !== (props.genreTags ?? []).length - 1) {
+                  return <span key={idx}>{val + ", "}</span>
                 } else {
-                  return <span>{val}</span>
+                  return <span key={idx}>{val}</span>
                 }
               })}
             </div>
@@ -54,7 +54,7 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
               {/* duration of movie */}
               <FaRegClock color="yellow" />
               <span>
-                {formatDuration(props.duration)}
+                {formatDuration(props.duration ?? 0)}
               </span>
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
         <div className="flex flex-row gap-x-2 justify-end">
           <div className="flex flex-row gap-x-2">
             {
-              props.stars.map((val, idx) => {
+              props.stars && props.stars.map((val, idx) => {
                 return <span key={idx}>{val}</span>
               })
             }

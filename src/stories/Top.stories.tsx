@@ -1,12 +1,28 @@
 import { Meta, StoryObj } from "@storybook/react";
 import Top from "../components/FrontPage/Top";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+        }
+    }
+})
 
 const meta = {
     title: "FrontPage/Top",
     component: Top,
-    parameters: {
-        layout: "centered"
-    }
+    decorators: [
+        (Story) => (
+            <div style={{ margin: '3em' }} >
+                <QueryClientProvider client={queryClient} >
+                    <Story />
+                </QueryClientProvider>
+            </div>
+        )
+    ]
 } satisfies Meta<typeof Top>
 
 export default meta
@@ -18,7 +34,6 @@ export const Primary: Story = {
         imageURLs: [
             "https://image.tmdb.org/t/p/w1280/s3TBrRGB1iav7gFOCNx3H31MoES.jpg​",
             "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-            "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg"
         ],
         shouldAutoScroll: true,
         scrollInterval: 3000,
