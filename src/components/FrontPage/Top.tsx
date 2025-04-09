@@ -68,7 +68,9 @@ export default function Top(props: TopProps) {
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>
+    return <div className={`w-[${width}] h-200`}>
+      <img src={`https://fakeimg.pl/${width}x${height}/1c1c1c/ffffff/?text=Please+Try+Again&font=lobster`} alt="placeholder image if no data is present to show in carousel" />
+    </div>
   }
 
   if (isSuccess) {
@@ -78,7 +80,7 @@ export default function Top(props: TopProps) {
   return (
     <div className="w-full">
       {
-        data?.length === 0 && (
+        data === undefined || data === null || data?.length === 0 && (
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-2xl font-bold">No Movies Found</h1>
           </div>
