@@ -1,13 +1,17 @@
 import Title from "../../stories/Title"
 import { SlCalender } from "react-icons/sl";
 import { FaRegClock } from "react-icons/fa6";
+import { useEffect, useState } from "react";
 
 export interface CarouselLayoverProps {
   title?: string,
   genreTags?: string[],
   rating?: number,
-  director?: string,
-  stars?: string[],
+  cast_crew: {
+    name: string,
+    character_name: string,
+    photourl: string
+  }[]
   summary?: string,
   releaseYear?: number,
   duration?: number // in milliseconds
@@ -16,6 +20,26 @@ export interface CarouselLayoverProps {
 export default function CarouselLayover(props: CarouselLayoverProps) {
 
   const ratings = new Array();
+
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
+
+  // Set the width and height of the window
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+      setHeight(window.innerHeight);
+    };
+
+    // Set initial size
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  }, [width, height]);
 
   for (let i = 0; i < (props.rating ?? 0); i++) {
     ratings.push(<div className="mask mask-star bg-orange-400" aria-label={(i + 1) + " star"}></div>)
@@ -78,16 +102,18 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
       </div>
       <div className="flex flex-col gap-y-2 self-end p-2">
         {/* Right side of CarouselLayover*/}
-        <div className="flex flex-row gap-x-2 justify-end">
+        <div className="flex flex-row gap-x-2 justify-end xl:text-lg lg:text-md md:text-sm sm:text-xs">
           {/* Director name */}
-          <p>{props.director}</p>
+          <p>{props.cast_crew.length && props.cast_crew.find((val) => val.character_name === "Director")?.name}</p>
           <p className="text-yellow-500">: Director</p>
         </div>
         <div className="flex flex-row gap-x-2 justify-end">
           <div className="flex flex-row gap-x-2">
             {
-              props.stars && props.stars.map((val, idx) => {
-                return <span key={idx}>{val}</span>
+              props.cast_crew && props.cast_crew.map((val, idx) => {
+                if (val.character_name !== "Director") {
+                  return <span key={idx}>{val.name}</span>
+                }
               })
             }
           </div>

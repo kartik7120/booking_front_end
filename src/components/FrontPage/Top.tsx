@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Carousel, { CarouselProps } from "../Carousel";
 import { CarouselLayoverProps } from "./CarouselLayover";
 import { useEffect, useState } from "react";
+import Header from "../Header";
 
 export interface TopProps extends CarouselLayoverProps, CarouselProps {
 
@@ -10,13 +11,18 @@ export interface TopProps extends CarouselLayoverProps, CarouselProps {
 interface UpcomingMovieResponse {
   title: string;
   duration: number; // in milliseconds
-  releaseYear: number;
+  release_date: number;
   poster_url: string;
   id: number;
   ranking: number;
   type: string[]
   summary: string;
   director: string;
+  cast_crew: {
+    name: string,
+    character_name: string,
+    photourl: string
+  }[]
   // stars: {
   //   name: string;
   //   character_name: string;
@@ -79,36 +85,41 @@ export default function Top(props: TopProps) {
 
   return (
     <div className="w-full">
-      {
-        data === undefined || data === null || data?.length === 0 && (
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-2xl font-bold">No Movies Found</h1>
-          </div>
-        )
-      }
-      {
-        data && data.length > 0 && (
-          <Carousel
-            imageURLs={
-              props.imageURLs
-            }
-            shouldAutoScroll={props.shouldAutoScroll}
-            scrollInterval={props.scrollInterval}
-            CarouselLayoverProps={
-              data?.map((movie) => ({
-                title: movie.title,
-                genreTags: movie.type,
-                rating: 0,
-                director: movie.director,
-                releaseYear: movie.releaseYear,
-                summary: movie.summary,
-                duration: movie.duration,
-                stars: [""]
-              })) || []
-            }
-          />
-        )
-      }
+      <div className="absolute top-0 left-0 w-full z-10">
+        <Header />
+      </div>
+      <div>
+        {
+          data === undefined || data === null || data?.length === 0 && (
+            <div className="flex flex-col items-center justify-center">
+              <h1 className="text-2xl font-bold">No Movies Found</h1>
+            </div>
+          )
+        }
+        {
+          data && data.length > 0 && (
+            <Carousel
+              imageURLs={
+                props.imageURLs
+              }
+              shouldAutoScroll={props.shouldAutoScroll}
+              scrollInterval={props.scrollInterval}
+              CarouselLayoverProps={
+                data?.map((movie) => ({
+                  title: movie.title,
+                  genreTags: movie.type,
+                  rating: 0,
+                  cast_crew: movie.cast_crew,
+                  releaseYear: new Date(movie.release_date.toString().split(" ")[0]).getFullYear(),
+                  summary: movie.summary,
+                  duration: movie.duration,
+                  stars: [""]
+                })) || []
+              }
+            />
+          )
+        }
+      </div>
     </div>
   )
 }
