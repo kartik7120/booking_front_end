@@ -15,7 +15,7 @@ export default function MovieCard(props: MovieCardProps) {
     }
 
     return (
-        <div className="card bg-base-100 w-48 shadow-sm" onClick={handleOnClick}>
+        <div className="card bg-base-100 w-48 shadow-sm hover:border-2 hover:border-white transition-all duration-150 hover:scale-110 cursor-pointer active:scale-90" onClick={handleOnClick}>
             <figure>
                 <img
                     src={props.imageURL}
