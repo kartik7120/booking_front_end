@@ -23,12 +23,6 @@ interface UpcomingMovieResponse {
     character_name: string,
     photourl: string
   }[]
-  // stars: {
-  //   name: string;
-  //   character_name: string;
-  //   type: string;
-  //   photourl: string;
-  // }[];
 }
 
 export default function Top(props: TopProps) {
