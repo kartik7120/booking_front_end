@@ -149,10 +149,10 @@ export default function SeatMap(props: SeatMapProps) {
     }, [props.seats, selectedSeats]);
 
     return (
-        <div>
-            <div className="flex flex-row items-start">
+        <div className="w-full">
+            <div className="flex flex-row items-start gap-x-5 gap-y-5">
                 {/* This shows different columns and their names */}
-                <div className="flex flex-col items-center justify-center text-gray-400">
+                <div className="flex flex-col items-center justify-center gap-y-5 text-gray-400">
                     {
                         columns.map((column, index) => (
                             <div key={index} className="w-8 h-8 flex items-center justify-center">
@@ -161,10 +161,10 @@ export default function SeatMap(props: SeatMapProps) {
                         ))
                     }
                 </div>
-                <div className="flex flex-col items-center justify-center gap-2">
+                <div className="flex flex-col items-center gap-y-4">
                     {
                         rowColumnMatrix && Object.entries(rowColumnMatrix).map(([rowKey, seats]) => (
-                            <div key={rowKey} className="flex items-center justify-center">
+                            <div key={rowKey} className="flex flex-row items-center gap-x-6">
                                 {seats.map(seat => {
                                     if (seat.price === -1) {
                                         // This is a placeholder seat, return null or a placeholder component
