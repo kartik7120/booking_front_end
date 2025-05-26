@@ -16,6 +16,7 @@ const meta: Meta<typeof MovieTimeSlotIndex> = {
           movie_name: "Avatar: The Way of Water",
           movie_language: "English",
           tags: ["Action", "Adventure", "Fantasy"],
+          movie_id: 1,
         },
       },
       routing: {

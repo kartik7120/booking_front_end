@@ -97,14 +97,14 @@ export default function Index() {
     setStart_date(start_date);
     setEnd_date(end_date);
 
-    // Get the movie id from the url
-
     // navigator.geolocation.getCurrentPosition((position) => {
     //   setLongitude(position.coords.longitude);
     //   setLatitude(position.coords.latitude);
     // });
 
-    // selected Date by default is today
+    setMovie_id(state.movie_id);
+    setSelectedDate(start_date); // set the selected date to start date
+
   }, [])
 
   const { data, isSuccess, error, isError, isLoading } = useQuery<MovieTimeSlotResponse>({
