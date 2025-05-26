@@ -168,8 +168,8 @@ export default function SeatMap(props: SeatMapProps) {
                                 {seats.map(seat => {
                                     if (seat.price === -1) {
                                         // This is a placeholder seat, return null or a placeholder component
-                                        return <div key={seat.seatNumber} className="w-8 h-8 bg-gray-200 flex items-center justify-center text-gray-400">
-                                            a
+                                        return <div key={seat.seatNumber} className="w-8 h-8 flex items-center justify-center text-gray-400">
+                                            
                                         </div>;
                                     }
                                     return <Seat
