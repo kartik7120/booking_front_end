@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react"
-import TimeSlot from "../MovieTimeSlots/timeSlot"
 import Seat from "./Seat"
 
 export interface Seat {
@@ -16,17 +15,6 @@ export interface Seat {
 
 export interface SeatMapProps {
     // Define the properties that SeatMap will accept
-    // movieTimeSlots: {
-    //     start_time: string
-    //     end_time: string
-    //     duration: number,
-    //     date: string,
-    //     movieid: number,
-    //     venueid: number
-    // }[],
-    // venueName: string,
-    // venueAddress: string,
-    // movieName: string,
     seats: {
         totalRows: number,
         totalColumns: number,
@@ -140,8 +128,6 @@ export default function SeatMap(props: SeatMapProps) {
             }
         }
 
-        console.log("Seat Matrix:", seatMatrix);
-
         setRowColumnMatrix(() => {
             return seatMatrix;
         });
@@ -169,7 +155,7 @@ export default function SeatMap(props: SeatMapProps) {
                                     if (seat.price === -1) {
                                         // This is a placeholder seat, return null or a placeholder component
                                         return <div key={seat.seatNumber} className="w-8 h-8 flex items-center justify-center text-gray-400">
-                                            
+
                                         </div>;
                                     }
                                     return <Seat
