@@ -19,6 +19,7 @@ export default function CurvedTheatreScreen() {
                 fill="none"
                 stroke="#fff"
                 strokeWidth="1"
+                strokeLinecap="round"
             />
         </svg>
     )
