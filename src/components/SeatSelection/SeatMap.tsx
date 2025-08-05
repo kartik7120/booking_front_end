@@ -33,20 +33,23 @@ export interface SeatMapProps {
             seatMatrixID: number,
             is_booked: boolean
         }[]
-    }
+    },
+    setSelectSeatState: React.Dispatch<React.SetStateAction<Seat[]>>,
+    selectedSeats: Seat[],
+    setRowColumnMatrix: React.Dispatch<React.SetStateAction<SeatMatrix>>,
+    rowColumnMatrix: SeatMatrix
+
 }
 
-interface SeatMatrix {
+export interface SeatMatrix {
     [key: string]: Seat[]
 }
-
 
 export default function SeatMap(props: SeatMapProps) {
 
     const columns = Array.from({ length: props.seats.totalRows }, (_, i) => String.fromCharCode(65 + i));
 
-    const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
-    const [rowColumnMatrix, setRowColumnMatrix] = useState<SeatMatrix>({});
+    console.log(props)
 
     // Group seats based on rows
 
@@ -85,18 +88,18 @@ export default function SeatMap(props: SeatMapProps) {
                         type: seat.type,
                         isBooked: props.seats.bookedSeats.some(bookedSeat => bookedSeat.seat_number === seat.seat_number && bookedSeat.is_booked),
                         id: seat.id,
-                        isSelected: selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seat_number),
+                        isSelected: props.selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seat_number),
                         seatNumber: seat.seat_number,
                         onClick: () => {
                             // Handle click event, e.g., toggle selection
-                            setSelectedSeats(() => {
-                                const isSelected = selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seat_number);
+                            props.setSelectSeatState(() => {
+                                const isSelected = props.selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seat_number);
                                 if (isSelected) {
                                     // If already selected, remove it
-                                    return selectedSeats.filter(selectedSeat => selectedSeat.seatNumber !== seat.seat_number);
+                                    return props.selectedSeats.filter(selectedSeat => selectedSeat.seatNumber !== seat.seat_number);
                                 } else {
                                     // If not selected, add it
-                                    return [...selectedSeats, {
+                                    return [...props.selectedSeats, {
                                         price: seat.price,
                                         row: seat.row,
                                         column: seat.column,
@@ -128,11 +131,11 @@ export default function SeatMap(props: SeatMapProps) {
             }
         }
 
-        setRowColumnMatrix(() => {
+        props.setRowColumnMatrix(() => {
             return seatMatrix;
         });
 
-    }, [props.seats, selectedSeats]);
+    }, [props.seats, props.selectedSeats]);
 
     return (
         <div className="w-full">
@@ -149,7 +152,7 @@ export default function SeatMap(props: SeatMapProps) {
                 </div>
                 <div className="flex flex-col items-center gap-y-4">
                     {
-                        rowColumnMatrix && Object.entries(rowColumnMatrix).map(([rowKey, seats]) => (
+                        props.rowColumnMatrix && Object.entries(props.rowColumnMatrix).map(([rowKey, seats]) => (
                             <div key={rowKey} className="flex flex-row items-center gap-x-6">
                                 {seats.map(seat => {
                                     if (seat.price === -1) {
@@ -167,7 +170,7 @@ export default function SeatMap(props: SeatMapProps) {
                                         isBooked={seat.isBooked}
                                         id={seat.id}
                                         isSelected={
-                                            selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seatNumber)
+                                            props.selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seatNumber)
                                         } // Assuming isSelected is managed elsewhere
                                         seatNumber={seat.seatNumber}
                                         onClick={
