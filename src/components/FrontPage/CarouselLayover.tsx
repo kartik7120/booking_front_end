@@ -11,118 +11,98 @@ export interface CarouselLayoverProps {
     name: string,
     character_name: string,
     photourl: string
-  }[]
+  }[],
   summary?: string,
   releaseYear?: number,
   duration?: number // in milliseconds
 }
 
 export default function CarouselLayover(props: CarouselLayoverProps) {
-
   const ratings = new Array();
-
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
-
-  // Set the width and height of the window
 
   useEffect(() => {
     const handleResize = () => {
       setWidth(window.innerWidth);
       setHeight(window.innerHeight);
     };
-
-    // Set initial size
-
     window.addEventListener('resize', handleResize);
     handleResize();
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    }
+    return () => window.removeEventListener('resize', handleResize);
   }, [width, height]);
 
   for (let i = 0; i < (props.rating ?? 0); i++) {
-    ratings.push(<div className="mask mask-star bg-orange-400" aria-label={(i + 1) + " star"}></div>)
+    ratings.push(<div className="mask mask-star bg-orange-400" aria-label={(i + 1) + " star"}></div>);
   }
 
   function formatDuration(milliseconds: number) {
-    const hours = Math.floor(milliseconds / (1000 * 60 * 60)); // Calculate hours
-    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60)); // Calculate remaining minutes
-
+    const hours = Math.floor(milliseconds / (1000 * 60 * 60));
+    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours} h ${minutes} m`;
   }
 
   return (
-    <div className="flex flex-row justify-between items-center m-2 gap-x-3 w-full p-4">
-      <div className="flex flex-col items-start gap-y-3 p-2">
-        {/* Left side of Carousel Layover */}
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center m-2 gap-4 w-full p-4">
+      {/* Left Side */}
+      <div className="flex flex-col items-start gap-4 p-2 w-full lg:w-2/3">
         <Title title={props.title || ""} />
-        <div className="flex flex-col items-start gap-y-3"> {/* This dev is used to hold tags, year and duration */}
-          <div className="flex flex-row items-start gap-x-3">
-            {/* genreTags */}
-            <div>
-              {props.genreTags && props.genreTags.length > 0 && props.genreTags.map((val, idx) => {
-                if (idx !== (props.genreTags ?? []).length - 1) {
-                  return <span key={idx}>{val + ", "}</span>
-                } else {
-                  return <span key={idx}>{val}</span>
-                }
-              })}
-            </div>
-            <div className="flex flex-row gap-x-2 items-center">
-              {/* releaseYear with calender icon */}
-              <SlCalender color="yellow" />
-              <span>{props.releaseYear}</span>
-            </div>
-            <div className="flex flex-row gap-x-2 items-center">
-              {/* duration of movie */}
-              <FaRegClock color="yellow" />
-              <span>
-                {formatDuration(props.duration ?? 0)}
+
+        <div className="flex flex-wrap items-start gap-4 text-sm sm:text-base">
+          <div>
+            {props.genreTags?.map((val, idx) => (
+              <span key={idx}>
+                {val}{props.genreTags && idx !== props.genreTags.length - 1 ? ", " : ""}
               </span>
-            </div>
+            ))}
           </div>
-          <div className="flex flex-col items-start gap-y-3">
-            {/* Rating */}
-            <div className="rating">
-              {
-                ratings.map((val, idx) => {
-                  return <div className="mask mask-star bg-orange-200" aria-label={`${idx + 1} start`}>{val}</div>
-                })
-              }
-            </div>
-            <div className="flex flex-row gap-x-3 m-2">
-              {/* Buttons */}
-              <button className="btn btn-warning">Book tickets</button>
-              <button className="btn btn-soft btn-warning">Review</button>
-              <button className="btn btn-soft btn-warning">More</button>
-            </div>
+
+          <div className="flex items-center gap-1">
+            <SlCalender className="text-yellow-400" />
+            <span>{props.releaseYear}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <FaRegClock className="text-yellow-400" />
+            <span>{formatDuration(props.duration ?? 0)}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <div className="rating">
+            {ratings.map((val, idx) => (
+              <div key={idx} className="mask mask-star bg-orange-200" aria-label={`${idx + 1} star`}>
+                {val}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button className="btn btn-warning">Book tickets</button>
+            <button className="btn btn-soft btn-warning">Review</button>
+            <button className="btn btn-soft btn-warning">More</button>
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-y-2 self-end p-2">
-        {/* Right side of CarouselLayover*/}
-        <div className="flex flex-row gap-x-2 justify-end xl:text-lg lg:text-md md:text-sm sm:text-xs">
-          {/* Director name */}
-          <p>{props.cast_crew.length && props.cast_crew.find((val) => val.character_name === "Director")?.name}</p>
+
+      {/* Right Side */}
+      <div className="flex flex-col gap-2 p-2 w-full lg:w-1/3 text-sm sm:text-base">
+        <div className="flex flex-row flex-wrap gap-x-2 justify-start lg:justify-end">
+          <p>{props.cast_crew.find(val => val.character_name === "Director")?.name}</p>
           <p className="text-yellow-500">: Director</p>
         </div>
-        <div className="flex flex-row gap-x-2 justify-end">
-          <div className="flex flex-row gap-x-2">
-            {
-              props.cast_crew && props.cast_crew.map((val, idx) => {
-                if (val.character_name !== "Director") {
-                  return <span key={idx}>{val.name}</span>
-                }
-              })
-            }
-          </div>
+
+        <div className="flex flex-wrap gap-x-2 justify-start lg:justify-end">
+          {props.cast_crew.filter(val => val.character_name !== "Director").map((val, idx) => (
+            <span key={idx}>{val.name}</span>
+          ))}
           <p className="text-yellow-500">: Stars</p>
         </div>
-        <div>
-          <p className="line-clamp-3 justify-end text-justify break-words w-96">{props.summary}</p>
-        </div>
+
+        <p className="line-clamp-3 text-justify break-words w-full lg:w-96">
+          {props.summary}
+        </p>
       </div>
     </div>
-  )
+  );
 }
