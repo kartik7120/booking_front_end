@@ -3,6 +3,8 @@ import Navbar from '../FrontPage/Navbar'
 import Carousel, { CarouselProps } from '../Carousel'
 import { CarouselLayoverProps } from '../FrontPage/CarouselLayover';
 import MovieCard, { MovieCardProps } from '../MovieCard';
+import Stats from '../FrontPage/Stats';
+import Footer from '../FrontPage/footer';
 
 export default function HomePage() {
 
@@ -146,10 +148,10 @@ export default function HomePage() {
         shouldAutoScroll={true}
         scrollInterval={5000}
       />
-      <div >
+      <div>
         {/* Now Playing cards section */}
-        <h2 className='text-2xl font-bold text-center my-4'>Now Playing Movies</h2>
-        <div className='flex flex=row justify-evenly items-center flex-wrap gap-4 p-4'>
+        <h2 className='text-2xl h-2 font-bold my-4'>Now Playing Movies</h2>
+        <div className='flex flex-row items-center flex-wrap gap-4 p-4'>
           {movieCards.map((movieCard) => (
             <MovieCard
               key={movieCard.movie_id}
@@ -162,11 +164,12 @@ export default function HomePage() {
             />
           ))}
         </div>
+        <div className='divider'></div>
       </div>
       <div>
         {/* Upcoming card section */}
-        <h2 className='text-2xl font-bold text-center my-4'>Upcoming Movies</h2>
-        <div className='flex flex=row justify-evenly items-center flex-wrap gap-4 p-4'>
+        <h2 className='text-2xl h-2 font-bold my-4'>Upcoming Movies</h2>
+        <div className='flex flex-row items-center flex-wrap gap-4 p-4'>
           {upcomingMovies.map((movieCard) => (
             <MovieCard
               key={movieCard.movie_id}
@@ -179,7 +182,10 @@ export default function HomePage() {
             />
           ))}
         </div>
+        <div className='divider'></div>
       </div>
+      <Stats />
+      <Footer />
     </div>
   )
 }

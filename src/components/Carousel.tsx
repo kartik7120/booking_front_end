@@ -77,6 +77,7 @@ export default function Carousel(props: CarouselProps) {
                     </div>
                 </div>
             </div>
+            <div className="divider"></div>
         </div>
     );
 }

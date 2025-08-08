@@ -10,6 +10,22 @@ export default function Stats() {
             <div className="flex flex-col items-center justify-center p-4">
                 {/* Number of user's */}
                 <motion.div
+                    initial={{
+                        opacity: 0,
+                        translateY: 20,
+                        scale: 0.8
+                    }}
+                    whileInView={{ opacity: 1, scale: 1, translateY: 0 }}
+                    transition={{ duration: 0.7, ease: "easeInOut" }}
+                    viewport={{ once: true }}
+
+                >
+                    <p className="text-4xl font-bold font-mono">
+                        {/* This should be dynamic, fetching from the backend */}
+                        {convertNumberToK(10000)}
+                    </p>
+                </motion.div>
+                <motion.div
                     viewport={{ once: true }}
                     initial={{
                         opacity: 0,
@@ -18,9 +34,13 @@ export default function Stats() {
                     transition={{ duration: 0.7, ease: "easeInOut" }}
                 >
                     <p className="text-4xl font-bold font-mono">
-                        Number of users
+                        Customers
                     </p>
                 </motion.div>
+            </div>
+            <div className="divider lg:divider-horizontal"></div>
+            <div className="flex flex-col items-center justify-center p-4">
+                {/* Number of tickets booked */}
                 <motion.div
                     // viewport={{ once: true }}
                     initial={{
@@ -31,16 +51,13 @@ export default function Stats() {
                     }}
                     whileInView={{ opacity: 1, scale: 1, translateY: 0 }}
                     transition={{ duration: 0.7, ease: "easeInOut" }}
+                    viewport={{ once: true }}
                 >
                     <p className="text-4xl font-bold font-mono">
                         {/* This should be dynamic, fetching from the backend */}
-                        {convertNumberToK(10000)}
+                        {convertNumberToK(50000)}
                     </p>
                 </motion.div>
-            </div>
-            <div className="divider lg:divider-horizontal"></div>
-            <div className="flex flex-col items-center justify-center p-4">
-                {/* Number of tickets booked */}
                 <motion.div
                     viewport={{ once: true }}
                     initial={{
@@ -53,6 +70,11 @@ export default function Stats() {
                         Tickets booked
                     </p>
                 </motion.div>
+            </div>
+            <div className="divider lg:divider-horizontal"></div>
+
+            <div className="flex flex-col items-center justify-center p-4">
+                {/* Number of venues */}
                 <motion.div
                     // viewport={{ once: true }}
                     initial={{
@@ -63,17 +85,14 @@ export default function Stats() {
                     }}
                     whileInView={{ opacity: 1, scale: 1, translateY: 0 }}
                     transition={{ duration: 0.7, ease: "easeInOut" }}
+                    viewport={{ once: true }}
+
                 >
                     <p className="text-4xl font-bold font-mono">
                         {/* This should be dynamic, fetching from the backend */}
-                        {convertNumberToK(50000)}
+                        {convertNumberToK(150)}+
                     </p>
                 </motion.div>
-            </div>
-            <div className="divider lg:divider-horizontal"></div>
-
-            <div className="flex flex-col items-center justify-center p-4">
-                {/* Number of venues */}
                 <motion.div
                     viewport={{ once: true }}
                     initial={{
@@ -86,6 +105,11 @@ export default function Stats() {
                         Registered venues
                     </p>
                 </motion.div>
+            </div>
+            <div className="divider lg:divider-horizontal"></div>
+
+            <div className="flex flex-col items-center justify-center p-4">
+                {/* Daily bookings */}
                 <motion.div
                     // viewport={{ once: true }}
                     initial={{
@@ -96,17 +120,14 @@ export default function Stats() {
                     }}
                     whileInView={{ opacity: 1, scale: 1, translateY: 0 }}
                     transition={{ duration: 0.7, ease: "easeInOut" }}
+                    viewport={{ once: true }}
+
                 >
                     <p className="text-4xl font-bold font-mono">
                         {/* This should be dynamic, fetching from the backend */}
-                        {convertNumberToK(150)}+
+                        {convertNumberToK(2000)}
                     </p>
                 </motion.div>
-            </div>
-            <div className="divider lg:divider-horizontal"></div>
-
-            <div className="flex flex-col items-center justify-center p-4">
-                {/* Daily bookings */}
                 <motion.div
                     viewport={{ once: true }}
                     initial={{
@@ -117,22 +138,6 @@ export default function Stats() {
                 >
                     <p className="text-4xl font-bold font-mono">
                         Daily bookings
-                    </p>
-                </motion.div>
-                <motion.div
-                    // viewport={{ once: true }}
-                    initial={{
-                        // make a pop up effect from bottom
-                        opacity: 0,
-                        translateY: 20,
-                        scale: 0.8
-                    }}
-                    whileInView={{ opacity: 1, scale: 1, translateY: 0 }}
-                    transition={{ duration: 0.7, ease: "easeInOut" }}
-                >
-                    <p className="text-4xl font-bold font-mono">
-                        {/* This should be dynamic, fetching from the backend */}
-                        {convertNumberToK(2000)}
                     </p>
                 </motion.div>
             </div>
