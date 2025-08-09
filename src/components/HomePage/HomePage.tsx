@@ -5,6 +5,8 @@ import { CarouselLayoverProps } from '../FrontPage/CarouselLayover';
 import MovieCard, { MovieCardProps } from '../MovieCard';
 import Stats from '../FrontPage/Stats';
 import Footer from '../FrontPage/footer';
+import { useQuery } from '@tanstack/react-query';
+import { fetchNowPlayingMovies, getUpcomingMovies } from './getNowPlayingMovies';
 
 export default function HomePage() {
 
@@ -74,6 +76,26 @@ export default function HomePage() {
     ],
   );
 
+  const {
+    isError: isErrorNowPlayingMovies,
+    isLoading: isLoadingNowPlayingMovies,
+    data: nowPlayingMovies
+  } = useQuery({
+    queryKey: ['nowPlayingMovies'],
+    queryFn: fetchNowPlayingMovies,
+    refetchOnWindowFocus: false,
+  })
+
+  const {
+    isError: isErrorUpcomingMovies,
+    isLoading: isLoadingUpcomingMovies,
+    data: upcomingMoviesData
+  } = useQuery({
+    queryKey: ['upcomingMovies', { date: new Date().toISOString().split('T')[0] }],
+    queryFn: getUpcomingMovies,
+    refetchOnWindowFocus: false
+  });
+
   const [movieCards, setMovieCards] = useState<MovieCardProps[]>([{
     rating: 4.5,
     imageURL: "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
@@ -136,23 +158,31 @@ export default function HomePage() {
   return (
     <div>
       <Navbar isLoggedIn={isLoggedIn} />
-      <Carousel CarouselLayoverProps={
-        CarouselLayoverProps
-      }
-        imageURLs={
-          [
-            "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-            "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg"
-          ]
+      <div className='m-2'>
+        <Carousel isLoading={true} CarouselLayoverProps={
+          CarouselLayoverProps
         }
-        shouldAutoScroll={true}
-        scrollInterval={5000}
-      />
+          imageURLs={
+            [
+              "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+              "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg"
+            ]
+          }
+          shouldAutoScroll={true}
+          scrollInterval={5000}
+        />
+      </div>
       <div>
         {/* Now Playing cards section */}
-        <h2 className='text-2xl h-2 font-bold my-4'>Now Playing Movies</h2>
+        <h2 className='text-2xl h-2 font-bold my-4 p-4'>Now Playing Movies</h2>
         <div className='flex flex-row items-center flex-wrap gap-4 p-4'>
-          {movieCards.map((movieCard) => (
+          {
+            isLoadingNowPlayingMovies && <div className="skeleton h-96 w-full max-w-screen" />
+          }
+          {
+            isErrorNowPlayingMovies && <div className="text-red-500">Error loading now playing movies</div>
+          }
+          {nowPlayingMovies && nowPlayingMovies.length > 0 && nowPlayingMovies.map((movieCard: MovieCardProps) => (
             <MovieCard
               key={movieCard.movie_id}
               rating={movieCard.rating}
@@ -163,14 +193,43 @@ export default function HomePage() {
               comingSoon={movieCard.comingSoon}
             />
           ))}
+
+          {/* {nowPlayingMovies && movieCards.map((movieCard) => (
+            <MovieCard
+              key={movieCard.movie_id}
+              rating={movieCard.rating}
+              imageURL={movieCard.imageURL}
+              movie_id={movieCard.movie_id}
+              movie_name={movieCard.movie_name}
+              votes={movieCard.votes}
+              comingSoon={movieCard.comingSoon}
+            />
+          ))} */}
         </div>
         <div className='divider'></div>
       </div>
       <div>
         {/* Upcoming card section */}
-        <h2 className='text-2xl h-2 font-bold my-4'>Upcoming Movies</h2>
+        <h2 className='text-2xl h-2 font-bold my-4 p-4'>Upcoming Movies</h2>
         <div className='flex flex-row items-center flex-wrap gap-4 p-4'>
-          {upcomingMovies.map((movieCard) => (
+          {
+            isLoadingUpcomingMovies && <div className="skeleton h-96 w-full max-w-screen" />
+          }
+          {
+            isErrorUpcomingMovies && <div className="text-red-500">Error loading upcoming movies</div>
+          }
+          {upcomingMoviesData && upcomingMoviesData.length > 0 && upcomingMoviesData.map((movieCard: MovieCardProps) => (
+            <MovieCard
+              key={movieCard.movie_id}
+              rating={movieCard.rating}
+              imageURL={movieCard.imageURL}
+              movie_id={movieCard.movie_id}
+              movie_name={movieCard.movie_name}
+              votes={movieCard.votes}
+              comingSoon={true}
+            />
+          ))}
+          {/* {upcomingMovies.map((movieCard) => (
             <MovieCard
               key={movieCard.movie_id}
               rating={movieCard.rating}
@@ -180,7 +239,7 @@ export default function HomePage() {
               votes={movieCard.votes}
               comingSoon={movieCard.comingSoon}
             />
-          ))}
+          ))} */}
         </div>
         <div className='divider'></div>
       </div>

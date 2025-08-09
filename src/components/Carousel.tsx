@@ -6,6 +6,7 @@ export interface CarouselProps {
     shouldAutoScroll: boolean;
     scrollInterval: number; // in ms
     CarouselLayoverProps: CarouselLayoverProps[];
+    isLoading: boolean;
 }
 
 export default function Carousel(props: CarouselProps) {
@@ -45,6 +46,15 @@ export default function Carousel(props: CarouselProps) {
     if (imageURLs.length === 0) {
         return (
             <div className={`skeleton h-96 w-full`} />
+        );
+    }
+
+    if (props.isLoading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                {/* Add a skeleton */}
+                <div className="skeleton h-96 w-full max-w-screen" />
+            </div>
         );
     }
 
