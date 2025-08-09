@@ -6,7 +6,7 @@ import MovieCard, { MovieCardProps } from '../MovieCard';
 import Stats from '../FrontPage/Stats';
 import Footer from '../FrontPage/footer';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNowPlayingMovies, getUpcomingMovies } from './getNowPlayingMovies';
+import { fetchNowPlayingMovies, getUpcomingMovies, Movie } from './getNowPlayingMovies';
 
 export default function HomePage() {
 
@@ -80,7 +80,7 @@ export default function HomePage() {
     isError: isErrorNowPlayingMovies,
     isLoading: isLoadingNowPlayingMovies,
     data: nowPlayingMovies
-  } = useQuery({
+  } = useQuery<Movie[]>({
     queryKey: ['nowPlayingMovies'],
     queryFn: fetchNowPlayingMovies,
     refetchOnWindowFocus: false,
@@ -182,15 +182,15 @@ export default function HomePage() {
           {
             isErrorNowPlayingMovies && <div className="text-red-500">Error loading now playing movies</div>
           }
-          {nowPlayingMovies && nowPlayingMovies.length > 0 && nowPlayingMovies.map((movieCard: MovieCardProps) => (
+          {nowPlayingMovies && nowPlayingMovies.length > 0 && nowPlayingMovies.map((movieCard: Movie) => (
             <MovieCard
-              key={movieCard.movie_id}
-              rating={movieCard.rating}
-              imageURL={movieCard.imageURL}
-              movie_id={movieCard.movie_id}
-              movie_name={movieCard.movie_name}
+              key={movieCard.id}
+              rating={movieCard.ranking}
+              imageURL={movieCard.poster_url}
+              movie_id={movieCard.id}
+              movie_name={movieCard.title}
               votes={movieCard.votes}
-              comingSoon={movieCard.comingSoon}
+              comingSoon={false}
             />
           ))}
 
