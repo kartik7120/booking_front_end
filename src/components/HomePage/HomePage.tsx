@@ -41,7 +41,7 @@ export default function HomePage() {
     if (!nowPlayingMovies || !upcomingMoviesData) return;
     const sortedMovies = sortMovies([...nowPlayingMovies, ...upcomingMoviesData]);
 
-    console.log(`Sorted Movies:`, sortedMovies);
+    // console.log(`Sorted Movies:`, sortedMovies);
 
     if (sortedMovies.length === 0) {
       useStateCarouselLayoverProps([]);
