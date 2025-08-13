@@ -67,7 +67,7 @@ export default function HomePage() {
   useEffect(() => {
     // Read the cookies to check if the user is logged in
     const cookies = document.cookie.split('; ');
-    const loggedInCookie = cookies.find(cookie => cookie.startsWith('isLoggedIn='));
+    const loggedInCookie = cookies.find(cookie => cookie.startsWith('auth_token='));
 
     if (loggedInCookie) {
       const isLoggedInValue = loggedInCookie.split('=')[1];
@@ -105,7 +105,16 @@ export default function HomePage() {
             isLoadingNowPlayingMovies && <div className="skeleton h-96 w-full max-w-screen" />
           }
           {
-            isErrorNowPlayingMovies && <div className="text-red-500">Error loading now playing movies</div>
+            isErrorNowPlayingMovies && <div className="flex flex-col items-center justify-center w-full h-96">
+              <p className="text-red-500">Error loading now playing movies</p>
+              <p className="text-gray-500">Please try again later.</p>
+            </div>
+          }
+          {
+            nowPlayingMovies && nowPlayingMovies.length === 0 && <div className="flex flex-col items-center justify-center w-full h-96">
+              <p className="text-gray-500">No movies currently playing.</p>
+              <p className="text-gray-500">Check back later for updates.</p>
+            </div>
           }
           {nowPlayingMovies && nowPlayingMovies.length > 0 && nowPlayingMovies.map((movieCard: Movie) => (
             <MovieCard
@@ -129,7 +138,16 @@ export default function HomePage() {
             isLoadingUpcomingMovies && <div className="skeleton h-96 w-full max-w-screen" />
           }
           {
-            isErrorUpcomingMovies && <div className="text-red-500">Error loading upcoming movies</div>
+            isErrorUpcomingMovies && <div className="flex flex-col items-center justify-center w-full h-96">
+              <p className="text-red-500">Error loading upcoming movies</p>
+              <p className="text-gray-500">Please try again later.</p>
+            </div>
+          }
+          {
+            upcomingMoviesData && upcomingMoviesData.length === 0 && <div className="flex flex-col items-center justify-center w-full h-96">
+              <p className="text-gray-500">No upcoming movies available.</p>
+              <p className="text-gray-500">Check back later for updates.</p>
+            </div>
           }
           {upcomingMoviesData && upcomingMoviesData.length > 0 && upcomingMoviesData.map((movieCard: UpcomingMovies) => (
             <MovieCard
@@ -152,3 +170,11 @@ export default function HomePage() {
     </div>
   )
 }
+
+/**
+ * TODO: Impletement error handling for the queries
+ * TODO: Add logic to flush the cookies when the user logs out or if token expires
+ * TODO: Add navigation logic to navigate to the movie details page when a movie card is clicked
+ * TODO: Add logic to handle the case when there are no movies in the now playing or upcoming sections - DONE
+ * TODO: Add loading skeletons for the movie cards
+ */
