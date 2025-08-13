@@ -1,86 +1,24 @@
-import React, { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../FrontPage/Navbar'
-import Carousel, { CarouselProps } from '../Carousel'
+import Carousel from '../Carousel'
 import { CarouselLayoverProps } from '../FrontPage/CarouselLayover';
-import MovieCard, { MovieCardProps } from '../MovieCard';
+import MovieCard from '../MovieCard';
 import Stats from '../FrontPage/Stats';
 import Footer from '../FrontPage/footer';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNowPlayingMovies, getUpcomingMovies, Movie } from './getNowPlayingMovies';
+import { fetchNowPlayingMovies, getUpcomingMovies, Movie, UpcomingMovies } from './getNowPlayingMovies';
+import { sortMovies } from '../../utils/util';
 
 export default function HomePage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [CarouselLayoverProps, useStateCarouselLayoverProps] = useState<CarouselLayoverProps[]>(
-    [
-      {
-        title: "The Batman",
-        genreTags: ["Action", "Sci-fi"],
-        rating: 3,
-        summary: "bwhevruwvghuirhwyghwrignjuiwrnguirwnguirnwgunruignwuhgirwnguirnwgubnwrigbhwbrgyu",
-        duration: 4500000,
-        releaseYear: 2008,
-        cast_crew: [
-          {
-            "name": "Robert Pattinson",
-            "character_name": "Bruce Wayne / Batman",
-            "photourl": "https://example.com/robert_pattinson.jpg"
-          },
-          {
-            "name": "Zoë Kravitz",
-            "character_name": "Selina Kyle / Catwoman",
-            "photourl": "https://example.com/zoe_kravitz.jpg"
-          },
-          {
-            "name": "Paul Dano",
-            "character_name": "Edward Nashton / Riddler",
-            "photourl": "https://example.com/paul_dano.jpg"
-          },
-          {
-            "name": "Matt Reeves",
-            "character_name": "Director",
-            "photourl": "https://example.com/matt_reeves.jpg"
-          }
-        ]
-      },
-      {
-        title: "Interstellar",
-        genreTags: ["Sci-fi", "Drama"],
-        rating: 4,
-        summary: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
-        duration: 7200000,
-        releaseYear: 2014,
-        cast_crew: [
-          {
-            "name": "Ryan Gosling",
-            "character_name": "K",
-            "photourl": "https://example.com/ryan_gosling.jpg"
-          },
-          {
-            "name": "Harrison Ford",
-            "character_name": "Rick Deckard",
-            "photourl": "https://example.com/harrison_ford.jpg"
-          },
-          {
-            "name": "Ana de Armas",
-            "character_name": "Joi",
-            "photourl": "https://example.com/ana_de_armas.jpg"
-          },
-          {
-            "name": "Denis Villeneuve",
-            "character_name": "Director",
-            "photourl": "https://example.com/denis_villeneuve.jpg"
-          }
-        ]
-      }
-    ],
-  );
+  const [CarouselLayoverProps, useStateCarouselLayoverProps] = useState<CarouselLayoverProps[]>([]);
 
   const {
     isError: isErrorNowPlayingMovies,
     isLoading: isLoadingNowPlayingMovies,
     data: nowPlayingMovies
-  } = useQuery<Movie[]>({
+  } = useQuery<UpcomingMovies[]>({
     queryKey: ['nowPlayingMovies'],
     queryFn: fetchNowPlayingMovies,
     refetchOnWindowFocus: false,
@@ -90,82 +28,69 @@ export default function HomePage() {
     isError: isErrorUpcomingMovies,
     isLoading: isLoadingUpcomingMovies,
     data: upcomingMoviesData
-  } = useQuery({
+  } = useQuery<UpcomingMovies[]>({
     queryKey: ['upcomingMovies', { date: new Date().toISOString().split('T')[0] }],
     queryFn: getUpcomingMovies,
     refetchOnWindowFocus: false
   });
 
-  const [movieCards, setMovieCards] = useState<MovieCardProps[]>([{
-    rating: 4.5,
-    imageURL: "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-    movie_id: 1,
-    movie_name: "Inception",
-    votes: 1500,
-    comingSoon: false
-  },
-  {
-    rating: 4.0,
-    imageURL: "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
-    movie_id: 2,
-    movie_name: "The Dark Knight",
-    votes: 2000,
-    comingSoon: false
-  },
-  {
-    rating: 3.5,
-    imageURL: "https://image.tmdb.org/t/p/w1280/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg",
-    movie_id: 3,
-    movie_name: "Interstellar",
-    votes: 1200,
-    comingSoon: false
-  }
-  ]);
+  // Write a memo function to sort movies and upcoming movies by their ranking and if not present then by their votes or by their release date
+  // import sortMovies from '../../utils/util';
 
-  const [upcomingMovies, setUpcomingMovies] = useState<MovieCardProps[]>([{
-    rating: 0,
-    imageURL: "https://image.tmdb.org/t/p/w1280/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg",
-    movie_id: 4,
-    movie_name: "Dune Part Two",
-    votes: 0,
-    comingSoon: true
-  },
-  {
-    rating: 0,
-    imageURL: "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
-    movie_id: 5,
-    movie_name: "Avatar 3",
-    votes: 0,
-    comingSoon: true
-  },
-  {
-    rating: 0,
-    imageURL: "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-    movie_id: 6,
-    movie_name: "Guardians of the Galaxy Vol. 3",
-    votes: 0,
-    comingSoon: true
-  },
-  {
-    movie_name: "Mission: Impossible 7",
-    movie_id: 7,
-    imageURL: "https://image.tmdb.org/t/p/w1280/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg",
-    rating: 0,
-    votes: 0,
-    comingSoon: true
-  }])
+  useMemo(() => {
+    if (!nowPlayingMovies || !upcomingMoviesData) return;
+    const sortedMovies = sortMovies([...nowPlayingMovies, ...upcomingMoviesData]);
+
+    console.log(`Sorted Movies:`, sortedMovies);
+
+    if (sortedMovies.length === 0) {
+      useStateCarouselLayoverProps([]);
+      return;
+    }
+
+    // Update the state with sorted movies
+    useStateCarouselLayoverProps(sortedMovies.map(movie => ({
+      title: movie.title,
+      genreTags: movie.type,
+      rating: movie.ranking,
+      summary: movie.description,
+      duration: movie.duration * 60000, // Convert minutes to milliseconds
+      releaseYear: new Date(movie.release_date).getFullYear(),
+      cast_crew: movie.cast_crew.map(crew => ({
+        name: crew.name,
+        character_name: crew.character_name,
+        photourl: crew.photourl
+      }))
+    })));
+  }, [nowPlayingMovies, upcomingMoviesData]);
+
+  useEffect(() => {
+    // Read the cookies to check if the user is logged in
+    const cookies = document.cookie.split('; ');
+    const loggedInCookie = cookies.find(cookie => cookie.startsWith('isLoggedIn='));
+
+    if (loggedInCookie) {
+      const isLoggedInValue = loggedInCookie.split('=')[1];
+      setIsLoggedIn(isLoggedInValue === 'true');
+    } else {
+      setIsLoggedIn(false);
+    }
+
+  }, []);
 
   return (
     <div>
       <Navbar isLoggedIn={isLoggedIn} />
       <div className='m-2'>
-        <Carousel isLoading={true} CarouselLayoverProps={
+        <Carousel isLoading={!(CarouselLayoverProps && CarouselLayoverProps.length > 0)} CarouselLayoverProps={
           CarouselLayoverProps
         }
           imageURLs={
             [
               "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-              "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg"
+              "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
+              "https://image.tmdb.org/t/p/w1280/9GAGg2k5b6d8c4a7e1f3b4f5f5f5.jpg",
+              "https://image.tmdb.org/t/p/w1280/8X2k5b6d8c4a7e1f3b4f5f5f5f5.jpg",
             ]
           }
           shouldAutoScroll={true}
@@ -193,18 +118,6 @@ export default function HomePage() {
               comingSoon={false}
             />
           ))}
-
-          {/* {nowPlayingMovies && movieCards.map((movieCard) => (
-            <MovieCard
-              key={movieCard.movie_id}
-              rating={movieCard.rating}
-              imageURL={movieCard.imageURL}
-              movie_id={movieCard.movie_id}
-              movie_name={movieCard.movie_name}
-              votes={movieCard.votes}
-              comingSoon={movieCard.comingSoon}
-            />
-          ))} */}
         </div>
         <div className='divider'></div>
       </div>
@@ -218,32 +131,23 @@ export default function HomePage() {
           {
             isErrorUpcomingMovies && <div className="text-red-500">Error loading upcoming movies</div>
           }
-          {upcomingMoviesData && upcomingMoviesData.length > 0 && upcomingMoviesData.map((movieCard: MovieCardProps) => (
+          {upcomingMoviesData && upcomingMoviesData.length > 0 && upcomingMoviesData.map((movieCard: UpcomingMovies) => (
             <MovieCard
-              key={movieCard.movie_id}
-              rating={movieCard.rating}
-              imageURL={movieCard.imageURL}
-              movie_id={movieCard.movie_id}
-              movie_name={movieCard.movie_name}
-              votes={movieCard.votes}
               comingSoon={true}
+              imageURL={movieCard.poster_url}
+              movie_id={movieCard.id}
+              movie_name={movieCard.title}
+              rating={movieCard.ranking}
+              votes={movieCard.votes}
+              key={movieCard.id}
             />
           ))}
-          {/* {upcomingMovies.map((movieCard) => (
-            <MovieCard
-              key={movieCard.movie_id}
-              rating={movieCard.rating}
-              imageURL={movieCard.imageURL}
-              movie_id={movieCard.movie_id}
-              movie_name={movieCard.movie_name}
-              votes={movieCard.votes}
-              comingSoon={movieCard.comingSoon}
-            />
-          ))} */}
         </div>
         <div className='divider'></div>
       </div>
-      <Stats />
+      <div className='m-4'>
+        <Stats />
+      </div>
       <Footer />
     </div>
   )

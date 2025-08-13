@@ -86,7 +86,7 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
       </div>
 
       {/* Right Side */}
-      <div className="flex flex-col gap-2 p-2 w-full lg:w-1/3 text-sm sm:text-base">
+      {/* <div className="flex flex-col gap-2 p-2 w-full lg:w-1/3 text-sm sm:text-base">
         <div className="flex flex-row flex-wrap gap-x-2 justify-start lg:justify-end">
           <p>{props.cast_crew.find(val => val.character_name === "Director")?.name}</p>
           <p className="text-yellow-500">: Director</p>
@@ -98,10 +98,33 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
           ))}
           <p className="text-yellow-500">: Stars</p>
         </div>
+        <div>
+          <p className="line-clamp-3 text-justify break-words w-full lg:w-96">
+            {props.summary}
+          </p>
+        </div>
+      </div> */}
+      <div className="flex flex-col gap-2 w-full lg:w-1/3 text-sm sm:text-base">
+        {/* Director */}
+        <div className="flex flex-wrap gap-x-2 justify-start lg:justify-end items-center">
+          <p>{props.cast_crew.find(val => val.character_name === "Director")?.name}</p>
+          <p className="text-yellow-500">: Director</p>
+        </div>
 
-        <p className="line-clamp-3 text-justify break-words w-full lg:w-96">
-          {props.summary}
-        </p>
+        {/* Stars */}
+        <div className="flex flex-wrap gap-x-2 justify-start lg:justify-end items-center">
+          {props.cast_crew.filter(val => val.character_name !== "Director").map((val, idx) => (
+            <span key={idx}>{val.name}</span>
+          ))}
+          <p className="text-yellow-500">: Stars</p>
+        </div>
+
+        {/* Summary */}
+        <div className="lg:text-right">
+          <p className="line-clamp-3 text-justify break-words w-full lg:max-w-[28rem]">
+            {props.summary}
+          </p>
+        </div>
       </div>
     </div>
   );
