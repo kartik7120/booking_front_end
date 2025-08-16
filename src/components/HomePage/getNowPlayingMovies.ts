@@ -33,6 +33,7 @@ export interface UpcomingMovies {
     votes: number;
     ranking: number;
     id: number;
+    screen_wide_poster_url: string;
 }
 
 export async function fetchNowPlayingMovies() {
@@ -80,4 +81,39 @@ export async function getUpcomingMovies(
     }
 
     return data;
+}
+
+export async function IsTokenValid(
+    context: QueryFunctionContext<readonly unknown[]>
+): Promise<boolean> {
+    const queryKey = context.queryKey as readonly [string];
+    const [token] = queryKey;
+
+    try {
+        const res = await fetch(`http://localhost:8080/validateToken`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error('Token validation failed');
+        }
+
+        const data = await res.json();
+
+        // If isValid is false then the token is invalid and remove the token from the cookies
+
+        if (!data.isValid) {
+            document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            return false;
+        }
+
+        return data.isValid;
+    } catch (error) {
+        console.error('Error validating token:', error);
+        return false;
+    }
 }

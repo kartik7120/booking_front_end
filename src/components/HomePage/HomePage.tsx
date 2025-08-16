@@ -6,7 +6,7 @@ import MovieCard from '../MovieCard';
 import Stats from '../FrontPage/Stats';
 import Footer from '../FrontPage/footer';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNowPlayingMovies, getUpcomingMovies, Movie, UpcomingMovies } from './getNowPlayingMovies';
+import { fetchNowPlayingMovies, getUpcomingMovies, IsTokenValid, Movie, UpcomingMovies } from './getNowPlayingMovies';
 import { sortMovies } from '../../utils/util';
 
 export default function HomePage() {
@@ -32,6 +32,19 @@ export default function HomePage() {
     queryKey: ['upcomingMovies', { date: new Date().toISOString().split('T')[0] }],
     queryFn: getUpcomingMovies,
     refetchOnWindowFocus: false
+  });
+
+  const {
+    isError: isErrorTokenValidation,
+    isLoading: isLoadingTokenValidation,
+    data: isTokenValidBool
+  } = useQuery({
+    queryKey: ['validateToken', document.cookie.split('; ').find(cookie => cookie.startsWith('auth_token='))?.split('=')[1] || ''],
+    queryFn: IsTokenValid,
+    refetchOnWindowFocus: false,
+    retry: false, // Disable retries for token validation
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isLoggedIn // Only run this query if the user is logged in
   });
 
   // Write a memo function to sort movies and upcoming movies by their ranking and if not present then by their votes or by their release date
@@ -60,7 +73,9 @@ export default function HomePage() {
         name: crew.name,
         character_name: crew.character_name,
         photourl: crew.photourl
-      }))
+      })),
+      poster_url: movie.poster_url,
+      screen_wide_poster_url: movie.screen_wide_poster_url
     })));
   }, [nowPlayingMovies, upcomingMoviesData]);
 
@@ -70,13 +85,20 @@ export default function HomePage() {
     const loggedInCookie = cookies.find(cookie => cookie.startsWith('auth_token='));
 
     if (loggedInCookie) {
-      const isLoggedInValue = loggedInCookie.split('=')[1];
-      setIsLoggedIn(isLoggedInValue === 'true');
+      const token = loggedInCookie.split('=')[1];
+      // Validate the token
+      if (isTokenValidBool) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
     } else {
       setIsLoggedIn(false);
     }
 
-  }, []);
+  }, [
+    isTokenValidBool, isLoggedIn, CarouselLayoverProps.length > 0
+  ]);
 
   return (
     <div>
@@ -86,12 +108,14 @@ export default function HomePage() {
           CarouselLayoverProps
         }
           imageURLs={
-            [
-              "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-              "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
-              "https://image.tmdb.org/t/p/w1280/9GAGg2k5b6d8c4a7e1f3b4f5f5f5.jpg",
-              "https://image.tmdb.org/t/p/w1280/8X2k5b6d8c4a7e1f3b4f5f5f5f5.jpg",
-            ]
+            // [
+            //   "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+            //   "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
+            //   "https://image.tmdb.org/t/p/w1280/9GAGg2k5b6d8c4a7e1f3b4f5f5f5.jpg",
+            //   "https://image.tmdb.org/t/p/w1280/8X2k5b6d8c4a7e1f3b4f5f5f5f5.jpg",
+            // ]
+            CarouselLayoverProps.map(item => item.poster_url || "https://via.placeholder.com/1280x720")
+            // TODO: map over screen_wide_poster_url if available
           }
           shouldAutoScroll={true}
           scrollInterval={5000}
@@ -172,9 +196,9 @@ export default function HomePage() {
 }
 
 /**
- * TODO: Impletement error handling for the queries
- * TODO: Add logic to flush the cookies when the user logs out or if token expires
+ * TODO: Impletement error handling for the queries - DONE
+ * TODO: Add logic to flush the cookies when the user logs out or if token expires - DONE
  * TODO: Add navigation logic to navigate to the movie details page when a movie card is clicked
  * TODO: Add logic to handle the case when there are no movies in the now playing or upcoming sections - DONE
- * TODO: Add loading skeletons for the movie cards
+ * TODO: Add loading skeletons for the movie cards - DONE
  */

@@ -15,6 +15,8 @@ export interface CarouselLayoverProps {
   summary?: string,
   releaseYear?: number,
   duration?: number // in milliseconds
+  poster_url?: string
+  screen_wide_poster_url?: string
 }
 
 export default function CarouselLayover(props: CarouselLayoverProps) {

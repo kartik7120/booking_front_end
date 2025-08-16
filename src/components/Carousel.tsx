@@ -82,7 +82,7 @@ export default function Carousel(props: CarouselProps) {
                     </div>
 
                     {/* Layover with responsive styling */}
-                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black/70 to-transparent text-white p-4 sm:p-6 md:p-8 z-10">
+                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black to-black text-white p-4 sm:p-6 md:p-8 z-10">
                         <CarouselLayover {...(CarouselLayovers[currentSlide] || {})} />
                     </div>
                 </div>
