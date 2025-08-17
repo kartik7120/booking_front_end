@@ -41,10 +41,12 @@ async function RequestOTP(
 ) {
   const [, email] = context.queryKey;
 
+  console.log("email id: " + email)
+
   const res = await fetch("http://localhost:8080/generateOTP", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json" // 🔧 fixed typo: "Context-Type" → "Content-Type"
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({ email })
   });
@@ -63,12 +65,13 @@ async function RegisterUser(
 
   const res = await fetch("http://localhost:8080/registerUser", {
     headers: {
-      "Context-Type": "application/json"
+      "Content-Type": "application/json"
     },
     method: "POST",
     body: JSON.stringify({
       email, password, role: "user"
-    })
+    }),
+    credentials: "include"
   })
 
   return res.json()
@@ -81,7 +84,7 @@ async function ValidateOTP(
 
   const res = await fetch("http://localhost:8080/validateOTP", {
     headers: {
-      "Context-Type": "application/json"
+      "Content-Type": "application/json"
     },
     method: "POST",
     body: JSON.stringify({
@@ -141,6 +144,7 @@ export default function Navbar(props: NavbarProps) {
 
   const {
     mutate: registerUserMutate,
+    isPending: registerUserIsPending,
     isError: isErrorRegisterUser,
   } = useMutation({
     mutationFn: RegisterUser,
@@ -216,6 +220,31 @@ export default function Navbar(props: NavbarProps) {
   const handleRequestOtp = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    try {
+      const request = await fetch(`http://localhost:8080/checkIfUserExists/${resgiterEmail || email}`)
+
+      const res = await request.json();
+
+      if (res.exists) {
+        setError("User with this email id already exists, please try login in or register using another email id")
+        setEmail("")
+        setPassword("")
+        setConfirmPassword("")
+        setIsOTPScreen(false)
+        setRegisterPassword("")
+        setResgiterEmail("")
+        return
+      }
+    } catch (error: any) {
+      setError(error)
+      setEmail("")
+      setPassword("")
+      setConfirmPassword("")
+      setIsOTPScreen(false)
+      setRegisterPassword("")
+      setResgiterEmail("")
+    }
+
     if (registerPassword !== confirmPassword) {
       console.log("password: ", registerPassword)
       console.log("confirm password: ", confirmPassword)
@@ -224,11 +253,13 @@ export default function Navbar(props: NavbarProps) {
       return;
     }
 
+    console.log('email in handleRequestOtp function: ' + resgiterEmail)
+
 
     requestOtpMutate(
       {
         signal: new AbortController().signal,
-        queryKey: ["requestOTP", email] as readonly unknown[],
+        queryKey: ["requestOTP", resgiterEmail] as readonly unknown[],
         client: queryClient,
         meta: {}
       },
@@ -248,13 +279,12 @@ export default function Navbar(props: NavbarProps) {
 
   const handleSubmitOtp = async (event: React.FormEvent) => {
     event.preventDefault();
-    const email = (event.target as HTMLFormElement).email.value;
-    const otp = (event.target as HTMLFormElement).otp.value;
-
+    const el = resgiterEmail ? resgiterEmail : email
+    const pass = registerPassword ? registerPassword : password
     validateOtpMutate(
       {
         signal: new AbortController().signal,
-        queryKey: ["validateOTP", email, otp] as readonly unknown[],
+        queryKey: ["validateOTP", el, otp] as readonly unknown[],
         client: queryClient,
         meta: {}
       },
@@ -263,18 +293,29 @@ export default function Navbar(props: NavbarProps) {
           console.log("OTP validated successfully", data);
           // After successful OTP validation, you can set the isLoggedIn state to true
           if (data.message === "OTP validated successfully") {
-            if (email && password && confirmPassword) {
+            if (el && pass) {
+              console.log('registering new user')
               registerUserMutate(
                 {
                   signal: new AbortController().signal,
-                  queryKey: ["registerUser", email, password] as readonly unknown[],
+                  queryKey: ["registerUser", el, pass] as readonly unknown[],
                   client: queryClient,
                   meta: {}
                 },
                 {
                   onSuccess: (data) => {
                     console.log("Registration successful", data);
-                    setIsOTPScreen(false); // Hide OTP screen
+                    // setIsOTPScreen(false); // Hide OTP screen
+                    queryClient.invalidateQueries({
+                      queryKey: ["getUser"]
+                    })
+
+                    const loginModal = document.getElementById('my_modal_3');
+                    if (loginModal instanceof HTMLDialogElement) {
+                      if (loginModal?.open) {
+                        loginModal.close()
+                      }
+                    }
                   },
                   onError: (error) => {
                     console.error("Registration failed", error);
@@ -404,29 +445,38 @@ export default function Navbar(props: NavbarProps) {
           } */}
           {
             // OTP screen logic
-            isOTPScreen ? (
-              <div>
-                <h3 className="font-bold text-lg">Enter OTP</h3>
-                <p className="py-4">An OTP has been sent to your email. Please enter it below.</p>
-                <div className="form-control w-full max-w-xs">
-                  <label className="label">
-                    <span className="label-text">OTP</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    className="input input-bordered w-full max-w-xs"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-control mt-6">
-                  <button type="submit" className="btn btn-primary" onClick={
-                    handleSubmitOtp
-                  } disabled={!otp.trim().length || isErrorValidateOTP || isErrorRequestOTP || isErrorRegisterUser}>Verify OTP</button>
-                </div>
+            isOTPScreen ? (registerUserIsPending ? (
+              <div className="flex flex-col items-center gap-y-2">
+                <span className="loading loading-spinner loading-xl"></span>
+                <p className="text-xl">
+                  Registering you
+                </p>
               </div>
+            ) :
+              (
+                <div>
+                  <h3 className="font-bold text-lg">Enter OTP</h3>
+                  <p className="py-4">An OTP has been sent to your email. Please enter it below.</p>
+                  <div className="form-control w-full max-w-xs">
+                    {/* <label className="label">
+                    <span className="label-text">OTP</span>
+                  </label> */}
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      className="input input-bordered w-full max-w-xs"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-control mt-6">
+                    <button type="submit" className="btn btn-primary" onClick={
+                      handleSubmitOtp
+                    } disabled={!otp.trim().length && otp.length === 6}>Verify OTP</button>
+                  </div>
+                </div>
+              )
             ) : null
           }
           {/* name of each tab group should be unique */}
