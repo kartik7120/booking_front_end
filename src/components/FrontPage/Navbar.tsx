@@ -1,7 +1,7 @@
 import { FiSearch } from "react-icons/fi"
 import CinemagicIcon from "./CinemagicIcon"
 import { CiMenuBurger } from "react-icons/ci"
-import React, { useEffect, useState } from "react"
+import React, { ReactEventHandler, useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
 import Cookies from 'js-cookie'
 
@@ -457,6 +457,15 @@ export default function Navbar(props: NavbarProps) {
     );
   }
 
+  const logout = (e: React.FormEvent<HTMLButtonElement>) => {
+
+    e.preventDefault()
+
+    Cookies.remove("auth_token");
+
+    props.setIsLoggedIn(false);
+  }
+
 
   return (
     <div className="flex items-center justify-between m-7">
@@ -482,7 +491,7 @@ export default function Navbar(props: NavbarProps) {
               <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
                 <li><button className="btn btn-soft">Profile</button></li>
                 <li><button className="btn btn-soft">My Bookings</button></li>
-                <li><button className="btn btn-soft btn-error">Log out</button></li>
+                <li><button className="btn btn-soft btn-error" onClick={logout}>Log out</button></li>
               </ul>
             </div>
           ) : (
