@@ -9,83 +9,86 @@ export interface CarouselProps {
     isLoading: boolean;
 }
 
-export default function Carousel(props: CarouselProps) {
+export default function Carousel({
+    imageURLs = [],
+    shouldAutoScroll,
+    scrollInterval = 3000,
+    CarouselLayoverProps = [],
+    isLoading,
+}: CarouselProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [width, setWidth] = useState<number>();
-    const [height, setHeight] = useState<number>();
-
-    const imageURLs = props.imageURLs || [];
-    const CarouselLayovers = props.CarouselLayoverProps || [];
 
     useEffect(() => {
-        if (props.shouldAutoScroll && imageURLs.length > 0) {
-            const intervalID = setInterval(() => {
-                setCurrentSlide((prevSlide) => (prevSlide + 1) % imageURLs.length);
-            }, props.scrollInterval || 3000);
-            return () => clearInterval(intervalID);
+        let intervalID: NodeJS.Timeout | undefined;
+
+        if (shouldAutoScroll && imageURLs.length > 0) {
+            intervalID = setInterval(() => {
+                setCurrentSlide((prev) => (prev + 1) % imageURLs.length);
+            }, scrollInterval);
         }
 
-        const handleResize = () => {
-            setWidth(window.innerWidth);
-            setHeight(window.innerHeight);
+        return () => {
+            if (intervalID) clearInterval(intervalID);
         };
-
-        window.addEventListener("resize", handleResize);
-        handleResize();
-        return () => window.removeEventListener("resize", handleResize);
-    }, [props.shouldAutoScroll, props.scrollInterval, imageURLs]);
+    }, [shouldAutoScroll, scrollInterval, imageURLs.length]);
 
     const goToNextSlide = () => {
-        setCurrentSlide((currentSlide + 1) % imageURLs.length);
+        setCurrentSlide((prev) => (prev + 1) % imageURLs.length);
     };
 
     const goToPrevSlide = () => {
-        setCurrentSlide((currentSlide - 1 + imageURLs.length) % imageURLs.length);
+        setCurrentSlide((prev) => (prev - 1 + imageURLs.length) % imageURLs.length);
     };
 
-    if (imageURLs.length === 0) {
-        return (
-            <div className={`skeleton h-96 w-full`} />
-        );
-    }
+    const renderContent = () => {
+        if (isLoading || imageURLs.length === 0) {
+            return (
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="skeleton w-full h-full" />
+                </div>
+            );
+        }
 
-    if (props.isLoading) {
         return (
-            <div className="flex justify-center items-center h-96">
-                {/* Add a skeleton */}
-                <div className="skeleton h-96 w-full max-w-screen" />
-            </div>
+            <>
+                {imageURLs.map((url, idx) => (
+                    <div
+                        key={idx}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? "opacity-100" : "opacity-0"
+                            }`}
+                    >
+                        <img
+                            src={url}
+                            alt={`Slide ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                        />
+                    </div>
+                ))}
+
+                {/* Navigation Controls */}
+                <div className="absolute left-4 right-4 top-1/2 flex justify-between transform -translate-y-1/2 z-20">
+                    <button onClick={goToPrevSlide} className="btn btn-circle bg-white/30 hover:bg-white/50 text-black">
+                        ❮
+                    </button>
+                    <button onClick={goToNextSlide} className="btn btn-circle bg-white/30 hover:bg-white/50 text-black">
+                        ❯
+                    </button>
+                </div>
+
+                {/* Layover */}
+                <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black to-transparent text-white p-4 sm:p-6 md:p-8 z-10">
+                    <CarouselLayover {...(CarouselLayoverProps[currentSlide] || {})} />
+                </div>
+            </>
         );
-    }
+    };
 
     return (
         <div className="w-full max-md:hidden">
-            <div className="relative w-full max-w-screen overflow-hidden h-[70vh] sm:h-[80vh]">
-                <div className="relative w-full h-full">
-                    {imageURLs.map((url, idx) => (
-                        <div
-                            key={idx}
-                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? "opacity-100" : "opacity-0"}`}
-                        >
-                            <img src={url} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
-                        </div>
-                    ))}
-
-                    {/* Navigation controls */}
-                    <div className="absolute left-4 right-4 top-1/2 flex justify-between transform -translate-y-1/2 z-20">
-                        <button onClick={goToPrevSlide} className="btn btn-circle bg-white/30 hover:bg-white/50 text-black">
-                            ❮
-                        </button>
-                        <button onClick={goToNextSlide} className="btn btn-circle bg-white/30 hover:bg-white/50 text-black">
-                            ❯
-                        </button>
-                    </div>
-
-                    {/* Layover with responsive styling */}
-                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black to-black text-white p-4 sm:p-6 md:p-8 z-10">
-                        <CarouselLayover {...(CarouselLayovers[currentSlide] || {})} />
-                    </div>
-                </div>
+            {/* Aspect ratio wrapper to prevent layout shift */}
+            <div className="relative w-full aspect-[16/9] overflow-hidden">
+                {renderContent()}
             </div>
             <div className="divider"></div>
         </div>
