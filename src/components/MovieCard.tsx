@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 export interface MovieCardProps {
     rating: number; // out of 5
     imageURL: string;
@@ -8,10 +10,14 @@ export interface MovieCardProps {
 }
 
 export default function MovieCard(props: MovieCardProps) {
+
+  const navigate = useNavigate();
+
   const handleOnClick = () => {
     // Navigate to the details page
-
+    navigate(`movie/${props.movie_id}`)
   };
+
 
   return (
     <div

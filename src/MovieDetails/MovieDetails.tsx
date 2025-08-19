@@ -89,8 +89,16 @@ export default function MovieDetails() {
 
     const navigate = useNavigate();
 
-    if (id === null || id === undefined) {
-        id = "13"
+    if (!id) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[70vh] text-center px-4">
+                <h2 className="text-2xl font-semibold mb-4">Movie not found</h2>
+                <p className="text-gray-500 mb-6">We couldn’t load the movie details. Please check the URL or try again.</p>
+                <button className="btn btn-primary" onClick={() => navigate("/")}>
+                    Go to Home
+                </button>
+            </div>
+        );
     }
 
     const { data: movieDetails, error, status, isError } = useQuery<MovieDetailsResponse>({
@@ -105,19 +113,20 @@ export default function MovieDetails() {
 
     const { data: movieReviews, error: movieReviewResponseError, status: movieReviewResponseStatus, isError: movieReviewResponseIsError } = useQuery<MovieReviewResponse>({
         queryKey: ["movieReviews", id],
-        queryFn: () => fetch(`http://localhost:8080/getAllMovieReview/13`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                "limit": 5,
-                "offset": 0,
-                "sortBy": 0, // ASENDING
-                "filterBy": 0 // RATING
-            }),
-        }).then(res => res.json()),
-        // enabled: !!id, // Only run the query if id is available
+        queryFn: () =>
+            fetch(`http://localhost:8080/getAllMovieReview/${id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    limit: 5,
+                    offset: 0,
+                    sortBy: 0,
+                    filterBy: 0,
+                }),
+            }).then((res) => res.json()),
+        enabled: !!id,
         refetchOnWindowFocus: false,
         retry: true,
         retryDelay: 1000,
