@@ -8,11 +8,13 @@ import Footer from '../FrontPage/footer';
 import { useQuery } from '@tanstack/react-query';
 import { fetchNowPlayingMovies, getUpcomingMovies, IsTokenValid, Movie, UpcomingMovies } from './getNowPlayingMovies';
 import { sortMovies } from '../../utils/util';
+import Cookies from "js-cookie"
 
 export default function HomePage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [CarouselLayoverProps, useStateCarouselLayoverProps] = useState<CarouselLayoverProps[]>([]);
+  const [currentUserEmail, setCurrentUserEmail] = useState("")
 
   const {
     isError: isErrorNowPlayingMovies,
@@ -34,18 +36,29 @@ export default function HomePage() {
     refetchOnWindowFocus: false
   });
 
-  const {
-    isError: isErrorTokenValidation,
-    isLoading: isLoadingTokenValidation,
-    data: isTokenValidBool
-  } = useQuery({
-    queryKey: ['validateToken', document.cookie.split('; ').find(cookie => cookie.startsWith('auth_token='))?.split('=')[1] || ''],
-    queryFn: IsTokenValid,
-    refetchOnWindowFocus: false,
-    retry: false, // Disable retries for token validation
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isLoggedIn // Only run this query if the user is logged in
-  });
+  // const {
+  //   isError: isErrorTokenValidation,
+  //   isLoading: isLoadingTokenValidation,
+  //   data: isTokenValidBool,
+  //   isSuccess: IsTokenValidSuccess
+  // } = useQuery({
+  //   queryKey: ['validateToken', document.cookie.split('; ').find(cookie => cookie.startsWith('auth_token='))?.split('=')[1] || ''],
+  //   queryFn: IsTokenValid,
+  //   refetchOnWindowFocus: false,
+  //   retry: false, // Disable retries for token validation
+  //   staleTime: 5 * 60 * 1000, // 5 minutes
+  //   enabled: isLoggedIn // Only run this query if the user is logged in
+  // });
+
+
+  // const {
+  //   data: UserDetails,
+  //   isError: isErrorUserDetails,
+  // } = useQuery({
+  //   queryKey: ['getUserDetails', currentUserEmail],
+  //   queryFn: getUserDetails,
+  //   enabled: isTokenValidBool
+  // })
 
   // Write a memo function to sort movies and upcoming movies by their ranking and if not present then by their votes or by their release date
   // import sortMovies from '../../utils/util';
@@ -81,28 +94,20 @@ export default function HomePage() {
 
   useEffect(() => {
     // Read the cookies to check if the user is logged in
-    const cookies = document.cookie.split('; ');
-    const loggedInCookie = cookies.find(cookie => cookie.startsWith('auth_token='));
-
+    const loggedInCookie = Cookies.get("auth_token")
     if (loggedInCookie) {
-      const token = loggedInCookie.split('=')[1];
       // Validate the token
-      if (isTokenValidBool) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
+      setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
     }
-
   }, [
-    isTokenValidBool, isLoggedIn, CarouselLayoverProps.length > 0
+    isLoggedIn, CarouselLayoverProps.length > 0
   ]);
 
   return (
     <div>
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <div className='m-2'>
         <Carousel isLoading={!(CarouselLayoverProps && CarouselLayoverProps.length > 0)} CarouselLayoverProps={
           CarouselLayoverProps

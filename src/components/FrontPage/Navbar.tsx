@@ -1,11 +1,13 @@
 import { FiSearch } from "react-icons/fi"
 import CinemagicIcon from "./CinemagicIcon"
 import { CiMenuBurger } from "react-icons/ci"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
+import Cookies from 'js-cookie'
 
 export interface NavbarProps {
   isLoggedIn: boolean
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -23,9 +25,9 @@ async function LoginUser(
 ) {
   const [, email, password] = context.queryKey
 
-  const res = await fetch("http://localhost:8080/login", {
+  const res = await fetch("http://localhost:8080/loginUser", {
     headers: {
-      "Context-Type": "application/json"
+      "Content-Type": "application/json"
     },
     method: "POST",
     body: JSON.stringify({
@@ -128,11 +130,46 @@ export default function Navbar(props: NavbarProps) {
   const queryClient = useQueryClient();
 
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isOTPScreen, setIsOTPScreen] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [resgiterEmail, setResgiterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
 
   const {
-    mutate
+    mutate,
+    isError: IsLoginUserError,
+    error: LoginUserError,
+    isPending: IsLoginUserPending
   } = useMutation({
     mutationFn: LoginUser,
+    onError: (error, variables, context) => {
+      setError(error.message)
+      setOtp("")
+      setEmail("")
+      setPassword("")
+      setIsOTPScreen(false)
+    },
+    onSuccess: (data, variables, context) => {
+      console.log('User successfully logged')
+      console.log('cookie = ', document.cookie)
+      const loginModal = document.getElementById('my_modal_3');
+      if (loginModal instanceof HTMLDialogElement) {
+        loginModal.close()
+      }
+
+      Cookies.set("auth_token", data.token, {
+        sameSite: "Strict",
+        secure: false,
+        expires: 7,
+        path: "/",    // makes cookie accessible across your app
+      })
+
+      props.setIsLoggedIn(true)
+    }
   })
 
   const {
@@ -226,14 +263,23 @@ export default function Navbar(props: NavbarProps) {
       const res = await request.json();
 
       if (res.exists) {
-        setError("User with this email id already exists, please try login in or register using another email id")
-        setEmail("")
-        setPassword("")
-        setConfirmPassword("")
-        setIsOTPScreen(false)
-        setRegisterPassword("")
-        setResgiterEmail("")
-        return
+        if (email === "" && password === "") {
+          setError("A user with this email already exists. Please log in or use a different email to register.")
+          setEmail("")
+          setPassword("")
+          setConfirmPassword("")
+          setIsOTPScreen(false)
+          setRegisterPassword("")
+          setResgiterEmail("")
+          return
+        }
+      } else {
+        if (email !== "" && password !== "") {
+          setError("No user associated with this email ID exists")
+          setIsOTPScreen(false)
+          setEmail("")
+          setPassword("")
+        }
       }
     } catch (error: any) {
       setError(error)
@@ -243,6 +289,7 @@ export default function Navbar(props: NavbarProps) {
       setIsOTPScreen(false)
       setRegisterPassword("")
       setResgiterEmail("")
+      return
     }
 
     if (registerPassword !== confirmPassword) {
@@ -255,26 +302,47 @@ export default function Navbar(props: NavbarProps) {
 
     console.log('email in handleRequestOtp function: ' + resgiterEmail)
 
-
-    requestOtpMutate(
-      {
-        signal: new AbortController().signal,
-        queryKey: ["requestOTP", resgiterEmail] as readonly unknown[],
-        client: queryClient,
-        meta: {}
-      },
-      {
-        onSuccess: (data) => {
-          console.log("OTP sent successfully", data);
-          setIsOTPScreen(true); // Show OTP screen
+    if (email !== "" && password !== "") {
+      requestOtpMutate(
+        {
+          signal: new AbortController().signal,
+          queryKey: ["requestOTP", email] as readonly unknown[],
+          client: queryClient,
+          meta: {}
         },
-        onError: (error) => {
-          console.log("error in handleRequestOtp function: " + error)
-          console.error("Failed to send OTP", error);
-          setError("Failed to send OTP");
+        {
+          onSuccess: (data) => {
+            console.log("OTP sent successfully", data);
+            setIsOTPScreen(true); // Show OTP screen
+          },
+          onError: (error) => {
+            console.log("error in handleRequestOtp function: " + error)
+            console.error("Failed to send OTP", error);
+            setError("Failed to send OTP");
+          }
         }
-      }
-    );
+      );
+    } else {
+      requestOtpMutate(
+        {
+          signal: new AbortController().signal,
+          queryKey: ["requestOTP", resgiterEmail] as readonly unknown[],
+          client: queryClient,
+          meta: {}
+        },
+        {
+          onSuccess: (data) => {
+            console.log("OTP sent successfully", data);
+            setIsOTPScreen(true); // Show OTP screen
+          },
+          onError: (error) => {
+            console.log("error in handleRequestOtp function: " + error)
+            console.error("Failed to send OTP", error);
+            setError("Failed to send OTP");
+          }
+        }
+      );
+    }
   }
 
   const handleSubmitOtp = async (event: React.FormEvent) => {
@@ -293,7 +361,7 @@ export default function Navbar(props: NavbarProps) {
           console.log("OTP validated successfully", data);
           // After successful OTP validation, you can set the isLoggedIn state to true
           if (data.message === "OTP validated successfully") {
-            if (el && pass) {
+            if (resgiterEmail && registerPassword) {
               console.log('registering new user')
               registerUserMutate(
                 {
@@ -309,6 +377,8 @@ export default function Navbar(props: NavbarProps) {
                     queryClient.invalidateQueries({
                       queryKey: ["getUser"]
                     })
+
+                    props.setIsLoggedIn(true)
 
                     const loginModal = document.getElementById('my_modal_3');
                     if (loginModal instanceof HTMLDialogElement) {
@@ -387,14 +457,6 @@ export default function Navbar(props: NavbarProps) {
     );
   }
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isOTPScreen, setIsOTPScreen] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [resgiterEmail, setResgiterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
 
   return (
     <div className="flex items-center justify-between m-7">
@@ -408,10 +470,20 @@ export default function Navbar(props: NavbarProps) {
         <button className="btn btn-ghost">TV Shows</button>
         {
           props.isLoggedIn ? (
-            <div className="avatar avatar-placeholder">
-              <div className="bg-neutral text-neutral-content w-8 rounded-full">
-                <span className="text-xs">UI</span>
+            <div className="dropdown dropdown-left">
+              <div tabIndex={0} role="button" className="btn m-1 rounded-full">
+                <div className="avatar avatar-placeholder">
+                  <div className="bg-neutral text-neutral-content w-full rounded-full">
+                    P
+                  </div>
+
+                </div>
               </div>
+              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                <li><button className="btn btn-soft">Profile</button></li>
+                <li><button className="btn btn-soft">My Bookings</button></li>
+                <li><button className="btn btn-soft btn-error">Log out</button></li>
+              </ul>
             </div>
           ) : (
             <button className="btn btn-primary" onClick={handleLoginClick}>Login / Signup</button>
