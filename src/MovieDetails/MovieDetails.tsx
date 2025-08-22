@@ -75,7 +75,13 @@ function calculateAverageRating(reviews: review_list | undefined): number {
         return 0;
     }
 
-    if (reviews.reviews.length === 0) {
+    console.log(`review . review in calculateAverageRating : ${reviews.reviews}`)
+
+    if (reviews.reviews === null || reviews.reviews === undefined) {
+        return 0
+    }
+
+    if (reviews.reviews && reviews.reviews.length === 0) {
         return 0;
     }
 
@@ -171,7 +177,7 @@ export default function MovieDetails() {
             <div>
                 {/* Top 5 reviews */}
                 <MovieReviewSection rating={calculateAverageRating(movieReviews?.review_list)} votings={movieReviews?.totalVotes || 0} totalReviews={movieReviews?.totalReviewCount || 0} reviews={
-                    movieReviews?.review_list.reviews.map((review) => ({
+                    movieReviews && movieReviews.review_list && movieReviews.review_list.reviews && movieReviews?.review_list.reviews.map((review) => ({
                         rating: review.rating,
                         reviewDate: new Date().toLocaleDateString(), // will be filled by created_at field in the backend
                         reviewerName: review.reviewerName, // will be filled by user name in the backend

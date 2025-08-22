@@ -87,7 +87,7 @@ export default function Carousel({
     return (
         <div className="w-full max-md:hidden">
             {/* Aspect ratio wrapper to prevent layout shift */}
-            <div className="relative w-full aspect-[16/9] overflow-hidden">
+            <div className="relative w-full h-[90vh] overflow-hidden">
                 {renderContent()}
             </div>
             <div className="divider"></div>
