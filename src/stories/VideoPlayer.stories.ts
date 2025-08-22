@@ -18,7 +18,7 @@ export const Primary: Story = {
         rating: "7",
         releaseYear: "2025",
         summary: "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-        loginImageURL: "https://res.cloudinary.com/dprpnkw6j/image/upload/v1755781796/CITYPNG.COM_The_Batman_New_Logo_2021_-_2000x2000_tizsib.png",
+        logoImageURL: "https://res.cloudinary.com/dprpnkw6j/image/upload/v1755781796/CITYPNG.COM_The_Batman_New_Logo_2021_-_2000x2000_tizsib.png",
         duration: 10800000
     }
 }

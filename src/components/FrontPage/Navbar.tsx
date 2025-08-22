@@ -4,6 +4,7 @@ import { CiMenuBurger } from "react-icons/ci"
 import React, { ReactEventHandler, useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
 import Cookies from 'js-cookie'
+import { Outlet } from "react-router"
 
 export interface NavbarProps {
   isLoggedIn: boolean
@@ -138,6 +139,20 @@ export default function Navbar(props: NavbarProps) {
 
   const [resgiterEmail, setResgiterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+
+  useEffect(() => {
+    // Read the cookies to check if the user is logged in
+    const loggedInCookie = Cookies.get("auth_token")
+    if (loggedInCookie) {
+      // Validate the token
+      props.setIsLoggedIn(true);
+    } else {
+      props.setIsLoggedIn(false);
+    }
+  }, [
+    props.isLoggedIn
+  ]);
+
 
   const {
     mutate,
@@ -468,45 +483,46 @@ export default function Navbar(props: NavbarProps) {
 
 
   return (
-    <div className="flex items-center justify-between m-7">
-      {/* Logo */}
-      <CinemagicIcon />
+    <>
+      <div className="flex items-center justify-between m-7">
+        {/* Logo */}
+        <CinemagicIcon />
 
-      {/* Desktop nav items */}
-      <div className="flex flex-row justify-between gap-4 max-sm:hidden">
-        <button className="btn btn-ghost"><FiSearch /></button>
-        <button className="btn btn-ghost">Movies</button>
-        <button className="btn btn-ghost">TV Shows</button>
-        {
-          props.isLoggedIn ? (
-            <div className="dropdown dropdown-left">
-              <div tabIndex={0} role="button" className="btn m-1 rounded-full">
-                <div className="avatar avatar-placeholder">
-                  <div className="bg-neutral text-neutral-content w-full rounded-full">
-                    P
+        {/* Desktop nav items */}
+        <div className="flex flex-row justify-between gap-4 max-sm:hidden">
+          <button className="btn btn-ghost"><FiSearch /></button>
+          <button className="btn btn-ghost">Movies</button>
+          <button className="btn btn-ghost">TV Shows</button>
+          {
+            props.isLoggedIn ? (
+              <div className="dropdown dropdown-left">
+                <div tabIndex={0} role="button" className="btn m-1 rounded-full">
+                  <div className="avatar avatar-placeholder">
+                    <div className="bg-neutral text-neutral-content w-full rounded-full">
+                      P
+                    </div>
+
                   </div>
-
                 </div>
+                <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                  <li><button className="btn btn-soft">Profile</button></li>
+                  <li><button className="btn btn-soft">My Bookings</button></li>
+                  <li><button className="btn btn-soft btn-error" onClick={logout}>Log out</button></li>
+                </ul>
               </div>
-              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                <li><button className="btn btn-soft">Profile</button></li>
-                <li><button className="btn btn-soft">My Bookings</button></li>
-                <li><button className="btn btn-soft btn-error" onClick={logout}>Log out</button></li>
-              </ul>
-            </div>
-          ) : (
-            <button className="btn btn-primary" onClick={handleLoginClick}>Login / Signup</button>
-          )
-        }
-      </div>
+            ) : (
+              <button className="btn btn-primary" onClick={handleLoginClick}>Login / Signup</button>
+            )
+          }
+        </div>
 
-      <dialog id="my_modal_3" className="modal">
-        <div className="modal-box">
-          <form method="dialog">
-            {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-          </form>
-          {/* {
+        <dialog id="my_modal_3" className="modal">
+          <div className="modal-box">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            {/* {
             isErrorRequestOTP && <div className="flex flex-col items-center justify-center w-full h-96">
               <p className="text-red-500">Error sending OTP</p>
               <p className="text-gray-500">Please try again later. {error}</p>
@@ -524,175 +540,178 @@ export default function Navbar(props: NavbarProps) {
               <p className="text-gray-500">Please try again later.</p>
             </div>
           } */}
-          {
-            // OTP screen logic
-            isOTPScreen ? (registerUserIsPending ? (
-              <div className="flex flex-col items-center gap-y-2">
-                <span className="loading loading-spinner loading-xl"></span>
-                <p className="text-xl">
-                  Registering you
-                </p>
-              </div>
-            ) :
-              (
-                <div>
-                  <h3 className="font-bold text-lg">Enter OTP</h3>
-                  <p className="py-4">An OTP has been sent to your email. Please enter it below.</p>
-                  <div className="form-control w-full max-w-xs">
-                    {/* <label className="label">
+            {
+              // OTP screen logic
+              isOTPScreen ? (registerUserIsPending ? (
+                <div className="flex flex-col items-center gap-y-2">
+                  <span className="loading loading-spinner loading-xl"></span>
+                  <p className="text-xl">
+                    Registering you
+                  </p>
+                </div>
+              ) :
+                (
+                  <div>
+                    <h3 className="font-bold text-lg">Enter OTP</h3>
+                    <p className="py-4">An OTP has been sent to your email. Please enter it below.</p>
+                    <div className="form-control w-full max-w-xs">
+                      {/* <label className="label">
                     <span className="label-text">OTP</span>
                   </label> */}
-                    <input
-                      type="text"
-                      placeholder="Enter OTP"
-                      className="input input-bordered w-full max-w-xs"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      required
-                    />
+                      <input
+                        type="text"
+                        placeholder="Enter OTP"
+                        className="input input-bordered w-full max-w-xs"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-control mt-6">
+                      <button type="submit" className="btn btn-primary" onClick={
+                        handleSubmitOtp
+                      } disabled={!otp.trim().length && otp.length === 6}>Verify OTP</button>
+                    </div>
                   </div>
-                  <div className="form-control mt-6">
-                    <button type="submit" className="btn btn-primary" onClick={
-                      handleSubmitOtp
-                    } disabled={!otp.trim().length && otp.length === 6}>Verify OTP</button>
-                  </div>
+                )
+              ) : null
+            }
+            {/* name of each tab group should be unique */}
+            {
+              !isOTPScreen && <div className="tabs tabs-box">
+                <input type="radio" name="my_tabs_6" className="tab" aria-label="Login" />
+                <div className="tab-content bg-base-100 border-base-300 p-6">
+                  <form onSubmit={
+                    handleRequestOtp
+                  }>
+                    <h3 className="font-bold text-lg">Login</h3>
+                    <div className="form-control w-full max-w-xs">
+                      <label className="label">
+                        <span className="label-text">Email</span>
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="Enter your email"
+                        className="input input-bordered w-full max-w-xs"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-control w-full max-w-xs mt-4">
+                      <label className="label">
+                        <span className="label-text">Password</span>
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Enter your password"
+                        className="input input-bordered w-full max-w-xs"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-control mt-6">
+                      <button type="submit" className="btn btn-primary">Login</button>
+                    </div>
+                  </form>
                 </div>
-              )
-            ) : null
-          }
-          {/* name of each tab group should be unique */}
-          {
-            !isOTPScreen && <div className="tabs tabs-box">
-              <input type="radio" name="my_tabs_6" className="tab" aria-label="Login" />
-              <div className="tab-content bg-base-100 border-base-300 p-6">
-                <form onSubmit={
-                  handleRequestOtp
-                }>
-                  <h3 className="font-bold text-lg">Login</h3>
-                  <div className="form-control w-full max-w-xs">
-                    <label className="label">
-                      <span className="label-text">Email</span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="input input-bordered w-full max-w-xs"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-control w-full max-w-xs mt-4">
-                    <label className="label">
-                      <span className="label-text">Password</span>
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Enter your password"
-                      className="input input-bordered w-full max-w-xs"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-control mt-6">
-                    <button type="submit" className="btn btn-primary">Login</button>
-                  </div>
-                </form>
-              </div>
 
-              <input type="radio" name="my_tabs_6" className="tab" aria-label="Register" defaultChecked />
-              <div className="tab-content bg-base-100 border-base-300 p-6">
-                <form onSubmit={
-                  handleRequestOtp
-                }>
-                  <h3 className="font-bold text-lg">Register</h3>
-                  <div className="form-control w-full max-w-xs">
-                    <label className="label">
-                      <span className="label-text">Email</span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="input input-bordered w-full max-w-xs"
-                      value={resgiterEmail}
-                      onChange={(e) => setResgiterEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-control w-full max-w-xs mt-4">
-                    <label className="label">
-                      <span className="label-text">Password</span>
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Enter your password"
-                      className="input input-bordered w-full max-w-xs"
-                      value={registerPassword}
-                      onChange={(e) => setRegisterPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-control w-full max-w-xs mt-4">
-                    <label className="label">
-                      <span className="label-text">Confirm Password</span>
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Re-enter your password"
-                      className="input input-bordered w-full max-w-xs"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-control mt-6">
-                    <button type="submit" className="btn btn-primary">Register</button>
-                  </div>
-                </form>
+                <input type="radio" name="my_tabs_6" className="tab" aria-label="Register" defaultChecked />
+                <div className="tab-content bg-base-100 border-base-300 p-6">
+                  <form onSubmit={
+                    handleRequestOtp
+                  }>
+                    <h3 className="font-bold text-lg">Register</h3>
+                    <div className="form-control w-full max-w-xs">
+                      <label className="label">
+                        <span className="label-text">Email</span>
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="Enter your email"
+                        className="input input-bordered w-full max-w-xs"
+                        value={resgiterEmail}
+                        onChange={(e) => setResgiterEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-control w-full max-w-xs mt-4">
+                      <label className="label">
+                        <span className="label-text">Password</span>
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Enter your password"
+                        className="input input-bordered w-full max-w-xs"
+                        value={registerPassword}
+                        onChange={(e) => setRegisterPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-control w-full max-w-xs mt-4">
+                      <label className="label">
+                        <span className="label-text">Confirm Password</span>
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Re-enter your password"
+                        className="input input-bordered w-full max-w-xs"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-control mt-6">
+                      <button type="submit" className="btn btn-primary">Register</button>
+                    </div>
+                  </form>
+                </div>
               </div>
-            </div>
-          }
-        </div>
-        {
-          error && <div className="text-red-500 mt-4">{error}</div>
-        }
-      </dialog>
-
-      {/* Sidebar toggle button - visible on small screens only */}
-      <div className="sm:hidden">
-        <div className="drawer drawer-end sm:hidden">
-          <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content">
-            <label htmlFor="my-drawer-4" className="drawer-button btn btn-ghost">
-              <CiMenuBurger size={30} />
-            </label>
+            }
           </div>
-          <div className="drawer-side z-50">
-            <label htmlFor="my-drawer-4" className="drawer-overlay"></label>
+          {
+            error && <div className="text-red-500 mt-4">{error}</div>
+          }
+        </dialog>
 
-            {/* Sidebar */}
-            <div className="relative w-80 min-h-full bg-base-200 p-4">
-              {/* Close Button */}
-              <label
-                htmlFor="my-drawer-4"
-                className="btn btn-sm btn-circle absolute right-4 top-4"
-              >
-                ✕
+        {/* Sidebar toggle button - visible on small screens only */}
+        <div className="sm:hidden">
+          <div className="drawer drawer-end sm:hidden">
+            <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+            <div className="drawer-content">
+              <label htmlFor="my-drawer-4" className="drawer-button btn btn-ghost">
+                <CiMenuBurger size={30} />
               </label>
-              <ul className="menu mt-12 text-base-content">
-                <li><a>Movies</a></li>
-                <li><a>TV Shows</a></li>
-                {props.isLoggedIn ? (
-                  <li><a>Profile</a></li>
-                ) : (
-                  <li><a>Login / Signup</a></li>
-                )}
-              </ul>
+            </div>
+            <div className="drawer-side z-50">
+              <label htmlFor="my-drawer-4" className="drawer-overlay"></label>
+
+              {/* Sidebar */}
+              <div className="relative w-80 min-h-full bg-base-200 p-4">
+                {/* Close Button */}
+                <label
+                  htmlFor="my-drawer-4"
+                  className="btn btn-sm btn-circle absolute right-4 top-4"
+                >
+                  ✕
+                </label>
+                <ul className="menu mt-12 text-base-content">
+                  <li><a>Movies</a></li>
+                  <li><a>TV Shows</a></li>
+                  {props.isLoggedIn ? (
+                    <li><a>Profile</a></li>
+                  ) : (
+                    <li><a>Login / Signup</a></li>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      {/* Render Outlet */}
+      <Outlet />
+    </>
   )
 }

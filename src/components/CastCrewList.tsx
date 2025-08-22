@@ -8,7 +8,7 @@ interface CastCrewListProps {
 
 export default function CastCrewList(props: CastCrewListProps) {
     return (
-        <div>
+        <div className="m-8">
             <div>
                 <h2 className="text-2xl font-bold mb-4">Cast</h2>
                 <div className="flex flex-row items-center justify-start gap-x-4 mb-4 flex-wrap">

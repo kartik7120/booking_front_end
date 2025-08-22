@@ -6,7 +6,7 @@ import Title from "../stories/Title";
 import React from "react";
 
 interface VideoPlayerLayoverProps {
-    loginImageURL?: string;
+    logoImageURL?: string;
     releaseYear?: string;
     rating?: string;
     duration?: string;
@@ -18,7 +18,7 @@ interface VideoPlayerLayoverProps {
 }
 
 export default function VideoPlayerLayover({
-    duration, genres, loginImageURL, rating, releaseYear, summary, movie_title, disable_autoplay, SetDisableAutoplay
+    duration, genres, logoImageURL, rating, releaseYear, summary, movie_title, disable_autoplay, SetDisableAutoplay
 }: VideoPlayerLayoverProps) {
 
     function handleWatchTralierOnClick(e: React.FormEvent) {
@@ -35,14 +35,14 @@ export default function VideoPlayerLayover({
         <div className="w-full h-full bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white p-6">
             <div className="flex flex-col flex-wrap items-left">
                 <div>
-                    {loginImageURL ? <img
-                        src={loginImageURL}
+                    {logoImageURL ? <img
+                        src={logoImageURL}
                         alt="Logo"
                         className="w-[60vh] h-auto object-contain" /> :
                         <Title title={movie_title || ""} />
                     }
                 </div>
-                <div className="flex flex-row flex-wrap items-center gap-x-4">
+                <div className="flex flex-row flex-wrap items-center gap-x-4 mt-4">
                     <div className="flex flex-row items-center gap-x-2">
                         <BsCalendar2Date />
                         <p>{releaseYear}</p>
@@ -56,15 +56,15 @@ export default function VideoPlayerLayover({
                         <p>{rating}</p>
                     </div>
                 </div>
-                <div className="flex flex-row flex-wrap items-center gap-x-4">
+                <div className="flex flex-row flex-wrap items-center gap-x-4 mt-4">
                     {
                         genres && genres.length > 0 && genres.map((g) => {
                             return <div className="badge badge-neutral">{g}</div>
                         })
                     }
                 </div>
-                <div className="max-w-[50%] m-4">
-                    <p className="line-clamp-3 text-sm leading-relaxed">
+                <div className="max-w-[50%] m-2">
+                    <p className="line-clamp-3 leading-relaxed text-xl">
                         {summary}
                     </p>
                 </div>

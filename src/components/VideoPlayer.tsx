@@ -6,7 +6,7 @@ import { formatDuration } from "../utils/util";
 interface VideoPlayerProps {
     videoURL: string;
     posterURL?: string;
-    loginImageURL?: string;
+    logoImageURL?: string;
     releaseYear?: string;
     rating?: string;
     duration?: number;
@@ -15,7 +15,7 @@ interface VideoPlayerProps {
     movie_title?: string;
 }
 
-export default function VideoPlayer({ videoURL, posterURL, duration, loginImageURL, rating, releaseYear, summary, genres, movie_title }: VideoPlayerProps) {
+export default function VideoPlayer({ videoURL, posterURL, duration, logoImageURL, rating, releaseYear, summary, genres, movie_title }: VideoPlayerProps) {
     const [error, setError] = useState(false);
     const [isReady, setIsReady] = useState(false);
     const [disableAutoPlay, setDisableAutoPlay] = useState(false)
@@ -60,7 +60,7 @@ export default function VideoPlayer({ videoURL, posterURL, duration, loginImageU
                 </div>
             </dialog>
             {/* Poster or black background until video is ready */}
-            {!isReady && (
+            {(!isReady || disableAutoPlay) && (
                 posterURL ? (
                     <img
                         src={posterURL}
@@ -114,7 +114,7 @@ export default function VideoPlayer({ videoURL, posterURL, duration, loginImageU
                     disable_autoplay={disableAutoPlay}
                     duration={formatDuration(duration || 0)}
                     genres={genres}
-                    loginImageURL={loginImageURL}
+                    logoImageURL={logoImageURL}
                     movie_title={movie_title}
                     rating={rating}
                     releaseYear={releaseYear}

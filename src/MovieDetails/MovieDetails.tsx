@@ -1,8 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import VideoPlayer from "../components/VideoPlayer";
 import { useQuery } from "@tanstack/react-query";
-import MovieDetailsTop from "./MovieDetailsTop";
-import { formatDuration } from "../utils/util";
 import CastCrewList from "../components/CastCrewList";
 import MovieReviewSection from "./MovieReviewSection";
 
@@ -152,21 +150,9 @@ export default function MovieDetails() {
     }
 
 
-    // Fetch movie details using the id
-
     return (
         <div>
-            <VideoPlayer videoURL={movieDetails.trailer_url || ""} />
-            <div className="divider"></div>
-            <div>
-                <MovieDetailsTop movieDuration={formatDuration(movieDetails.duration)}
-                    movieFormats={movieDetails.movie_resolution}
-                    movieGenres={movieDetails.type}
-                    movieLanguages={movieDetails.language}
-                    releaseDate={movieDetails.release_date}
-                    summary={movieDetails.description}
-                />
-            </div>
+            <VideoPlayer videoURL={movieDetails.trailer_url || ""} duration={movieDetails.duration} genres={movieDetails.type} logoImageURL={""} rating={"0"} movie_title={movieDetails.title} posterURL={movieDetails.poster_url} releaseYear={movieDetails.release_date} summary={movieDetails.description} />
             <div className="divider"></div>
             <div className="flex flex-col items-start">
                 {movieDetails.cast_crew && movieDetails.cast_crew.length > 0 && (

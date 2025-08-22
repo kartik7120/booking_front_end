@@ -36,33 +36,6 @@ export default function HomePage() {
     refetchOnWindowFocus: false
   });
 
-  // const {
-  //   isError: isErrorTokenValidation,
-  //   isLoading: isLoadingTokenValidation,
-  //   data: isTokenValidBool,
-  //   isSuccess: IsTokenValidSuccess
-  // } = useQuery({
-  //   queryKey: ['validateToken', document.cookie.split('; ').find(cookie => cookie.startsWith('auth_token='))?.split('=')[1] || ''],
-  //   queryFn: IsTokenValid,
-  //   refetchOnWindowFocus: false,
-  //   retry: false, // Disable retries for token validation
-  //   staleTime: 5 * 60 * 1000, // 5 minutes
-  //   enabled: isLoggedIn // Only run this query if the user is logged in
-  // });
-
-
-  // const {
-  //   data: UserDetails,
-  //   isError: isErrorUserDetails,
-  // } = useQuery({
-  //   queryKey: ['getUserDetails', currentUserEmail],
-  //   queryFn: getUserDetails,
-  //   enabled: isTokenValidBool
-  // })
-
-  // Write a memo function to sort movies and upcoming movies by their ranking and if not present then by their votes or by their release date
-  // import sortMovies from '../../utils/util';
-
   useMemo(() => {
     if (!nowPlayingMovies || !upcomingMoviesData) return;
     const sortedMovies = sortMovies([...nowPlayingMovies, ...upcomingMoviesData]);
@@ -92,22 +65,9 @@ export default function HomePage() {
     })));
   }, [nowPlayingMovies, upcomingMoviesData]);
 
-  useEffect(() => {
-    // Read the cookies to check if the user is logged in
-    const loggedInCookie = Cookies.get("auth_token")
-    if (loggedInCookie) {
-      // Validate the token
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [
-    isLoggedIn, CarouselLayoverProps.length > 0
-  ]);
-
   return (
     <div>
-      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      {/* <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> */}
       <div className='m-2'>
         <Carousel isLoading={!(CarouselLayoverProps && CarouselLayoverProps.length > 0)} CarouselLayoverProps={
           CarouselLayoverProps
