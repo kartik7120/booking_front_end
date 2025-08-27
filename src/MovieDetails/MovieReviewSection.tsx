@@ -63,7 +63,7 @@ export default function MovieReviewSection(props: MovieReviewSectionProps) {
                             <p>No reviews available</p>
                         )
                     }
-                    <button className="btn btn-primary mt-4 w-full" onClick={() => {
+                    <button className="btn btn-warning mt-4 w-full" onClick={() => {
                         navigate(`/movie/${id}/reviews`, {
                             state: {
                                 movieRating: props.rating,

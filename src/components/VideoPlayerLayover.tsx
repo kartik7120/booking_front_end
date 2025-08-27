@@ -1,7 +1,7 @@
 import { BsCalendar2Date } from "react-icons/bs";
 import { FiClock } from "react-icons/fi";
 import { GoStarFill } from "react-icons/go";
-import { FaPlay, FaTicket } from "react-icons/fa6";
+import { FaPlay } from "react-icons/fa6";
 import Title from "../stories/Title";
 import React from "react";
 
@@ -72,10 +72,6 @@ export default function VideoPlayerLayover({
                     <button className="btn btn-warning" onClick={handleWatchTralierOnClick}>
                         Watch tralier
                         <FaPlay />
-                    </button>
-                    <button className="btn btn-warning">
-                        Book ticket
-                        <FaTicket />
                     </button>
                     <button className="btn btn-warning" onClick={() => SetDisableAutoplay(!disable_autoplay)}>
                         {disable_autoplay ? "Enable" : "Disable"} auto play

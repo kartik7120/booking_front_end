@@ -80,9 +80,9 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button className="btn btn-warning">Book tickets</button>
-            <button className="btn btn-soft btn-warning">Review</button>
-            <button className="btn btn-soft btn-warning">More</button>
+            <button className="btn btn-error">Book tickets</button>
+            <button className="btn btn-soft btn-error">Review</button>
+            <button className="btn btn-soft btn-error">More</button>
           </div>
         </div>
       </div>

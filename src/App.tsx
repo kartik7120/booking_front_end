@@ -1,6 +1,6 @@
 import './App.css'
 import { Route, Routes } from 'react-router'
-import MovieTimeSlotsIndex from "./components/Index"
+import Index from "./components/MovieTimeSlots/Index"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import MovieDetails from './MovieDetails/MovieDetails'
 import HomePage from './components/HomePage/HomePage'
@@ -18,7 +18,7 @@ function App() {
         <Route path="/" element={<Navbar isLoggedIn={IsLoggedIn} setIsLoggedIn={setIsLoggedIn} />}>
           <Route index element={<HomePage />} />
           <Route path='movie/:id' element={<MovieDetails />} />
-          <Route path="movie/:id/movieTimeSlots" element={<MovieTimeSlotsIndex />} />
+          <Route path="movie/:id/movieTimeSlots" element={<Index />} />
           <Route path="movie/:id/reviews" element={<MovieReviewsIndex />} />
         </Route>
       </Routes>

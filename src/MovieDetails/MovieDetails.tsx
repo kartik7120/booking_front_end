@@ -44,6 +44,7 @@ interface MovieDetailsResponse {
     movie_resolution: string[];
     votes: number;
     id: number;
+    logoImageURL: string
 }
 
 interface MovieReviewResponse {
@@ -98,7 +99,7 @@ export default function MovieDetails() {
             <div className="flex flex-col items-center justify-center h-[70vh] text-center px-4">
                 <h2 className="text-2xl font-semibold mb-4">Movie not found</h2>
                 <p className="text-gray-500 mb-6">We couldn’t load the movie details. Please check the URL or try again.</p>
-                <button className="btn btn-primary" onClick={() => navigate("/")}>
+                <button className="btn btn-error" onClick={() => navigate("/")}>
                     Go to Home
                 </button>
             </div>
@@ -142,7 +143,44 @@ export default function MovieDetails() {
     }
 
     if (status === "pending") {
-        return <div>Loading...</div>;
+        return (
+            <div className="animate-fadeIn px-4 py-6 space-y-6">
+                {/* Poster Skeleton */}
+                <div className="w-full h-[300px] bg-gray-800 rounded-lg animate-pulse flex items-center justify-center">
+                    <span className="text-gray-500">Loading trailer...</span>
+                </div>
+
+                {/* Title & Summary Skeleton */}
+                <div className="space-y-2">
+                    <div className="h-6 w-2/3 bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 w-5/6 bg-gray-700 rounded animate-pulse" />
+                </div>
+
+                {/* Cast & Crew Skeleton */}
+                <div className="space-y-4">
+                    <div className="h-5 w-1/3 bg-gray-600 rounded animate-pulse" />
+                    <div className="flex space-x-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="w-20 h-20 bg-gray-700 rounded-full animate-pulse" />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Reviews Skeleton */}
+                <div className="space-y-2">
+                    <div className="h-5 w-1/2 bg-gray-600 rounded animate-pulse" />
+                    {[...Array(2)].map((_, i) => (
+                        <div key={i} className="h-16 bg-gray-700 rounded animate-pulse" />
+                    ))}
+                </div>
+
+                {/* Book Tickets Button Placeholder */}
+                <div className="fixed bottom-0 right-0 w-full px-4 py-3 bg-gray-800 text-center text-gray-400 animate-pulse">
+                    Loading ticket options...
+                </div>
+            </div>
+        );
     }
 
     if (status === "success") {
@@ -151,7 +189,7 @@ export default function MovieDetails() {
 
 
     return (
-        <div>
+        <div className="m-4">
             <VideoPlayer videoURL={movieDetails.trailer_url || ""} duration={movieDetails.duration} genres={movieDetails.type} logoImageURL={""} rating={"0"} movie_title={movieDetails.title} posterURL={movieDetails.poster_url} releaseYear={movieDetails.release_date} summary={movieDetails.description} />
             <div className="divider"></div>
             <div className="flex flex-col items-start">
@@ -173,15 +211,15 @@ export default function MovieDetails() {
                     })) || undefined
                 } />
             </div>
-            <div>
-                {/* book tickets button at the bottom of the page absolute */}
-                <button className="btn btn-secondary fixed bottom-0 right-0 w-full" onClick={() => {
-                    navigate(`/movie/${id}/movieTimeSlots`, {
-                        state: {
-                            movieDetails: movieDetails,
-                        }
-                    })
-                }}>
+            <div className="sticky bottom-0 z-50 bg-base-100 px-4 py-3 shadow-md">
+                <button
+                    className="btn btn-error w-full"
+                    onClick={() => {
+                        navigate(`/movie/${id}/movieTimeSlots`, {
+                            state: { movieDetails },
+                        });
+                    }}
+                >
                     Book Tickets
                 </button>
             </div>

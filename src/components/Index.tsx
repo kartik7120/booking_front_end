@@ -1,14 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import Header from './Header'
+import { useLocation } from 'react-router';
 
 export default function MovieTimeSlotIndex() {
 
+    const { state } = useLocation()
+
     return (
         <div>
-            <button className="btn">Default</button>
-            <Header />
-            <div>
-            </div>
+            
         </div>
     )
 }

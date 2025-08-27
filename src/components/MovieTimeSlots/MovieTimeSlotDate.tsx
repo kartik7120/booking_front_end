@@ -3,36 +3,32 @@ interface MovieTimeSlotDateProps {
     available: boolean; // true if the date is available for booking
     isLoading: boolean;
     onClick?: () => void; // optional click handler
+    isSelected?: boolean; // NEW: highlights selected date
 }
 
 export default function MovieTimeSlotDate(props: MovieTimeSlotDateProps) {
+    const { date, available, isLoading, isSelected, onClick } = props;
 
-    if (props.isLoading) {
-        return <div className="skeleton w-16 h-32"></div>
-    }
-
-    if (!props.date) {
-        return <div></div>
-    }
-
-    // Check if the date is in the correct format
+    if (isLoading) return <div className="skeleton w-16 h-32"></div>;
+    if (!date) return <div></div>;
 
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) return <div>Invalid date format</div>;
 
-    if (!dateRegex.test(props.date)) {
-        return <div>Invalid date format</div>
-    }
+    const day = date.split("-")[2];
+    const month = new Date(date).toLocaleString("default", { month: "short" });
+
+    const baseColor = available ? "bg-red-500 hover:bg-red-600" : "bg-gray-600 hover:bg-gray-700";
+    const cursor = available ? "cursor-pointer" : "cursor-not-allowed";
+    const ring = isSelected ? "ring-2 ring-yellow-400" : "";
 
     return (
-        <div onClick={props.onClick} className={`flex flex-col items-center justify-center p-4 rounded-lg shadow-md ${props.available ? 'bg-red-500' : 'bg-gray-600'} ${props.available ? 'hover:bg-red-600' : 'hover:bg-gray-700'} transition duration-300 ease-in-out ${props.available ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-            {/* DD of date */}
-            <p className="text-2xl font-bold text-white">
-                {props.date && props.date.split("-")[2]}
-            </p>
-            {/* Month of date */}
-            <p className="text-lg font-semibold text-white">
-                {props.date && new Date(props.date).toLocaleString('default', { month: 'short' })}
-            </p>
+        <div
+            onClick={onClick}
+            className={`flex border-2 border-black flex-col items-center justify-center p-4 rounded-lg shadow-md transition duration-300 ease-in-out ${baseColor} ${cursor} ${ring}`}
+        >
+            <p className="text-2xl font-bold text-white">{day}</p>
+            <p className="text-lg font-semibold text-white">{month}</p>
         </div>
-    )
+    );
 }

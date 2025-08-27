@@ -5,6 +5,7 @@ import TimeSlot from "./timeSlot";
 import { useLocation, useNavigate } from "react-router";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { TbBrandGoogleMaps } from "react-icons/tb";
+import Title from "../../stories/Title";
 
 export interface MovieTimeSlotRequest {
   start_date: string
@@ -15,6 +16,9 @@ export interface MovieTimeSlotRequest {
 }
 
 export async function FetchMovieTimeSlot(params: MovieTimeSlotRequest) {
+
+  console.log(`params : ${JSON.stringify(params)}`)
+
   const response = await fetch("http://localhost:8080/getMovieTimeSlots", {
     body: JSON.stringify(params),
     method: "POST",
@@ -79,18 +83,20 @@ function generateDateRange(startDate: Date, endDate: Date) {
 
 export default function Index() {
 
-  const [start_date, setStart_date] = useState<string>("2025-04-05")
-  const [end_date, setEnd_date] = useState<string>("2025-04-06")
-  const [movie_id, setMovie_id] = useState<number>(1)
-  const [longitude, setLongitude] = useState<number>(-122.4194)
-  const [latitude, setLatitude] = useState<number>(37.7749)
+  const [start_date, setStart_date] = useState<string | null>(null)
+  const [end_date, setEnd_date] = useState<string | null>(null)
+  const [movie_id, setMovie_id] = useState<number | string | null>(null)
+  const [longitude, setLongitude] = useState<number>(0)
+  const [latitude, setLatitude] = useState<number>(0)
   const [selectedDate, setSelectedDate] = useState<string>("2025-04-06")
 
   const navigate = useNavigate();
   const { state } = useLocation();
 
+  console.log(`state = ${JSON.stringify(state)}`)
+
   useEffect(() => {
-    const date = new Date("2025-04-06");
+    const date = new Date();
     const start_date = date.toISOString().split("T")[0];
     const end_date = new Date(date.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
@@ -102,7 +108,7 @@ export default function Index() {
     //   setLatitude(position.coords.latitude);
     // });
 
-    setMovie_id(state.movie_id);
+    setMovie_id(state.movieDetails.id);
     setSelectedDate(start_date); // set the selected date to start date
 
   }, [])
@@ -115,7 +121,8 @@ export default function Index() {
       longitude,
       movie_id
     } as MovieTimeSlotRequest],
-    queryFn: ({ queryKey }) => FetchMovieTimeSlot(queryKey[1] as MovieTimeSlotRequest)
+    queryFn: ({ queryKey }) => FetchMovieTimeSlot(queryKey[1] as MovieTimeSlotRequest),
+    enabled: !!start_date && !!end_date && !!movie_id,
   });
 
   // if (isLoading) {
@@ -128,6 +135,10 @@ export default function Index() {
   //   </div>
   // }
 
+  if (isSuccess) {
+    console.log(`response from get movie time slots endpoint : ${data}`)
+  }
+
   if (isError) {
     console.error(error)
     return <div>
@@ -136,7 +147,8 @@ export default function Index() {
   }
 
   return (
-    <div>
+
+    <div className="m-6 lg:m-4 sm:m-3">
       {/* Need to add movie details as to what movie is selected */}
       <div className="flex flex-col gap-y-4 mb-4">
         <div className="flex flex-row items-center gap-x-3 mb-4">
@@ -149,7 +161,13 @@ export default function Index() {
         </div>
         <div>
           {/* Movie details */}
-          <h1 className="text-3xl font-bold">{state.movie_name} - ({state.movie_language})</h1>
+          {!state.movieDetails ? (
+            <div className="animate-pulse h-10 bg-gray-600 rounded w-2/3" />
+          ) : (
+            <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+              {`${state.movieDetails.title} - (${state.movieDetails.language.join(", ")})`}
+            </h1>
+          )}
           {
             state.tags && state.tags.length > 0 && (
               <div className="flex flex-row gap-x-2 mt-2">
@@ -169,7 +187,7 @@ export default function Index() {
           {
             // Start a loop for the between start and end date and show the venues and movietimeslots based on the timeslot clicked
             // If no timeslot is available for a date then set available to false
-            generateDateRange(new Date(start_date), new Date(end_date)).map((date, idx) => (
+            start_date && end_date && generateDateRange(new Date(start_date), new Date(end_date)).map((date, idx) => (
               <MovieTimeSlotDate
                 key={idx}
                 date={date}
@@ -181,6 +199,7 @@ export default function Index() {
                   console.log("Clicked on date: ", date);
                   setSelectedDate(date);
                 }}
+                isSelected={date === selectedDate}
               />
             ))
           }
@@ -188,6 +207,20 @@ export default function Index() {
         <div className="divider"></div>
         {/* Show the venues and timeslots based the selected date */}
         <div className="flex flex-col gap-y-4">
+          {isLoading && (
+            <div className="flex flex-col gap-y-4">
+              {Array.from({ length: 2 }).map((_, idx) => (
+                <div key={idx} className="animate-pulse bg-gray-800 p-4 rounded-lg">
+                  <div className="h-6 bg-gray-600 rounded w-1/3 mb-2" />
+                  <div className="flex gap-x-2">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-10 w-20 bg-gray-600 rounded" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {
             isSuccess && data && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([venueName, movieTimeSlots], idx) => (
               // Only show the venues that have movie time slots available for the selected date

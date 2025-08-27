@@ -511,7 +511,7 @@ export default function Navbar(props: NavbarProps) {
                 </ul>
               </div>
             ) : (
-              <button className="btn btn-primary" onClick={handleLoginClick}>Login / Signup</button>
+              <button className="btn btn-warning" onClick={handleLoginClick}>Login / Signup</button>
             )
           }
         </div>
