@@ -5,7 +5,6 @@ import TimeSlot from "./timeSlot";
 import { useLocation, useNavigate } from "react-router";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { TbBrandGoogleMaps } from "react-icons/tb";
-import Title from "../../stories/Title";
 
 export interface MovieTimeSlotRequest {
   start_date: string
@@ -124,16 +123,6 @@ export default function Index() {
     queryFn: ({ queryKey }) => FetchMovieTimeSlot(queryKey[1] as MovieTimeSlotRequest),
     enabled: !!start_date && !!end_date && !!movie_id,
   });
-
-  // if (isLoading) {
-  //   return <div>
-  //     {
-  //       isLoading && Array.from({ length: 2 }).map((_, idx) => (
-  //         <MovieTimeSlotDate isLoading={true} key={idx} date={""} available={false} />
-  //       ))
-  //     }
-  //   </div>
-  // }
 
   if (isSuccess) {
     console.log(`response from get movie time slots endpoint : ${data}`)
