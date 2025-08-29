@@ -7,6 +7,7 @@ import HomePage from './components/HomePage/HomePage'
 import MovieReviewsIndex from "./components/MovieReviews/Index"
 import Navbar from './components/FrontPage/Navbar'
 import { useState } from 'react'
+import SeatSelection from './components/SeatDetails/SeatSelection'
 
 const queryClient = new QueryClient()
 
@@ -20,6 +21,7 @@ function App() {
           <Route path='movie/:id' element={<MovieDetails />} />
           <Route path="movie/:id/movieTimeSlots" element={<Index />} />
           <Route path="movie/:id/reviews" element={<MovieReviewsIndex />} />
+          <Route path="movie/:id/venue/:venueID/movieTimeSlots/:movieTimeSlotID/seatSelection" element={<SeatSelection />} />
         </Route>
       </Routes>
     </QueryClientProvider>

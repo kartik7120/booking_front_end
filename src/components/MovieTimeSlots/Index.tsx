@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import MovieTimeSlotDate from "./MovieTimeSlotDate";
-import { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import TimeSlot from "./timeSlot";
 import { useLocation, useNavigate } from "react-router";
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -38,7 +38,8 @@ export interface MovieTimeSlotResponse {
     duration: number,
     date: string,
     movieid: number,
-    venueid: number
+    venueid: number,
+    MovieTimeSlotID: number
   }[],
   venues: {
     name: string,
@@ -125,18 +126,31 @@ export default function Index() {
   });
 
   if (isSuccess) {
-    console.log(`response from get movie time slots endpoint : ${data}`)
+    console.log(`response from get movie time slots endpoint : ${JSON.stringify(data)}`)
   }
 
   if (isError) {
     console.error(error)
+
+    if (error) {
+      return <div className="flex flex-row items-center w-full h-full justify-center">
+        <p className="text-2xl text-center">{error.message}</p>
+      </div>
+    }
+
     return <div>
       Error loading dates
     </div>
   }
 
-  return (
+  function handleMovieTimeSlotClick(m: MovieTimeSlotResponse['movie_time_slots'][0]) {
 
+    // Get venue id and movieTimeSlotID from the movie time slot selected
+
+    navigate(`/movie/${m.movieid}/venue/${m.venueid}/movieTimeSlots/${m.MovieTimeSlotID}/seatSelection`)
+  }
+
+  return (
     <div className="m-6 lg:m-4 sm:m-3">
       {/* Need to add movie details as to what movie is selected */}
       <div className="flex flex-col gap-y-4 mb-4">
@@ -185,7 +199,6 @@ export default function Index() {
                 }
                 isLoading={isLoading}
                 onClick={() => {
-                  console.log("Clicked on date: ", date);
                   setSelectedDate(date);
                 }}
                 isSelected={date === selectedDate}
@@ -223,6 +236,7 @@ export default function Index() {
                           <TimeSlot
                             key={idx}
                             time={movieTimeSlot.start_time}
+                            onClick={() => handleMovieTimeSlotClick(movieTimeSlot)}
                           />
                         ))
                       }
