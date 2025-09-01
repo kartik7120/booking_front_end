@@ -53,26 +53,26 @@ export async function getMovieTimeSlot(movieTimeSlotID: string | undefined) {
 
 export default function SeatSelection() {
 
-    const params = useParams()
+    // const params = useParams()
 
-    const queryClient = useQueryClient()
-    const [error, setError] = useState("")
+    // const queryClient = useQueryClient()
+    // const [error, setError] = useState("")
 
-    const { data: venueData, error: errorVenue, isError, isLoading } = useQuery<Venue>({
-        queryKey: ['venue', params.venueID],
-        queryFn: () => getVenueDetails(params.venueID),
-    })
+    // const { data: venueData, error: errorVenue, isError, isLoading } = useQuery<Venue>({
+    //     queryKey: ['venue', params.venueID],
+    //     queryFn: () => getVenueDetails(params.venueID),
+    // })
 
-    const { data: movieTimeSlotData, error: movieTimeSlotError, isError: isMovieTimeSlotError } = useQuery<MovieTimeSlotResponse["movie_time_slots"][0]>({
-        queryKey: ['movieTimeSlot', params.movieTimeSlotID],
-        queryFn: () => getMovieTimeSlot(params.movieTimeSlotID)
-    })
+    // const { data: movieTimeSlotData, error: movieTimeSlotError, isError: isMovieTimeSlotError } = useQuery<MovieTimeSlotResponse["movie_time_slots"][0]>({
+    //     queryKey: ['movieTimeSlot', params.movieTimeSlotID],
+    //     queryFn: () => getMovieTimeSlot(params.movieTimeSlotID)
+    // })
 
-    const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id])
+    // const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id])
 
-    return (
-        <div>
-            <SeatSelectionTop venueName={venueData?.name || "N/A"} movieName={movieDetails?.title || "N/A"} showDate={movieTimeSlotData?.date} showTime={movieTimeSlotData?.start_time} />
-        </div>
-    )
+    // return (
+    //     <div>
+    //         {/* <SeatSelectionTop venueName={venueData?.name || "N/A"} movieName={movieDetails?.title || "N/A"} showDate={movieTimeSlotData?.date} showTime={movieTimeSlotData?.start_time} /> */}
+    //     </div>
+    // )
 }

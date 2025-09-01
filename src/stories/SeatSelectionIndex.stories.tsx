@@ -1,14 +1,14 @@
 import { Meta, StoryObj } from "@storybook/react";
-import Index from "../components/SeatSelection/Index";
+import SeatSelectionIndex from "../components/SeatSelection/SeatSelectionIndex";
 import withReactQuery from "../../.storybook/decorators/withReactQuery";
 import { reactRouterParameters } from "storybook-addon-remix-react-router";
 import withReactRouter from "../../.storybook/decorators/withReactRouter"
 
 const meta = {
     title: "Seat Selection/Index",
-    component: Index,
+    component: SeatSelectionIndex,
     parameters: {
-        layout:"centered",
+        layout: "centered",
         reactRouter: reactRouterParameters({
             location: {
                 pathParams: {
@@ -25,11 +25,11 @@ const meta = {
         decorators: [withReactQuery, withReactRouter],
         tags: ["autodocs"]
     }
-} satisfies Meta<typeof Index>
+} satisfies Meta<typeof SeatSelectionIndex>
 
 export default meta;
 
-type Story = StoryObj<typeof Index>;
+type Story = StoryObj<typeof SeatSelectionIndex>;
 
 export const Primary: Story = {
     args: {

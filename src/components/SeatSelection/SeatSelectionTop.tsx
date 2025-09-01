@@ -1,12 +1,11 @@
-import { useMemo } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { useNavigate } from "react-router";
 
 interface SeatSelectionTopProps {
     movieName: string;
     venueName: string;
-    showTime: Date;
-    showDate: Date;
+    showTime: string;
+    showDate: string;
 }
 
 const dayMap = {
@@ -23,6 +22,8 @@ export default function SeatSelectionTop(props: SeatSelectionTopProps) {
 
     const navigate = useNavigate();
 
+    // console.log(props.showDate)
+
     return (
         <div className="flex flex-row items-center gap-x-2 mb-4">
             <div className="cursor-pointer" onClick={() => navigate(-1)}>
@@ -34,15 +35,17 @@ export default function SeatSelectionTop(props: SeatSelectionTopProps) {
                     <p className="text-gray-500">{props.venueName}|</p>
                     <p className="text-gray-500">
                         {
-                            props.showDate.toLocaleDateString("en-US", {
-                                weekday: "long",
-                                month: "long",
-                                day: "numeric",
-                                year: "numeric"
-                            }) + " | " + props.showTime.toLocaleTimeString("en-US", {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })
+                            // props.showDate && props.showDate.toLocaleDateString("en-US", {
+                            //     weekday: "long",
+                            //     month: "long",
+                            //     day: "numeric",
+                            //     year: "numeric"
+                            // }) + " | " + props.showTime.toLocaleTimeString("en-US", {
+                            //     hour: '2-digit',
+                            //     minute: '2-digit'
+                            // })
+
+                            `${props.showDate} - ${props.showTime}`
                         }
                     </p>
                 </div>

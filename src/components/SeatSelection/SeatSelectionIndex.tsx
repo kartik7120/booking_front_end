@@ -1,9 +1,11 @@
 import { useLocation, useParams } from "react-router"
 import SeatSelectionTop from "./SeatSelectionTop";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import SeatMap, { Seat, SeatMatrix } from "./SeatMap";
 import Legend from "./Legend";
 import { useMemo, useState } from "react";
+import { Movie } from "../HomePage/getNowPlayingMovies";
+import { getVenueDetails } from "../SeatDetails/SeatSelection";
 
 export interface BookedSeats {
   id?: number;
@@ -35,6 +37,23 @@ export interface SeatMatrixType {
   id?: number;
 }
 
+interface MovieTimeSlot {
+  start_time: string;   // Format: "HH:MM:SS"
+  end_time: string;     // Format: "HH:MM:SS"
+  duration: number;     // Duration in minutes
+  date: string;         // Format: "YYYY-MM-DD"
+  movieid: number;
+  venueid: number;
+}
+
+interface VenueDetails {
+  name: string;
+  address: string;
+  rows: number;
+  columns: number;
+}
+
+
 async function fetchGetBookedSeats({
   queryKey,
 }: {
@@ -56,9 +75,9 @@ async function fetchGetBookedSeats({
       body: JSON.stringify({ "movie_time_slot_id": Number(queryKey[1]) }),
     })
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
+    // if (!response.ok) {
+    //   throw new Error("Network response was not ok");
+    // }
 
     return response.json() as Promise<GetBookedSeats>;
   } catch (error) {
@@ -99,6 +118,31 @@ async function GetSeatMatrix({
   }
 }
 
+async function GetVenueDetails(venue_id: number | string) {
+  const response = await fetch(`http://localhost:8080/getVenue/${venue_id}`)
+
+  if (!response.ok) {
+    throw new Error("error fetching get venues details ")
+  }
+
+  return response.json()
+}
+
+async function GetMovieTimeSlotDetails(movie_time_slot_id: string | undefined) {
+
+  if (movie_time_slot_id === undefined) {
+    throw new Error("movie time slot id cannot be undefined")
+  }
+
+  const response = await fetch(`http://localhost:8080/getMovieTimeSlot/${movie_time_slot_id}`)
+
+  // if (!response.ok) {
+  //   throw new Error("error requesting movie time slot details")
+  // }
+
+  return response.json()
+}
+
 function calculateNoOfRowsAndColumns(seats: SeatMatrixType[]): {
   row: number,
   column: number
@@ -119,6 +163,8 @@ export default function Index() {
 
   const { state } = useLocation();
 
+  const queryClient = useQueryClient()
+
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [rowColumnMatrix, setRowColumnMatrix] = useState<SeatMatrix>({});
 
@@ -136,7 +182,6 @@ export default function Index() {
   } = useQuery<GetBookedSeats>({
     queryKey: ['seatSelection', params.movieTimeSlotID],
     queryFn: ({ queryKey }) => fetchGetBookedSeats({ queryKey }),
-    retry: 3,
     enabled: !!params.movieTimeSlotID, // prevent firing if 0 or NaN
 
   })
@@ -155,34 +200,64 @@ export default function Index() {
   } = useQuery<GetSeatMatrix>({
     queryKey: ['seatSelection', params.venueID],
     queryFn: ({ queryKey }) => GetSeatMatrix({ queryKey }),
-    retry: 3,
     enabled: !!params.venueID
   })
+
+  const {
+    data: movieTimeSlotDetails,
+    isError: movieTimeSlotDetailsIsError,
+    error: movieTimeSlotDetailsError,
+    isSuccess: movieTimeSlotDetailsSuccess
+  } = useQuery<MovieTimeSlot>({
+    queryKey: ["movie_time_slot_details", params.movieTimeSlotID],
+    queryFn: () => GetMovieTimeSlotDetails(params.movieTimeSlotID),
+    enabled: !!params.venueID
+  })
+
+
+  const {
+    data: venueDetails,
+    isError: venueDetailsIsError,
+    error: venueDetailsError,
+    isSuccess: venueDetailsIsSuccess
+  } = useQuery<VenueDetails>({
+    queryKey: ['venue', params.venueID],
+    queryFn: () => getVenueDetails(params.venueID),
+    enabled: !!params.venueID
+  })
+
+  // if (movieTimeSlotDetailsSuccess) {
+  //   console.log("movie time slot details object: ", JSON.stringify(movieTimeSlotDetails))
+  // }
+
+  if (venueDetailsIsSuccess) {
+    console.log(`venueDetails :`, venueDetails)
+  }
 
   if (isError || isErrorSeatMatrix) {
     return <div>Error fetching seats</div>
   }
-
   const totalRows = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).row, [getSeatMatrix?.seats])
   const totalColumns = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).column, [getSeatMatrix?.seats])
+  const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id])
 
   return (
     <div className="m-6 flex flex-col justify-between gap-y-6 h-full">
       <SeatSelectionTop
         movieName={
-          state.movieName || "Movie Name Not Available"
+          movieDetails?.title || "N/A"
         }
         showDate={
-          state.showDate || new Date()
+          movieTimeSlotDetails?.date || "N/A"
         }
         showTime={
-          state.showTime || new Date()
+          movieTimeSlotDetails?.start_time || "N/A"
         }
         venueName={
-          state.venueName || "Venue Name Not Available"
+          venueDetails?.name || "N/A"
         }
       />
-      <div>
+      {/* <div>
         <SeatMap
           seats={{
             seatMap: getSeatMatrix?.seats?.map(
@@ -212,7 +287,7 @@ export default function Index() {
           setRowColumnMatrix={setRowColumnMatrix}
           setSelectSeatState={setSelectedSeats}
         />
-      </div>
+      </div> */}
       <div className="justify-center items-center flex flex-col bottom-0">
         <Legend />
       </div>
