@@ -81,6 +81,15 @@ function generateDateRange(startDate: Date, endDate: Date) {
   return dateArray;
 }
 
+function MovieTimeSlotTypeGuard(movie_time_slots: unknown): movie_time_slots is MovieTimeSlotResponse {
+
+  return (
+    movie_time_slots !== null && typeof movie_time_slots === "object" &&
+    "movie_time_slots" in movie_time_slots &&
+    Array.isArray((movie_time_slots as MovieTimeSlotResponse).movie_time_slots)
+  )
+}
+
 export default function Index() {
 
   const [start_date, setStart_date] = useState<string | null>(null)
@@ -113,7 +122,7 @@ export default function Index() {
 
   }, [])
 
-  const { data, isSuccess, error, isError, isLoading } = useQuery<MovieTimeSlotResponse>({
+  const { data, isSuccess, error, isError, isLoading } = useQuery<MovieTimeSlotResponse | { error: string }>({
     queryKey: ["getMovieTimeSlots", {
       start_date,
       end_date,
@@ -140,6 +149,12 @@ export default function Index() {
 
     return <div>
       Error loading dates
+    </div>
+  }
+
+  if (!MovieTimeSlotTypeGuard(data) && data && data.error === "No venues could be found") {
+    return <div className="flex flex-row w-full h-full items-center justify-center text-2xl">
+      No venues could be found
     </div>
   }
 
@@ -195,7 +210,7 @@ export default function Index() {
                 key={idx}
                 date={date}
                 available={
-                  isSuccess && data && data.movie_time_slots.filter((movie_time_slot) => movie_time_slot.date === date).length > 0
+                  isSuccess && MovieTimeSlotTypeGuard(data) && data.movie_time_slots && data.movie_time_slots.length > 0 && data.movie_time_slots.filter((movie_time_slot) => movie_time_slot.date === date).length > 0
                 }
                 isLoading={isLoading}
                 onClick={() => {
@@ -224,7 +239,7 @@ export default function Index() {
             </div>
           )}
           {
-            isSuccess && data && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([venueName, movieTimeSlots], idx) => (
+            isSuccess && MovieTimeSlotTypeGuard(data) && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([venueName, movieTimeSlots], idx) => (
               // Only show the venues that have movie time slots available for the selected date
               movieTimeSlots.filter((movieTimeSlot) => movieTimeSlot.date === selectedDate).length > 0 && (
                 <div className="flex flex-row items-center justify-between gap-x-4 p-4 bg-gray-700 rounded-lg shadow-md flex-wrap" key={idx}>
@@ -255,7 +270,7 @@ export default function Index() {
             ))
           }
           {
-            isSuccess && data && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([_, movieTimeSlots], idx) => (
+            isSuccess && MovieTimeSlotTypeGuard(data) && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([_, movieTimeSlots], idx) => (
               movieTimeSlots.filter((movieTimeSlot) => movieTimeSlot.date === selectedDate).length === 0 && (
                 <div className="flex flex-row items-center justify-between gap-x-4 p-4 bg-gray-700 rounded-lg shadow-md flex-wrap">
                   <div key={0} className="flex flex-col gap-y-2">
@@ -266,7 +281,7 @@ export default function Index() {
             ))
           }
           {
-            isSuccess && data && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).length === 0 && (
+            isSuccess && MovieTimeSlotTypeGuard(data) && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).length === 0 && (
               <div className="flex flex-row items-center justify-between gap-x-4 p-4 bg-gray-700 rounded-lg shadow-md flex-wrap">
                 <div key={0} className="flex flex-col gap-y-2">
                   <h2 className="text-2xl font-bold">No movie time slots available</h2>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useCallback } from "react";
 import Seat from "./Seat";
+import { propEffect } from "motion/react";
 
 export interface Seat {
     price: number;
@@ -66,12 +67,13 @@ export default function SeatMap(props: SeatMapProps) {
         [props.setSelectSeatState, selectedSeatSet]
     );
 
-    useEffect(() => {
-        const seatMatrix: SeatMatrix = {};
+    const seatMatrix = useMemo(() => {
+        const selectedSeatSet = new Set(props.selectedSeats.map(s => s.seatNumber));
+        const matrix: SeatMatrix = {};
 
         for (let row = 0; row < props.seats.totalRows; row++) {
             const rowKey = String.fromCharCode(65 + row);
-            seatMatrix[rowKey] = [];
+            matrix[rowKey] = [];
 
             for (let col = 0; col < props.seats.totalColumns; col++) {
                 const seatNumber = `${rowKey}${col + 1}`;
@@ -82,7 +84,7 @@ export default function SeatMap(props: SeatMapProps) {
                         booked => booked.seat_number === seat.seat_number && booked.is_booked
                     );
 
-                    seatMatrix[rowKey].push({
+                    matrix[rowKey].push({
                         price: seat.price,
                         row: seat.row,
                         column: seat.column,
@@ -103,7 +105,7 @@ export default function SeatMap(props: SeatMapProps) {
                         })
                     });
                 } else {
-                    seatMatrix[rowKey].push({
+                    matrix[rowKey].push({
                         price: -1,
                         row,
                         column: col,
@@ -118,8 +120,20 @@ export default function SeatMap(props: SeatMapProps) {
             }
         }
 
-        props.setRowColumnMatrix(seatMatrix);
-    }, [props.seats, props.selectedSeats, selectedSeatSet]);
+        return matrix;
+    }, [props.seats, props.selectedSeats, handleSeatClick]);
+
+
+    useEffect(() => {
+
+        console.log(`row column matrix : ${JSON.stringify(props.rowColumnMatrix)}`)
+
+        if (JSON.stringify(props.rowColumnMatrix) !== JSON.stringify(seatMatrix)) {
+            props.setRowColumnMatrix(seatMatrix);
+        }
+    }, [seatMatrix]);
+
+    console.log(`row and column matrix : ${JSON.stringify(props.rowColumnMatrix)}`)
 
     return (
         <div className="w-full">
@@ -132,32 +146,34 @@ export default function SeatMap(props: SeatMapProps) {
                     ))}
                 </div>
                 <div className="flex flex-col items-center gap-y-4">
-                    {Object.entries(props.rowColumnMatrix).map(([rowKey, seats]) => (
-                        <div key={rowKey} className="flex flex-row items-center gap-x-6">
-                            {seats.map(seat =>
-                                seat.price === -1 ? (
-                                    <div key={seat.seatNumber} className="w-8 h-8 flex items-center justify-center text-gray-400" />
-                                ) : (
-                                    <Seat
-                                        key={seat.id}
-                                        price={seat.price}
-                                        row={seat.row}
-                                        column={seat.column}
-                                        type={seat.type}
-                                        isBooked={seat.isBooked}
-                                        id={seat.id}
-                                        isSelected={
-                                            props.selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seatNumber)
-                                        } // Assuming isSelected is managed elsewhere
-                                        seatNumber={seat.seatNumber}
-                                        onClick={
-                                            seat.onClick // Use the onClick function defined in the seat object
-                                        }
-                                    />
-                                )
-                            )}
-                        </div>
-                    ))}
+                    {
+                        Object.entries(props.rowColumnMatrix).map(([rowKey, seats]) => (
+                            <div key={rowKey} className="flex flex-row items-center gap-x-6">
+                                {seats.map(seat =>
+                                    seat.price === -1 ? (
+                                        <div key={seat.seatNumber} className="w-8 h-8 flex items-center justify-center text-gray-400" />
+                                    ) : (
+                                        <Seat
+                                            key={seat.id}
+                                            price={seat.price}
+                                            row={seat.row}
+                                            column={seat.column}
+                                            type={seat.type}
+                                            isBooked={seat.isBooked}
+                                            id={seat.id}
+                                            isSelected={
+                                                props.selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seatNumber)
+                                            } // Assuming isSelected is managed elsewhere
+                                            seatNumber={seat.seatNumber}
+                                            onClick={
+                                                seat.onClick // Use the onClick function defined in the seat object
+                                            }
+                                        />
+                                    )
+                                )}
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
         </div>

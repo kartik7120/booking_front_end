@@ -53,6 +53,15 @@ interface VenueDetails {
   columns: number;
 }
 
+function isGetBookedSeats(data: unknown): data is GetBookedSeats {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "status" in data &&
+    "booked_seats" in data &&
+    Array.isArray((data as GetBookedSeats).booked_seats)
+  );
+}
 
 async function fetchGetBookedSeats({
   queryKey,
@@ -155,142 +164,291 @@ function calculateNoOfRowsAndColumns(seats: SeatMatrixType[]): {
     column = Math.max(column, seats[i].column || 0);
   }
 
+  // console.log(`total number of rows and column: ${row} and ${column}`)
+
   return { row, column }
 }
 
+
 export default function Index() {
   const params = useParams();
-
   const { state } = useLocation();
-
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [rowColumnMatrix, setRowColumnMatrix] = useState<SeatMatrix>({});
 
   const {
     data: getBookedSeats,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    isRefetching,
-    isFetching,
-    status,
-    failureCount,
-    isSuccess
-  } = useQuery<GetBookedSeats>({
+    isLoading: isLoadingBookedSeats,
+    isError: isErrorBookedSeats,
+    isSuccess: isSuccessBookedSeats,
+  } = useQuery({
     queryKey: ['seatSelection', params.movieTimeSlotID],
     queryFn: ({ queryKey }) => fetchGetBookedSeats({ queryKey }),
-    enabled: !!params.movieTimeSlotID, // prevent firing if 0 or NaN
-
-  })
+    enabled: !!params.movieTimeSlotID,
+  });
 
   const {
     data: getSeatMatrix,
     isLoading: isLoadingSeatMatrix,
     isError: isErrorSeatMatrix,
-    error: errorSeatMatrix,
-    refetch: refetchSeatMatrix,
-    isRefetching: isRefetchingSeatMatrix,
-    isFetching: isFetchingSeatMatrix,
-    status: statusSeatMatrix,
-    failureCount: failureCountSeatMatrix,
-    isSuccess: isSuccessSeatMatrix
-  } = useQuery<GetSeatMatrix>({
+    isSuccess: isSuccessSeatMatrix,
+  } = useQuery({
     queryKey: ['seatSelection', params.venueID],
     queryFn: ({ queryKey }) => GetSeatMatrix({ queryKey }),
-    enabled: !!params.venueID
-  })
+    enabled: !!params.venueID,
+  });
 
   const {
     data: movieTimeSlotDetails,
-    isError: movieTimeSlotDetailsIsError,
-    error: movieTimeSlotDetailsError,
-    isSuccess: movieTimeSlotDetailsSuccess
-  } = useQuery<MovieTimeSlot>({
+    isLoading: isLoadingMovieTimeSlot,
+    isSuccess: isSuccessMovieTimeSlot,
+  } = useQuery({
     queryKey: ["movie_time_slot_details", params.movieTimeSlotID],
     queryFn: () => GetMovieTimeSlotDetails(params.movieTimeSlotID),
-    enabled: !!params.venueID
-  })
-
+    enabled: !!params.venueID,
+  });
 
   const {
     data: venueDetails,
-    isError: venueDetailsIsError,
-    error: venueDetailsError,
-    isSuccess: venueDetailsIsSuccess
-  } = useQuery<VenueDetails>({
+    isLoading: isLoadingVenueDetails,
+    isSuccess: isSuccessVenueDetails,
+  } = useQuery({
     queryKey: ['venue', params.venueID],
     queryFn: () => getVenueDetails(params.venueID),
-    enabled: !!params.venueID
-  })
+    enabled: !!params.venueID,
+  });
 
-  // if (movieTimeSlotDetailsSuccess) {
-  //   console.log("movie time slot details object: ", JSON.stringify(movieTimeSlotDetails))
-  // }
+  const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id]);
 
-  if (venueDetailsIsSuccess) {
-    console.log(`venueDetails :`, venueDetails)
+  const totalRows = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).row, [getSeatMatrix?.seats]);
+  const totalColumns = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).column, [getSeatMatrix?.seats]);
+
+  const bookedSeatsData = isGetBookedSeats(getBookedSeats)
+    ? getBookedSeats.booked_seats.map((bookedSeat) => ({
+      id: bookedSeat.id || 0,
+      seat_number: bookedSeat.seatNumber || "Unknown",
+      movieTimeSlotID: bookedSeat.movieTimeSlotID || 0,
+      seatMatrixID: bookedSeat.seatMatrixID || 0,
+      is_booked: bookedSeat.isBooked || false,
+    }))
+    : [];
+
+  if (isErrorBookedSeats || isErrorSeatMatrix) {
+    return <div className="text-red-500 text-center">Error fetching seat data.</div>;
   }
-
-  if (isError || isErrorSeatMatrix) {
-    return <div>Error fetching seats</div>
-  }
-  const totalRows = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).row, [getSeatMatrix?.seats])
-  const totalColumns = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).column, [getSeatMatrix?.seats])
-  const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id])
 
   return (
     <div className="m-6 flex flex-col justify-between gap-y-6 h-full">
-      <SeatSelectionTop
-        movieName={
-          movieDetails?.title || "N/A"
-        }
-        showDate={
-          movieTimeSlotDetails?.date || "N/A"
-        }
-        showTime={
-          movieTimeSlotDetails?.start_time || "N/A"
-        }
-        venueName={
-          venueDetails?.name || "N/A"
-        }
-      />
-      {/* <div>
-        <SeatMap
-          seats={{
-            seatMap: getSeatMatrix?.seats?.map(
-              (seat, index) => ({
-                seat_number: seat.seatNumber || `Seat ${index + 1}`,
-                price: seat.price || 0,
-                row: seat.row || 0,
-                column: seat.column || 0,
-                type: seat.type || "TWO_D",
-                id: seat.id || index,
-              })
-            ) || [],
-            bookedSeats: getBookedSeats?.booked_seats?.map(
-              (bookedSeat) => ({
-                id: bookedSeat.id || 0,
-                seat_number: bookedSeat.seatNumber || "Unknown",
-                movieTimeSlotID: bookedSeat.movieTimeSlotID || 0,
-                seatMatrixID: bookedSeat.seatMatrixID || 0,
-                is_booked: bookedSeat.isBooked || false
-              })
-            ) || [],
-            totalColumns: totalColumns,
-            totalRows: totalRows
-          }}
-          rowColumnMatrix={rowColumnMatrix}
-          selectedSeats={selectedSeats}
-          setRowColumnMatrix={setRowColumnMatrix}
-          setSelectSeatState={setSelectedSeats}
-        />
-      </div> */}
+      {/* SeatSelectionTop */}
+      <div>
+        {isLoadingVenueDetails || isLoadingMovieTimeSlot ? (
+          <div className="text-center text-gray-500 animate-pulse">Loading show details...</div>
+        ) : (
+          <SeatSelectionTop
+            movieName={movieDetails?.title || "N/A"}
+            showDate={movieTimeSlotDetails?.date || "N/A"}
+            showTime={movieTimeSlotDetails?.start_time || "N/A"}
+            venueName={venueDetails?.name || "N/A"}
+          />
+        )}
+      </div>
+
+      {/* SeatMap */}
+      <div>
+        {isLoadingBookedSeats || isLoadingSeatMatrix ? (
+          <div className="text-center text-gray-500 animate-pulse">Loading seat map...</div>
+        ) : (
+          isSuccessBookedSeats && isSuccessSeatMatrix && totalRows && totalColumns && (
+            <SeatMap
+              seats={{
+                seatMap: getSeatMatrix?.seats?.map((seat, index) => ({
+                  seat_number: seat.seatNumber || `Seat ${index + 1}`,
+                  price: seat.price || 0,
+                  row: seat.row || 0,
+                  column: seat.column || 0,
+                  type: seat.type || "TWO_D",
+                  id: seat.id || index,
+                })) || [],
+                bookedSeats: bookedSeatsData,
+                totalColumns,
+                totalRows,
+              }}
+              rowColumnMatrix={rowColumnMatrix}
+              selectedSeats={selectedSeats}
+              setRowColumnMatrix={setRowColumnMatrix}
+              setSelectSeatState={setSelectedSeats}
+            />
+          )
+        )}
+      </div>
+
+      {/* Legend */}
       <div className="justify-center items-center flex flex-col bottom-0">
-        <Legend />
+        {isLoadingSeatMatrix ? (
+          <div className="text-gray-500 animate-pulse">Loading legend...</div>
+        ) : (
+          <Legend />
+        )}
       </div>
     </div>
-  )
+  );
 }
+
+// export default function Index() {
+//   const params = useParams();
+
+//   const { state } = useLocation();
+
+//   const queryClient = useQueryClient()
+
+//   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
+//   const [rowColumnMatrix, setRowColumnMatrix] = useState<SeatMatrix>({});
+
+//   const {
+//     data: getBookedSeats,
+//     isLoading,
+//     isError,
+//     error,
+//     refetch,
+//     isRefetching,
+//     isFetching,
+//     status,
+//     failureCount,
+//     isSuccess
+//   } = useQuery<GetBookedSeats | { error: string }>({
+//     queryKey: ['seatSelection', params.movieTimeSlotID],
+//     queryFn: ({ queryKey }) => fetchGetBookedSeats({ queryKey }),
+//     enabled: !!params.movieTimeSlotID, // prevent firing if 0 or NaN
+
+//   })
+
+//   if (isSuccess) {
+//     console.log(`booked seats data : ${JSON.stringify(getBookedSeats)}`)
+//   }
+
+//   const {
+//     data: getSeatMatrix,
+//     isLoading: isLoadingSeatMatrix,
+//     isError: isErrorSeatMatrix,
+//     error: errorSeatMatrix,
+//     refetch: refetchSeatMatrix,
+//     isRefetching: isRefetchingSeatMatrix,
+//     isFetching: isFetchingSeatMatrix,
+//     status: statusSeatMatrix,
+//     failureCount: failureCountSeatMatrix,
+//     isSuccess: isSuccessSeatMatrix
+//   } = useQuery<GetSeatMatrix>({
+//     queryKey: ['seatSelection', params.venueID],
+//     queryFn: ({ queryKey }) => GetSeatMatrix({ queryKey }),
+//     enabled: !!params.venueID
+//   })
+
+//   if (isSuccessSeatMatrix) {
+//     console.log(`seat matrix : ${JSON.stringify(getSeatMatrix)}`)
+//   }
+
+//   const {
+//     data: movieTimeSlotDetails,
+//     isError: movieTimeSlotDetailsIsError,
+//     error: movieTimeSlotDetailsError,
+//     isSuccess: movieTimeSlotDetailsSuccess
+//   } = useQuery<MovieTimeSlot>({
+//     queryKey: ["movie_time_slot_details", params.movieTimeSlotID],
+//     queryFn: () => GetMovieTimeSlotDetails(params.movieTimeSlotID),
+//     enabled: !!params.venueID
+//   })
+
+
+//   const {
+//     data: venueDetails,
+//     isError: venueDetailsIsError,
+//     error: venueDetailsError,
+//     isSuccess: venueDetailsIsSuccess
+//   } = useQuery<VenueDetails>({
+//     queryKey: ['venue', params.venueID],
+//     queryFn: () => getVenueDetails(params.venueID),
+//     enabled: !!params.venueID
+//   })
+
+//   // if (movieTimeSlotDetailsSuccess) {
+//   //   console.log("movie time slot details object: ", JSON.stringify(movieTimeSlotDetails))
+//   // }
+
+//   if (venueDetailsIsSuccess) {
+//     console.log(`venueDetails :`, venueDetails)
+//   }
+
+//   if (isError || isErrorSeatMatrix) {
+//     return <div>Error fetching seats</div>
+//   }
+//   const totalRows = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).row, [getSeatMatrix?.seats])
+//   const totalColumns = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).column, [getSeatMatrix?.seats])
+//   const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id])
+
+//   console.log(`total rows : ${totalRows} and total columns: ${totalColumns}`)
+
+//   const bookedSeatsData = isGetBookedSeats(getBookedSeats)
+//     ? getBookedSeats.booked_seats.map((bookedSeat) => ({
+//       id: bookedSeat.id || 0,
+//       seat_number: bookedSeat.seatNumber || "Unknown",
+//       movieTimeSlotID: bookedSeat.movieTimeSlotID || 0,
+//       seatMatrixID: bookedSeat.seatMatrixID || 0,
+//       is_booked: bookedSeat.isBooked || false,
+//     }))
+//     : [];
+
+//   return (
+//     <div className="m-6 flex flex-col justify-between gap-y-6 h-full">
+//       <SeatSelectionTop
+//         movieName={
+//           movieDetails?.title || "N/A"
+//         }
+//         showDate={
+//           movieTimeSlotDetails?.date || "N/A"
+//         }
+//         showTime={
+//           movieTimeSlotDetails?.start_time || "N/A"
+//         }
+//         venueName={
+//           venueDetails?.name || "N/A"
+//         }
+//       />
+//       <div>
+//         {/* {isSuccess && isSuccessSeatMatrix && totalRows && totalColumns && <SeatMap
+//           seats={{
+//             seatMap: getSeatMatrix?.seats?.map(
+//               (seat, index) => ({
+//                 seat_number: seat.seatNumber || `Seat ${index + 1}`,
+//                 price: seat.price || 0,
+//                 row: seat.row || 0,
+//                 column: seat.column || 0,
+//                 type: seat.type || "TWO_D",
+//                 id: seat.id || index,
+//               })
+//             ) || [],
+//             bookedSeats: bookedSeatsData && bookedSeatsData?.map(
+//               (bookedSeat) => ({
+//                 id: bookedSeat.id || 0,
+//                 seat_number: bookedSeat.seat_number || "Unknown",
+//                 movieTimeSlotID: bookedSeat.movieTimeSlotID || 0,
+//                 seatMatrixID: bookedSeat.seatMatrixID || 0,
+//                 is_booked: bookedSeat.is_booked || false
+//               })
+//             ) || [],
+//             totalColumns: totalColumns,
+//             totalRows: totalRows
+//           }}
+//           rowColumnMatrix={rowColumnMatrix}
+//           selectedSeats={selectedSeats}
+//           setRowColumnMatrix={setRowColumnMatrix}
+//           setSelectSeatState={setSelectedSeats}
+//         />} */}
+//       </div>
+//       <div className="justify-center items-center flex flex-col bottom-0">
+//         <Legend />
+//       </div>
+//     </div>
+//   )
+// }
