@@ -1,11 +1,12 @@
-import { useLocation, useParams } from "react-router"
+import { useLocation, useNavigate, useParams } from "react-router"
 import SeatSelectionTop from "./SeatSelectionTop";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import SeatMap, { Seat, SeatMatrix } from "./SeatMap";
 import Legend from "./Legend";
-import { useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { Movie } from "../HomePage/getNowPlayingMovies";
 import { getVenueDetails } from "../SeatDetails/SeatSelection";
+import CurvedTheatreScreen from "../MovieTimeSlots/CurvedTheatreScreen";
 
 export interface BookedSeats {
   id?: number;
@@ -28,7 +29,7 @@ export interface GetSeatMatrix {
 }
 
 export interface SeatMatrixType {
-  seatNumber?: string;
+  seat_number?: string;
   isBooked?: boolean;
   price?: number;
   row?: number;
@@ -74,7 +75,7 @@ async function fetchGetBookedSeats({
       throw new Error("Movie Time Slot ID is required");
     }
 
-    console.log(`movie time slot id inside fetch function = ${queryKey}`)
+    // console.log(`movie time slot id inside fetch function = ${queryKey}`)
 
     const response = await fetch("http://localhost:8080/GetBookedSeats", {
       method: "POST",
@@ -106,7 +107,7 @@ async function GetSeatMatrix({
       throw new Error("Venue ID is required");
     }
 
-    console.log(`venue id inside fetch function = ${queryKey}`)
+    // console.log(`venue id inside fetch function = ${queryKey}`)
 
     const response = await fetch("http://localhost:8080/GetSeatMatrix", {
       method: "POST",
@@ -178,6 +179,8 @@ export default function Index() {
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [rowColumnMatrix, setRowColumnMatrix] = useState<SeatMatrix>({});
 
+  const navigate = useNavigate()
+
   const {
     data: getBookedSeats,
     isLoading: isLoadingBookedSeats,
@@ -199,6 +202,10 @@ export default function Index() {
     queryFn: ({ queryKey }) => GetSeatMatrix({ queryKey }),
     enabled: !!params.venueID,
   });
+
+  // if (isSuccessSeatMatrix) {
+  //   console.log(`seat matrix data : ${JSON.stringify(getSeatMatrix)}`)
+  // }
 
   const {
     data: movieTimeSlotDetails,
@@ -239,6 +246,18 @@ export default function Index() {
     return <div className="text-red-500 text-center">Error fetching seat data.</div>;
   }
 
+  function handleConfirmSeats(e: FormEvent<HTMLButtonElement>) {
+
+    e.preventDefault()
+
+    // Add details from the zustand store and navigate
+
+    // Also need to add price legend
+
+    console.log(`selected seats: ${JSON.stringify(selectedSeats)}`)
+    navigate(`/confirmOrder`)
+  }
+
   return (
     <div className="m-6 flex flex-col justify-between gap-y-6 h-full">
       {/* SeatSelectionTop */}
@@ -256,6 +275,9 @@ export default function Index() {
       </div>
 
       {/* SeatMap */}
+      <div className="flex flex-row items-center justify-center">
+        <CurvedTheatreScreen />
+      </div>
       <div>
         {isLoadingBookedSeats || isLoadingSeatMatrix ? (
           <div className="text-center text-gray-500 animate-pulse">Loading seat map...</div>
@@ -264,7 +286,7 @@ export default function Index() {
             <SeatMap
               seats={{
                 seatMap: getSeatMatrix?.seats?.map((seat, index) => ({
-                  seat_number: seat.seatNumber || `Seat ${index + 1}`,
+                  seat_number: seat.seat_number || "",
                   price: seat.price || 0,
                   row: seat.row || 0,
                   column: seat.column || 0,
@@ -292,6 +314,20 @@ export default function Index() {
           <Legend />
         )}
       </div>
+
+      {
+        selectedSeats && selectedSeats.length > 0 &&
+        <div>
+          <button className="btn btn-error w-full" onClick={handleConfirmSeats}>
+            Confirm seats
+          </button>
+        </div>
+      }
+      {
+        selectedSeats && selectedSeats.length <= 0 && <div className="btn btn-error opacity-0">
+          Confirm seats
+        </div>
+      }
     </div>
   );
 }

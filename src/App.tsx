@@ -23,6 +23,11 @@ function App() {
           <Route path="movie/:id/movieTimeSlots" element={<Index />} />
           <Route path="movie/:id/reviews" element={<MovieReviewsIndex />} />
           <Route path="movie/:id/venue/:venueID/movieTimeSlots/:movieTimeSlotID/seatSelection" element={<SeatSelectionIndex />} />
+          <Route path="/confirmOrder" element={
+            <div>
+              Confirm order screen will be used to fetch data from zustand store and show user order summary and ask user to enter email id and phone number
+            </div>
+          } />
         </Route>
       </Routes>
     </QueryClientProvider>

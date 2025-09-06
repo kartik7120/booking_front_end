@@ -50,6 +50,8 @@ export default function SeatMap(props: SeatMapProps) {
         [props.seats.totalRows]
     );
 
+    console.log(`props.seats: ${JSON.stringify(props.seats)}`)
+
     const selectedSeatSet = useMemo(
         () => new Set(props.selectedSeats.map(s => s.seatNumber)),
         [props.selectedSeats]
@@ -76,8 +78,12 @@ export default function SeatMap(props: SeatMapProps) {
             matrix[rowKey] = [];
 
             for (let col = 0; col < props.seats.totalColumns; col++) {
+
                 const seatNumber = `${rowKey}${col + 1}`;
+                console.log(`seat number created on frontend : ${seatNumber}`)
                 const seat = props.seats.seatMap.find(s => s.seat_number === seatNumber);
+
+                console.log(`does seat ${seatNumber} exists : `, seat)
 
                 if (seat) {
                     const isBooked = props.seats.bookedSeats.some(
