@@ -1,5 +1,40 @@
+import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react"
-import z from "zod"
+import z, { email } from "zod"
+import useStore from "../../zustand/store";
+
+export interface Customer {
+    customerName?: string;
+    phoneNumber?: string;
+    email?: string;
+    country?: string;
+    state?: string;
+    city?: string;
+    zipcode?: number;
+    street?: string;
+    idempotentKey?: string;
+}
+
+export interface CustomerCreationResponse {
+    message: string;
+    customer_id: string; // or number, depending on the type of CustomerId
+}
+
+
+export async function create_customer(customer: Customer): Promise<CustomerCreationResponse> {
+
+    const response = await fetch("http://localhost:8080/createCustomer", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            ...customer
+        })
+    })
+
+    return response.json()
+}
 
 export default function ConfirmOrderContactDetails() {
 
@@ -7,6 +42,19 @@ export default function ConfirmOrderContactDetails() {
     const [phoneNumber, setphoneNumber] = useState<string | number>("")
     const [error, setError] = useState("")
     const [selectCountryCode, setSelectCountryCode] = useState("")
+    const [selectState, setSelectState] = useState("")
+    const [selectCity, setSelectCity] = useState("")
+    const [selectAddress, setSelectAddress] = useState("")
+    const [selectZipcode, setSelectZipcode] = useState<number | string>("")
+    const [customerName, setCustomerName] = useState("")
+
+    const idempotentKey = useStore((state) => state.idempotencyKey)
+
+    const { mutate } = useMutation({
+        mutationFn: () => create_customer({
+            email: emailID, phoneNumber: phoneNumber.toString(), country: selectCountryCode, idempotentKey: idempotentKey, state: selectState, city: selectCity, street: selectAddress, zipcode: Number(selectZipcode), customerName: ""
+        }),
+    })
 
     async function handleSubmit(e: FormEvent<HTMLButtonElement>) {
         try {
@@ -19,17 +67,36 @@ export default function ConfirmOrderContactDetails() {
 
             const UserInfo = z.object({
                 emailID: z.email(),
-                phoneNumber: z.string().max(10)
+                phoneNumber: z.string().max(10),
+                countryCode: z.string().max(3),
+                customerName: z.string(),
+                address: z.string(),
+                city: z.string(),
+                state: z.string(),
+                zipcode: z.number()
             });
 
-            let { emailID: email, phoneNumber: phone_number } = UserInfo.parse({
+            let contactDetails = UserInfo.parse({
                 emailID,
-                phoneNumber
+                phoneNumber,
+                countryCode: selectCountryCode,
+                customerName,
+                address: selectAddress,
+                city: selectCity,
+                state: selectState,
+                zipcode: Number(selectZipcode)
             })
 
             // Call the backend endpoint to confirm booking / create order and navigate to payment page
 
-            console.log(`email id : ${email} and phone number: ${phone_number}`)
+            // Here after gibing email id and phone number, user's will be navigated to payment gateway page
+            // where they will be able to see the order summary and make payment,
+
+
+            console.log(`Contact details after submitting form: ${contactDetails}`)
+
+            // Call the mutation to create customer
+            mutate()
 
         } catch (error) {
             if (error instanceof z.ZodError) {
@@ -48,15 +115,79 @@ export default function ConfirmOrderContactDetails() {
                     <input required={true} type="email" className="input w-full" placeholder="Enter your email ID" value={emailID} onChange={(val) => setEmailID(val.target.value)} />
                 </fieldset>
                 <fieldset className="fieldset flex flex-row items-center gap-x-4">
-                    <select required={true} defaultValue="Select Country code" defaultChecked className="select" value={selectCountryCode} onChange={(e) => setSelectCountryCode(e.target.value)}
+                    <select required={true} defaultChecked className="select" value={selectCountryCode} onChange={(e) => setSelectCountryCode(e.target.value)}
                     >
-                        <option disabled={true}>Select Country code</option>
+                        <option disabled={true} value="">Select Country code</option>
                         <option>91</option>
                         <option>1</option>
                         <option>23</option>
                     </select>
                     <legend className="fieldset-legend text-xl">Enter your phone number</legend>
                     <input type="number" required={true} className="input w-full" placeholder="Enter your phone number" value={phoneNumber} onChange={(e) => setphoneNumber(e.target.value)} />
+                </fieldset>
+
+                {/* Need to add fields for state, country , address street */}
+
+                <fieldset className="fieldset">
+                    <legend className="fieldset-legend text-xl">Enter your full name</legend>
+                    <input type="text" className="input w-full" placeholder="Enter your full name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                </fieldset>
+
+                <fieldset className="fieldset">
+                    <legend className="fieldset-legend text-xl">Enter your address</legend>
+                    <input type="text" className="input w-full" placeholder="Enter your address" value={selectAddress} onChange={(e) => setSelectAddress(e.target.value)} />
+                </fieldset>
+
+                <fieldset className="fieldset">
+                    <legend className="fieldset-legend text-xl">Enter your city</legend>
+                    <input type="text" className="input w-full" placeholder="Enter your city" value={selectCity} onChange={(e) => setSelectCity(e.target.value)} />
+                </fieldset>
+
+                <fieldset className="fieldset">
+                    <legend className="fieldset-legend text-xl">Enter your state</legend>
+                    {/* Dropdown for states */}
+                    <select defaultValue="Enter your state" defaultChecked required className="select" value={selectState} onChange={(e) => {
+                        setSelectState(e.target.value)
+                    }}>
+                        <option disabled={true} value="">Enter your state</option>
+                        <option>Maharashtra</option>
+                        <option>Gujarat</option>
+                        <option>Rajasthan</option>
+                        <option>Punjab</option>
+                        <option>Haryana</option>
+                        <option>Uttar Pradesh</option>
+                        <option>Bihar</option>
+                        <option>West Bengal</option>
+                        <option>Tamil Nadu</option>
+                        <option>Kerala</option>
+                        <option>Karnataka</option>
+                        <option>Andhra Pradesh</option>
+                        <option>Telangana</option>
+                        <option>Odisha</option>
+                        <option>Chhattisgarh</option>
+                        <option>Jharkhand</option>
+                        <option>Assam</option>
+                        <option>Nagaland</option>
+                        <option>Manipur</option>
+                        <option>Mizoram</option>
+                        <option>Tripura</option>
+                        <option>Meghalaya</option>
+                        <option>Sikkim</option>
+                        <option>Arunachal Pradesh</option>
+                        <option>Goa</option>
+                        <option>Himachal Pradesh</option>
+                        <option>Uttarakhand</option>
+                        <option>Jammu and Kashmir</option>
+                        <option>Ladakh</option>
+                        <option>Delhi</option>
+                        <option>Puducherry</option>
+                        <option>Chandigarh</option>
+                        <option value="other">Other</option>
+                    </select>
+                </fieldset>
+                <fieldset className="fieldset">
+                    <legend className="fieldset-legend text-xl">Enter your zipcode</legend>
+                    <input type="number" className="input w-full" required placeholder="Enter your zipcode" value={selectZipcode} onChange={(e) => setSelectZipcode(e.target.value)} />
                 </fieldset>
                 <button className="btn btn-error btn-outline" type="submit" onClick={handleSubmit}>Confirm booking</button>
             </form>

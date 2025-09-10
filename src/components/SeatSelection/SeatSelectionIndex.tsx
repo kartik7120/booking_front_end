@@ -7,6 +7,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { Movie } from "../HomePage/getNowPlayingMovies";
 import { getVenueDetails } from "../SeatDetails/SeatSelection";
 import CurvedTheatreScreen from "../MovieTimeSlots/CurvedTheatreScreen";
+import useStore from "../../zustand/store";
 
 export interface BookedSeats {
   id?: number;
@@ -181,6 +182,9 @@ export default function Index() {
 
   const navigate = useNavigate()
 
+  const store = useStore()
+  const addSelectedSeatsToStore = store.setSelectedSeatsID
+
   const {
     data: getBookedSeats,
     isLoading: isLoadingBookedSeats,
@@ -252,6 +256,7 @@ export default function Index() {
 
     // Add details from the zustand store and navigate
 
+    addSelectedSeatsToStore(selectedSeats.map((seat) => seat.id.toString()))
     // Also need to add price legend
 
     console.log(`selected seats: ${JSON.stringify(selectedSeats)}`)
