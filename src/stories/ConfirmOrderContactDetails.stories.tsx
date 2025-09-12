@@ -7,7 +7,7 @@ const meta = {
     component: ConfirmOrderContactDetails,
     decorators: (Story) => (
         <QueryClientProvider client={new QueryClient()} >
-            <div className="m-4 p-4 border-2 border-dashed">
+            <div className="m-4 p-4">
                 <Story />
             </div>
         </QueryClientProvider>

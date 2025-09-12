@@ -9,6 +9,7 @@ export interface Store {
     contactEmail?: string;
     contactPhoneNumber?: string;
     selectedSeatsID?: string[];
+    customersID?: string;
     setIdempotencyKey: (idempotencyKey: string) => void;
     setOrderID: (orderID: string) => void;
     setMovieID: (movieID: number) => void;
@@ -17,6 +18,8 @@ export interface Store {
     setContactEmail: (contactEmail: string) => void;
     setContactPhoneNumber: (contactPhoneNumber: string) => void;
     setSelectedSeatsID: (selectedSeatsID: string[]) => void;
+    setCustomersID: (customersID: string) => void;
+    clearStore: () => void;
 }
 
 const useStore = create<Store>((set) => ({
@@ -36,6 +39,8 @@ const useStore = create<Store>((set) => ({
     setContactEmail: (contactEmail: string) => set({ contactEmail }),
     setContactPhoneNumber: (contactPhoneNumber: string) => set({ contactPhoneNumber }),
     setSelectedSeatsID: (selectedSeatsID: string[]) => set({ selectedSeatsID }),
+    clearStore: () => set({}),
+    setCustomersID: (customersID: string) => set({ customersID }),
 }))
 
 export default useStore

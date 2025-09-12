@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router"
 import SeatSelectionTop from "./SeatSelectionTop";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SeatMap, { Seat, SeatMatrix } from "./SeatMap";
 import Legend from "./Legend";
 import { FormEvent, useMemo, useState } from "react";
@@ -171,6 +171,38 @@ function calculateNoOfRowsAndColumns(seats: SeatMatrixType[]): {
   return { row, column }
 }
 
+interface CreateOrderRequestParams {
+  idempotent_key: string;
+  movie_id: number;
+  movie_time_slot_id: number;
+  venue_id: number;
+  seatMatrixIDs: number[];
+}
+
+export async function CreateOrder({
+  idempotent_key,
+  movie_id,
+  movie_time_slot_id,
+  venue_id,
+  seatMatrixIDs
+}: CreateOrderRequestParams): Promise<{ error: string } | { order_id: string }> {
+
+  const response = await fetch("http://localhost:8080/CreateOrder", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      idempotent_key,
+      movie_id,
+      movie_time_slot_id,
+      venue_id,
+      seatMatrixIDs
+    }),
+  })
+
+  return response.json()
+}
 
 export default function Index() {
   const params = useParams();
@@ -183,8 +215,13 @@ export default function Index() {
   const navigate = useNavigate()
 
   const store = useStore()
-  const addSelectedSeatsToStore = store.setSelectedSeatsID
-
+  const idempotentKey = useStore((state) => state.idempotencyKey)
+  const setMovieInStore = useStore((state) => state.setMovieID)
+  const setMovieTimeSlotInStore = useStore((state) => state.setMovieTimeSlotID)
+  const setVenueInStore = useStore((state) => state.setVenueID)
+  const addSelectedSeatsToStore = useStore((state) => state.setSelectedSeatsID)
+  const seatMatrixIdsInStore = useStore((state) => state.selectedSeatsID)
+  const setOrderID = useStore((state) => state.setOrderID)
   const {
     data: getBookedSeats,
     isLoading: isLoadingBookedSeats,
@@ -231,6 +268,30 @@ export default function Index() {
     enabled: !!params.venueID,
   });
 
+  const { mutate: CreateOrderMutate, isPending } = useMutation({
+    mutationKey: ['createOrder', idempotentKey],
+    mutationFn: () => CreateOrder({
+      idempotent_key: idempotentKey || "",
+      movie_id: Number(params.id),
+      movie_time_slot_id: Number(params.movieTimeSlotID),
+      venue_id: Number(params.venueID),
+      seatMatrixIDs: selectedSeats.map((seat) => seat.id)
+    }),
+    onSuccess: (data) => {
+      if ('order_id' in data) {
+        // Set the order id in the zustand store
+        setOrderID(data.order_id)
+        console.log(`order id received after creating order: ${data.order_id}`)
+        // navigate to the contact details page
+        navigate(`/confirmOrder/${data.order_id}`)
+
+      } else if ('error' in data) {
+        alert(`Error creating order: ${data.error}`)
+        console.error(`error creating order: ${data.error}`)
+      }
+    },
+  })
+
   const movieDetails = queryClient.getQueryData<Movie>(["movieDetails", params.id]);
 
   const totalRows = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).row, [getSeatMatrix?.seats]);
@@ -256,11 +317,29 @@ export default function Index() {
 
     // Add details from the zustand store and navigate
 
+    if (selectedSeats.length === 0) {
+      alert("Please select at least one seat to proceed")
+      return
+    }
+
     addSelectedSeatsToStore(selectedSeats.map((seat) => seat.id.toString()))
     // Also need to add price legend
 
-    console.log(`selected seats: ${JSON.stringify(selectedSeats)}`)
-    navigate(`/confirmOrder`)
+    if (params.id && store.movieID !== Number(params.id)) {
+      setMovieInStore(Number(params.id))
+    }
+
+    if (params.movieTimeSlotID && store.movieTimeSlotID !== Number(params.movieTimeSlotID)) {
+      setMovieTimeSlotInStore(Number(params.movieTimeSlotID))
+    }
+
+    if (params.venueID && store.venueID !== Number(params.venueID)) {
+      setVenueInStore(Number(params.venueID))
+    }
+
+    CreateOrderMutate()
+
+    // Call the order creation API endpoint to create order and navigate to contact details page after setting the order id in the zustand store
   }
 
   return (
@@ -323,7 +402,8 @@ export default function Index() {
       {
         selectedSeats && selectedSeats.length > 0 &&
         <div>
-          <button className="btn btn-error w-full" onClick={handleConfirmSeats}>
+          <button className={`btn btn-error w-full`} onClick={handleConfirmSeats}>
+            {isPending && <span className="loading loading-spinner"></span>}
             Confirm seats
           </button>
         </div>

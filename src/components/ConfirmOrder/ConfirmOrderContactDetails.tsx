@@ -1,18 +1,19 @@
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react"
-import z, { email } from "zod"
+import z, { email, string } from "zod"
 import useStore from "../../zustand/store";
+import { useNavigate } from "react-router";
 
 export interface Customer {
-    customerName?: string;
-    phoneNumber?: string;
+    customer_name?: string;
+    phone_number?: string;
     email?: string;
     country?: string;
     state?: string;
     city?: string;
     zipcode?: number;
     street?: string;
-    idempotentKey?: string;
+    idempotent_key?: string;
 }
 
 export interface CustomerCreationResponse {
@@ -20,6 +21,20 @@ export interface CustomerCreationResponse {
     customer_id: string; // or number, depending on the type of CustomerId
 }
 
+export async function CreatePaymentLink(idempotencyKey: string): Promise<{ Error: string, Status: string, PaymentLink: string, Message: string } | { error: string }> {
+
+    const response = await fetch("http://localhost:8080/createPaymentLink", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            idempotent_key: idempotencyKey
+        })
+    })
+
+    return response.json()
+}
 
 export async function create_customer(customer: Customer): Promise<CustomerCreationResponse> {
 
@@ -49,11 +64,57 @@ export default function ConfirmOrderContactDetails() {
     const [customerName, setCustomerName] = useState("")
 
     const idempotentKey = useStore((state) => state.idempotencyKey)
+    const setCustomerID = useStore((state) => state.setCustomersID)
+    const customerID = useStore((state) => state.customersID)
+
+    const { mutate: createPaymentLinkMutation } = useMutation({
+        mutationKey: ["createPaymentLink", customerID, emailID, phoneNumber, idempotentKey],
+        mutationFn: () => CreatePaymentLink(idempotentKey!),
+        onSuccess: (data) => {
+            // Redirect to payment link
+
+            if (data && (data as any).error) {
+                setError((data as any).error)
+                return
+            }
+
+            if (data && "error" in data) {
+                setError(data.error)
+                return
+            }
+
+            console.log(`Payment link response data: ${data}`)
+
+            if (data && data.PaymentLink) {
+                console.log(`Navigating to payment link: ${data.PaymentLink}`)
+                window.location.href = data.PaymentLink
+            } else {
+                setError("Failed to get payment link. Please try again.")
+            }
+        },
+        onError: (error) => {
+            console.error("Error creating payment link:", error)
+            setError("Error creating payment link. Please try again.")
+        },
+        retry: 3,
+        retryDelay: 1000,
+    })
 
     const { mutate } = useMutation({
         mutationFn: () => create_customer({
-            email: emailID, phoneNumber: phoneNumber.toString(), country: selectCountryCode, idempotentKey: idempotentKey, state: selectState, city: selectCity, street: selectAddress, zipcode: Number(selectZipcode), customerName: ""
+            email: emailID, phone_number: phoneNumber.toString(), country: selectCountryCode, idempotent_key: idempotentKey, state: selectState, city: selectCity, street: selectAddress, zipcode: Number(selectZipcode), customer_name: customerName
         }),
+        onSuccess: (data) => {
+            console.log(`Customer creation response data: ${data}`)
+
+            if (data && data.customer_id) {
+                setCustomerID(data.customer_id)
+                // After creating customer, create payment link
+                createPaymentLinkMutation()
+            } else {
+                setError("Failed to create customer. Please try again.")
+            }
+        },
     })
 
     async function handleSubmit(e: FormEvent<HTMLButtonElement>) {

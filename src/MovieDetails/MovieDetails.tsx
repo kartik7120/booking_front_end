@@ -3,6 +3,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import { useQuery } from "@tanstack/react-query";
 import CastCrewList from "../components/CastCrewList";
 import MovieReviewSection from "./MovieReviewSection";
+import useStore from "./../zustand/store";
 
 async function fetchMovieDetails(id: number) {
     try {
@@ -25,6 +26,13 @@ async function fetchMovieDetails(id: number) {
         console.error("Error fetching movie details:", error);
         throw error;
     }
+}
+
+export async function GetIdempotentKey(): Promise<string> {
+
+    const response = await fetch("http://localhost:8080/getIdempotentKey")
+
+    return response.json()
 }
 
 interface MovieDetailsResponse {
@@ -94,6 +102,10 @@ export default function MovieDetails() {
 
     const navigate = useNavigate();
 
+    const store = useStore();
+
+    const setIdempotencyKey = useStore((state) => state.setIdempotencyKey)
+
     if (!id) {
         return (
             <div className="flex flex-col items-center justify-center h-[70vh] text-center px-4">
@@ -115,6 +127,24 @@ export default function MovieDetails() {
         retryDelay: 1000,
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
+
+    const { data: idempotentKey, error: idempotentKeyError, status: idempotentKeyStatus, isError: idempotentKeyIsError } = useQuery({
+        queryKey: ["idempotentKey"],
+        queryFn: () => GetIdempotentKey(),
+        refetchOnWindowFocus: false,
+        retry: true,
+        retryDelay: 1000,
+    })
+
+    // Need to call the commit idempotent key
+
+    if (idempotentKeyStatus === "success") {
+        if (idempotentKey) {
+            if (store.idempotencyKey !== idempotentKey) {
+                setIdempotencyKey(idempotentKey)
+            }
+        }
+    }
 
     const { data: movieReviews, error: movieReviewResponseError, status: movieReviewResponseStatus, isError: movieReviewResponseIsError } = useQuery<MovieReviewResponse>({
         queryKey: ["movieReviews", id],
