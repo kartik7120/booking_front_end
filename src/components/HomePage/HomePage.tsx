@@ -9,12 +9,15 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchNowPlayingMovies, getUpcomingMovies, IsTokenValid, Movie, UpcomingMovies } from './getNowPlayingMovies';
 import { sortMovies } from '../../utils/util';
 import Cookies from "js-cookie"
+import useStore from '../../zustand/store';
 
 export default function HomePage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [CarouselLayoverProps, useStateCarouselLayoverProps] = useState<CarouselLayoverProps[]>([]);
   const [currentUserEmail, setCurrentUserEmail] = useState("")
+
+  const reset = useStore(state => state.clearStore)
 
   const {
     isError: isErrorNowPlayingMovies,
@@ -64,6 +67,11 @@ export default function HomePage() {
       screen_wide_poster_url: movie.screen_wide_poster_url
     })));
   }, [nowPlayingMovies, upcomingMoviesData]);
+
+  useEffect(() => {
+    // Reset store
+    reset();
+  }, [])
 
   return (
     <div>

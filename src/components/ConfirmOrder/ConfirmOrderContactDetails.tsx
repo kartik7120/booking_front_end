@@ -21,7 +21,7 @@ export interface CustomerCreationResponse {
     customer_id: string; // or number, depending on the type of CustomerId
 }
 
-export async function CreatePaymentLink(idempotencyKey: string): Promise<{ Error: string, Status: string, PaymentLink: string, Message: string } | { error: string }> {
+export async function CreatePaymentLink(idempotencyKey: string): Promise<{ Error: string, Status: string, payment_link: string, Message: string } | { error: string }> {
 
     const response = await fetch("http://localhost:8080/createPaymentLink", {
         method: "POST",
@@ -67,7 +67,7 @@ export default function ConfirmOrderContactDetails() {
     const setCustomerID = useStore((state) => state.setCustomersID)
     const customerID = useStore((state) => state.customersID)
 
-    const { mutate: createPaymentLinkMutation } = useMutation({
+    const { mutate: createPaymentLinkMutation, isPending: isPaymentPending } = useMutation({
         mutationKey: ["createPaymentLink", customerID, emailID, phoneNumber, idempotentKey],
         mutationFn: () => CreatePaymentLink(idempotentKey!),
         onSuccess: (data) => {
@@ -85,9 +85,10 @@ export default function ConfirmOrderContactDetails() {
 
             console.log(`Payment link response data: ${data}`)
 
-            if (data && data.PaymentLink) {
-                console.log(`Navigating to payment link: ${data.PaymentLink}`)
-                window.location.href = data.PaymentLink
+            if (data && data.payment_link) {
+                console.log(`Navigating to payment link: ${data.payment_link}`)
+                window.location.href = data.payment_link
+                return
             } else {
                 setError("Failed to get payment link. Please try again.")
             }
@@ -100,9 +101,9 @@ export default function ConfirmOrderContactDetails() {
         retryDelay: 1000,
     })
 
-    const { mutate } = useMutation({
+    const { mutate, isError, error: customerMutateError, isPending: isCustomerPending } = useMutation({
         mutationFn: () => create_customer({
-            email: emailID, phone_number: phoneNumber.toString(), country: selectCountryCode, idempotent_key: idempotentKey, state: selectState, city: selectCity, street: selectAddress, zipcode: Number(selectZipcode), customer_name: customerName
+            email: emailID, phone_number: selectCountryCode + phoneNumber.toString(), country: selectCountryCode, idempotent_key: idempotentKey, state: selectState, city: selectCity, street: selectAddress, zipcode: Number(selectZipcode), customer_name: customerName
         }),
         onSuccess: (data) => {
             console.log(`Customer creation response data: ${data}`)
@@ -115,6 +116,10 @@ export default function ConfirmOrderContactDetails() {
                 setError("Failed to create customer. Please try again.")
             }
         },
+        onError: (error) => {
+            console.error("Error creating customer:", error)
+            setError("Error creating customer. Please try again.")
+        }
     })
 
     async function handleSubmit(e: FormEvent<HTMLButtonElement>) {
@@ -168,6 +173,8 @@ export default function ConfirmOrderContactDetails() {
         }
     }
 
+    const isLoading = isCustomerPending || isPaymentPending
+
     return (
         <div className="border-2 rounded-xl p-10 w-full flex flex-col gap-y-3">
             <form className="flex flex-col gap-y-3 justify-center">
@@ -179,9 +186,9 @@ export default function ConfirmOrderContactDetails() {
                     <select required={true} defaultChecked className="select" value={selectCountryCode} onChange={(e) => setSelectCountryCode(e.target.value)}
                     >
                         <option disabled={true} value="">Select Country code</option>
-                        <option>91</option>
-                        <option>1</option>
-                        <option>23</option>
+                        <option>+91</option>
+                        <option>+1</option>
+                        <option>+23</option>
                     </select>
                     <legend className="fieldset-legend text-xl">Enter your phone number</legend>
                     <input type="number" required={true} className="input w-full" placeholder="Enter your phone number" value={phoneNumber} onChange={(e) => setphoneNumber(e.target.value)} />
@@ -250,7 +257,14 @@ export default function ConfirmOrderContactDetails() {
                     <legend className="fieldset-legend text-xl">Enter your zipcode</legend>
                     <input type="number" className="input w-full" required placeholder="Enter your zipcode" value={selectZipcode} onChange={(e) => setSelectZipcode(e.target.value)} />
                 </fieldset>
-                <button className="btn btn-error btn-outline" type="submit" onClick={handleSubmit}>Confirm booking</button>
+                <button
+                    className="btn btn-error btn-outline"
+                    type="submit"
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Processing..." : "Confirm booking"}
+                </button>
             </form>
             {error && error.length && (
                 <div role="alert" className="alert alert-error">
@@ -262,6 +276,18 @@ export default function ConfirmOrderContactDetails() {
                     </span>
                 </div>
             )}
+            {
+                isError && (
+                    <div role="alert" className="alert alert-error">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>
+                            {customerMutateError instanceof Error ? customerMutateError.message : "An unknown error occurred"}
+                        </span>
+                    </div>
+                )
+            }
         </div>
     )
 }

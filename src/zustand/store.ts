@@ -22,7 +22,7 @@ export interface Store {
     clearStore: () => void;
 }
 
-const useStore = create<Store>((set) => ({
+const useStore = create<Store>()((set, _, Store) => ({
     idempotencyKey: undefined,
     orderID: undefined,
     movieID: undefined,
@@ -39,7 +39,7 @@ const useStore = create<Store>((set) => ({
     setContactEmail: (contactEmail: string) => set({ contactEmail }),
     setContactPhoneNumber: (contactPhoneNumber: string) => set({ contactPhoneNumber }),
     setSelectedSeatsID: (selectedSeatsID: string[]) => set({ selectedSeatsID }),
-    clearStore: () => set({}),
+    clearStore: () => set(Store.getInitialState()),
     setCustomersID: (customersID: string) => set({ customersID }),
 }))
 

@@ -187,7 +187,7 @@ export async function CreateOrder({
   seatMatrixIDs
 }: CreateOrderRequestParams): Promise<{ error: string } | { order_id: string }> {
 
-  const response = await fetch("http://localhost:8080/CreateOrder", {
+  const response = await fetch("http://localhost:8080/createOrder", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -222,6 +222,8 @@ export default function Index() {
   const addSelectedSeatsToStore = useStore((state) => state.setSelectedSeatsID)
   const seatMatrixIdsInStore = useStore((state) => state.selectedSeatsID)
   const setOrderID = useStore((state) => state.setOrderID)
+
+  console.log(`idempotent key in seat selection index: ${idempotentKey}`)
   const {
     data: getBookedSeats,
     isLoading: isLoadingBookedSeats,
@@ -278,6 +280,7 @@ export default function Index() {
       seatMatrixIDs: selectedSeats.map((seat) => seat.id)
     }),
     onSuccess: (data) => {
+      console.log(`data received after creating order: ${JSON.stringify(data)}`)
       if ('order_id' in data) {
         // Set the order id in the zustand store
         setOrderID(data.order_id)
@@ -402,7 +405,7 @@ export default function Index() {
       {
         selectedSeats && selectedSeats.length > 0 &&
         <div>
-          <button className={`btn btn-error w-full`} onClick={handleConfirmSeats}>
+          <button className={`btn btn-error w-full`} disabled={isPending} onClick={handleConfirmSeats}>
             {isPending && <span className="loading loading-spinner"></span>}
             Confirm seats
           </button>

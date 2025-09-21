@@ -28,7 +28,7 @@ async function fetchMovieDetails(id: number) {
     }
 }
 
-export async function GetIdempotentKey(): Promise<string> {
+export async function GetIdempotentKey(): Promise<{ idempotent_key: string }> {
 
     const response = await fetch("http://localhost:8080/getIdempotentKey")
 
@@ -139,11 +139,15 @@ export default function MovieDetails() {
     // Need to call the commit idempotent key
 
     if (idempotentKeyStatus === "success") {
+        console.log(`itempotent key fetched: ${JSON.stringify(idempotentKey)}`)
         if (idempotentKey) {
-            if (store.idempotencyKey !== idempotentKey) {
-                setIdempotencyKey(idempotentKey)
+            if (store.idempotencyKey !== idempotentKey.idempotent_key) {
+                console.log(`setting itempotent key in store: ${idempotentKey.idempotent_key}`)
+                setIdempotencyKey(idempotentKey.idempotent_key)
             }
         }
+    } else if (idempotentKeyIsError) {
+        console.error("Error fetching idempotent key:", idempotentKeyError);
     }
 
     const { data: movieReviews, error: movieReviewResponseError, status: movieReviewResponseStatus, isError: movieReviewResponseIsError } = useQuery<MovieReviewResponse>({
@@ -243,7 +247,8 @@ export default function MovieDetails() {
             </div>
             <div className="sticky bottom-0 z-50 bg-base-100 px-4 py-3 shadow-md">
                 <button
-                    className="btn btn-error w-full"
+                    // Should not be able to proceed until idempotent key is fetched ro set in the store
+                    className={`btn btn-error w-full ${idempotentKeyStatus === "pending" ? "loading" : ""}`}
                     onClick={() => {
                         navigate(`/movie/${id}/movieTimeSlots`, {
                             state: { movieDetails },
