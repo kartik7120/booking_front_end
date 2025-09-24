@@ -9,6 +9,7 @@ import Navbar from './components/FrontPage/Navbar'
 import { useState } from 'react'
 import SeatSelectionIndex from "./components/SeatSelection/SeatSelectionIndex"
 import ConfirmOrderContactDetails from './components/ConfirmOrder/ConfirmOrderContactDetails'
+import PollingPageIndex from './components/PollingPage/PollingPageIndex'
 
 const queryClient = new QueryClient()
 
@@ -26,6 +27,8 @@ function App() {
           <Route path="/confirmOrder/:orderID" element={
             <ConfirmOrderContactDetails />
           } />
+          <Route path="/confirmingBooking" element={<PollingPageIndex />} />
+          <Route path="/ticket/:ticketID" element={<div>This is the ticket route</div>} />
         </Route>
       </Routes>
     </QueryClientProvider>
