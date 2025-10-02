@@ -10,6 +10,7 @@ import { useState } from 'react'
 import SeatSelectionIndex from "./components/SeatSelection/SeatSelectionIndex"
 import ConfirmOrderContactDetails from './components/ConfirmOrder/ConfirmOrderContactDetails'
 import PollingPageIndex from './components/PollingPage/PollingPageIndex'
+import TicketPageIndex from './components/TicketPage/TicketPageIndex'
 
 const queryClient = new QueryClient()
 
@@ -28,7 +29,7 @@ function App() {
             <ConfirmOrderContactDetails />
           } />
           <Route path="/confirmingBooking" element={<PollingPageIndex />} />
-          <Route path="/ticket/:ticketID" element={<div>This is the ticket route</div>} />
+          <Route path="/ticket/:ticketID" element={<TicketPageIndex />} />
         </Route>
       </Routes>
     </QueryClientProvider>

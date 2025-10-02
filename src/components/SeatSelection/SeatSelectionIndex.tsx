@@ -11,7 +11,7 @@ import useStore from "../../zustand/store";
 
 export interface BookedSeats {
   id?: number;
-  seatNumber?: string;
+  seat_number?: string;
   movieTimeSlotID?: number;
   seatMatrixID?: number;
   isBooked?: boolean;
@@ -303,12 +303,14 @@ export default function Index() {
   const bookedSeatsData = isGetBookedSeats(getBookedSeats)
     ? getBookedSeats.booked_seats.map((bookedSeat) => ({
       id: bookedSeat.id || 0,
-      seat_number: bookedSeat.seatNumber || "Unknown",
+      seat_number: bookedSeat.seat_number || "Unknown",
       movieTimeSlotID: bookedSeat.movieTimeSlotID || 0,
       seatMatrixID: bookedSeat.seatMatrixID || 0,
-      is_booked: bookedSeat.isBooked || false,
+      is_booked: bookedSeat.isBooked,
     }))
     : [];
+
+
 
   if (isErrorBookedSeats || isErrorSeatMatrix) {
     return <div className="text-red-500 text-center">Error fetching seat data.</div>;

@@ -11,20 +11,32 @@ export default function PollingPageIndex() {
 
     const idempotentKey = useStore((state) => state.idempotencyKey)
 
+    console.log(idempotentKey)
+
     useEffect(() => {
         if (!idempotentKey) return;
 
+        console.log("useEffect triggered")
+
         const interval = setInterval(async () => {
             try {
+
+                console.log(`inside try catch block for payment status`)
                 const res = await fetch(
-                    `/payment-status?idempotentKey=${idempotentKey}`
-                );
+                    `http://localhost:8080/payment-status`
+                    , {
+                        method: "POST",
+                        body: JSON.stringify({
+                            "idempotent_key": idempotentKey
+                        })
+                    });
+
                 if (!res.ok) return;
 
                 const data = await res.json();
                 console.log("polling response:", data);
 
-                if (data.PaymentStatus === "succeeded") {
+                if (data.paymentSuccess === true) {
                     setStatus("succeeded");
                     setMessage("Payment Successful 🎉 Redirecting...");
                     clearInterval(interval);
@@ -33,7 +45,7 @@ export default function PollingPageIndex() {
                     setTimeout(() => {
                         navigate(`/ticket/${data.TicketID}`);
                     }, 2000);
-                } else if (data.PaymentStatus === "failed") {
+                } else {
                     setStatus("failed");
                     setMessage("Payment Failed ❌ Please try again.");
                     clearInterval(interval);

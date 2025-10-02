@@ -86,6 +86,7 @@ export default function ConfirmOrderContactDetails() {
             console.log(`Payment link response data: ${data}`)
 
             if (data && data.payment_link) {
+
                 console.log(`Navigating to payment link: ${data.payment_link}`)
                 window.location.href = data.payment_link
                 return

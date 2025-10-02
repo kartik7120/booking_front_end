@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export interface Store {
     idempotencyKey?: string;
@@ -22,25 +23,33 @@ export interface Store {
     clearStore: () => void;
 }
 
-const useStore = create<Store>()((set, _, Store) => ({
-    idempotencyKey: undefined,
-    orderID: undefined,
-    movieID: undefined,
-    movieTimeSlotID: undefined,
-    venueID: undefined,
-    contactEmail: undefined,
-    contactPhoneNumber: undefined,
-    selectedSeatsID: [],
-    setIdempotencyKey: (idempotencyKey: string) => set({ idempotencyKey }),
-    setOrderID: (orderID: string) => set({ orderID }),
-    setMovieID: (movieID: number) => set({ movieID }),
-    setMovieTimeSlotID: (movieTimeSlotID: number) => set({ movieTimeSlotID }),
-    setVenueID: (venueID: number) => set({ venueID }),
-    setContactEmail: (contactEmail: string) => set({ contactEmail }),
-    setContactPhoneNumber: (contactPhoneNumber: string) => set({ contactPhoneNumber }),
-    setSelectedSeatsID: (selectedSeatsID: string[]) => set({ selectedSeatsID }),
-    clearStore: () => set(Store.getInitialState()),
-    setCustomersID: (customersID: string) => set({ customersID }),
-}))
-
+const useStore = create<Store>()(
+  persist(
+    (set, get) => ({
+      idempotencyKey: undefined,
+      orderID: undefined,
+      movieID: undefined,
+      movieTimeSlotID: undefined,
+      venueID: undefined,
+      contactEmail: undefined,
+      contactPhoneNumber: undefined,
+      selectedSeatsID: [],
+      customersID: undefined,
+      setIdempotencyKey: (idempotencyKey) => set({ idempotencyKey }),
+      setOrderID: (orderID) => set({ orderID }),
+      setMovieID: (movieID) => set({ movieID }),
+      setMovieTimeSlotID: (movieTimeSlotID) => set({ movieTimeSlotID }),
+      setVenueID: (venueID) => set({ venueID }),
+      setContactEmail: (contactEmail) => set({ contactEmail }),
+      setContactPhoneNumber: (contactPhoneNumber) => set({ contactPhoneNumber }),
+      setSelectedSeatsID: (selectedSeatsID) => set({ selectedSeatsID }),
+      setCustomersID: (customersID) => set({ customersID }),
+      clearStore: () => set({}), // You may want to reset to initial state manually
+    }),
+    {
+      name: 'booking-store', // localStorage key
+      partialize: (state) => ({ ...state }), // Optional: choose what to persist
+    }
+  )
+);
 export default useStore
