@@ -43,7 +43,7 @@ export default function PollingPageIndex() {
 
                     // redirect to ticket page
                     setTimeout(() => {
-                        navigate(`/ticket/${data.TicketID}`);
+                        navigate(`/ticket/${data.ticketID}`);
                     }, 2000);
                 } else {
                     setStatus("failed");

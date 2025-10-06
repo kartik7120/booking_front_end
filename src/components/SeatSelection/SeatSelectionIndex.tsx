@@ -14,7 +14,7 @@ export interface BookedSeats {
   seat_number?: string;
   movieTimeSlotID?: number;
   seatMatrixID?: number;
-  isBooked?: boolean;
+  is_booked: boolean;
 }
 
 export interface GetBookedSeats {
@@ -55,13 +55,16 @@ interface VenueDetails {
   columns: number;
 }
 
-function isGetBookedSeats(data: unknown): data is GetBookedSeats {
+function isGetBookedSeats(data: unknown): data is BookedSeats[] {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    "status" in data &&
-    "booked_seats" in data &&
-    Array.isArray((data as GetBookedSeats).booked_seats)
+    Array.isArray(data) &&
+    data.every(
+      (item) =>
+        typeof item === "object" &&
+        item !== null &&
+        "is_booked" in item &&
+        typeof (item as any).is_booked === "boolean"
+    )
   );
 }
 
@@ -69,7 +72,7 @@ async function fetchGetBookedSeats({
   queryKey,
 }: {
   queryKey: readonly unknown[];
-}): Promise<GetBookedSeats> {
+}): Promise<BookedSeats> {
   try {
 
     if (!queryKey[1]) {
@@ -90,7 +93,7 @@ async function fetchGetBookedSeats({
     //   throw new Error("Network response was not ok");
     // }
 
-    return response.json() as Promise<GetBookedSeats>;
+    return response.json() as Promise<BookedSeats>;
   } catch (error) {
     console.error("Error fetching booked seats:", error);
     throw error; // Rethrow the error to be handled by React Query
@@ -301,16 +304,14 @@ export default function Index() {
   const totalColumns = useMemo(() => calculateNoOfRowsAndColumns(getSeatMatrix?.seats || []).column, [getSeatMatrix?.seats]);
 
   const bookedSeatsData = isGetBookedSeats(getBookedSeats)
-    ? getBookedSeats.booked_seats.map((bookedSeat) => ({
-      id: bookedSeat.id || 0,
-      seat_number: bookedSeat.seat_number || "Unknown",
-      movieTimeSlotID: bookedSeat.movieTimeSlotID || 0,
-      seatMatrixID: bookedSeat.seatMatrixID || 0,
-      is_booked: bookedSeat.isBooked,
+    ? getBookedSeats.map((bookedSeat) => ({
+      id: bookedSeat.id ?? 0,
+      seat_number: bookedSeat.seat_number ?? "Unknown",
+      movieTimeSlotID: bookedSeat.movieTimeSlotID ?? 0,
+      seatMatrixID: bookedSeat.seatMatrixID ?? 0,
+      is_booked: bookedSeat.is_booked ?? false,
     }))
     : [];
-
-
 
   if (isErrorBookedSeats || isErrorSeatMatrix) {
     return <div className="text-red-500 text-center">Error fetching seat data.</div>;

@@ -31,7 +31,7 @@ export interface SeatMapProps {
             seat_number: string;
             movieTimeSlotID: number;
             seatMatrixID: number;
-            is_booked: boolean | undefined;
+            is_booked: boolean;
         }[];
     };
     setSelectSeatState: React.Dispatch<React.SetStateAction<Seat[]>>;
@@ -89,7 +89,7 @@ export default function SeatMap(props: SeatMapProps) {
 
                     console.log(`booked seats: ${JSON.stringify(props.seats.bookedSeats)}`)
                     const isBooked = props.seats.bookedSeats.some(
-                        booked => booked.seat_number === seat.seat_number
+                        booked => booked.seat_number === seat.seat_number && booked.is_booked === true
                     );
 
                     matrix[rowKey].push({

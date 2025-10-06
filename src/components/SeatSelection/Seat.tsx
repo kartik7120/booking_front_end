@@ -1,5 +1,4 @@
 export interface SeatProps {
-    // Define the properties that Seat will accept
     seatNumber: string;
     price: number;
     row: number;
@@ -12,13 +11,31 @@ export interface SeatProps {
 }
 
 export default function Seat(props: SeatProps) {
+    const { seatNumber, isBooked, isSelected, onClick } = props;
 
-    console.log(`seat number: ${props.seatNumber} and is_booked ${props.isBooked}`)
+    console.log(`Seat number: ${seatNumber}, is_booked: ${isBooked}`);
+
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (isBooked) return; // 🚫 prevent action if seat is booked
+        onClick(e);
+    };
+
     return (
-        <div onClick={props.onClick} className={`flex flex-col items-center justify-center ${props.isBooked ? "" : props.isSelected ? "" : "text-green-600"} w-8 h-8 border-2 rounded-lg ${props.isBooked ? "" : "cursor-pointer"} transition-all duration-200 ${!props.isBooked && !props.isSelected ? "hover:bg-green-600 hover:text-white" : ""} ease-in-out ${props.isBooked ? "bg-gray-300 text-gray-900 border-white cursor-not-allowed" : props.isSelected ? "bg-green-500 border-green-700" : "bg-white border-green-400 hover:bg-gray-100"}`}>
+        <div
+            onClick={handleClick}
+            className={`flex flex-col items-center justify-center
+                w-8 h-8 border-2 rounded-lg transition-all duration-200 ease-in-out
+                ${isBooked
+                    ? "bg-gray-300 text-gray-900 border-white cursor-not-allowed"
+                    : isSelected
+                        ? "bg-green-500 border-green-700 text-white"
+                        : "bg-white border-green-400 text-green-600 hover:bg-green-600 hover:text-white cursor-pointer"
+                }
+            `}
+        >
             <p className="text-center text-sm font-semibold">
-                {props.seatNumber}
+                {seatNumber}
             </p>
         </div>
-    )
+    );
 }
