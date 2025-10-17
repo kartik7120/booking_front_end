@@ -135,7 +135,7 @@ export default function MovieDetails() {
         isError: movieReviewResponseIsError,
     } = useQuery<MovieReviewResponse>({
         queryKey: ["movieReviews", id],
-        queryFn: () =>
+        queryFn: async () =>
             fetch(`http://localhost:8080/getAllMovieReview/${id}`, {
                 method: "POST",
                 headers: {

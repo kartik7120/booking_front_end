@@ -76,6 +76,13 @@ export default function MovieReviewSection(props: MovieReviewSectionProps) {
                     }}>
                         View More Reviews
                     </button>
+                    {/* Add reivew button / Can be added by the logged in or anonymous user */}
+
+                    <button className="btn btn-error w-full" onClick={() => {
+                        navigate(`/movie/${id}/add-review`)
+                    }}>
+                        Add Review
+                    </button>
                 </div>
             </div>
         </div>

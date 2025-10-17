@@ -11,6 +11,7 @@ import SeatSelectionIndex from "./components/SeatSelection/SeatSelectionIndex"
 import ConfirmOrderContactDetails from './components/ConfirmOrder/ConfirmOrderContactDetails'
 import PollingPageIndex from './components/PollingPage/PollingPageIndex'
 import TicketPageIndex from './components/TicketPage/TicketPageIndex'
+import AddReviewIndex from './components/AddReview/AddReviewIndex'
 
 const queryClient = new QueryClient()
 
@@ -30,6 +31,7 @@ function App() {
           } />
           <Route path="/confirmingBooking" element={<PollingPageIndex />} />
           <Route path="/ticket/:ticketID" element={<TicketPageIndex />} />
+          <Route path="movie/:id/add-review" element={<AddReviewIndex />} />
         </Route>
       </Routes>
     </QueryClientProvider>
