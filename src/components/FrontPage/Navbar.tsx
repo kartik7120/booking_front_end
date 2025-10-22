@@ -1,7 +1,7 @@
 import { FiSearch } from "react-icons/fi"
 import CinemagicIcon from "./CinemagicIcon"
 import { CiMenuBurger } from "react-icons/ci"
-import React, { ReactEventHandler, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
 import Cookies from 'js-cookie'
 import { Outlet } from "react-router"
@@ -98,25 +98,25 @@ async function ValidateOTP(
   return res.json()
 }
 
-async function ValidateToken(
-  context: QueryFunctionContext<readonly unknown[]>
-) {
-  const [, token] = context.queryKey
+// async function ValidateToken(
+//   context: QueryFunctionContext<readonly unknown[]>
+// ) {
+//   const [, token] = context.queryKey
 
-  const res = await fetch("http://localhost:8080/validateToken", {
-    headers: {
-      "Context-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    method: "GET"
-  })
+//   const res = await fetch("http://localhost:8080/validateToken", {
+//     headers: {
+//       "Context-Type": "application/json",
+//       "Authorization": `Bearer ${token}`
+//     },
+//     method: "GET"
+//   })
 
-  if (!res.ok) {
-    throw new Error("Token validation failed")
-  }
+//   if (!res.ok) {
+//     throw new Error("Token validation failed")
+//   }
 
-  return res.json()
-}
+//   return res.json()
+// }
 
 /**
  * When the register button is clicked, redirect to the register popover card
@@ -158,17 +158,16 @@ export default function Navbar(props: NavbarProps) {
     mutate,
     isError: IsLoginUserError,
     error: LoginUserError,
-    isPending: IsLoginUserPending
   } = useMutation({
     mutationFn: LoginUser,
-    onError: (error, variables, context) => {
+    onError: (error) => {
       setError(error.message)
       setOtp("")
       setEmail("")
       setPassword("")
       setIsOTPScreen(false)
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data) => {
       console.log('User successfully logged')
       console.log('cookie = ', document.cookie)
       const loginModal = document.getElementById('my_modal_3');
@@ -233,41 +232,6 @@ export default function Navbar(props: NavbarProps) {
       });
     }
   }, []);
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    // Handle form submission logic here
-    // For example, you can call an API to log in the user
-    const email = (event.target as HTMLFormElement).email.value;
-    const password = (event.target as HTMLFormElement).password.value;
-    const confirmPassword = (event.target as HTMLFormElement).confirmPassword?.value;
-
-    if (password !== confirmPassword) {
-      console.error("Passwords do not match");
-      setError("Passwords do not match");
-      return;
-    }
-
-    mutate(
-      {
-        signal: new AbortController().signal,
-        queryKey: ["login", email, password] as readonly unknown[],
-        client: queryClient,
-        meta: {}
-      },
-      {
-        onSuccess: (data) => {
-          console.log("Login successful", data);
-          queryClient.invalidateQueries(); // Invalidate queries to refresh data
-        },
-        onError: (error) => {
-          console.error("Login failed", error);
-        }
-      }
-    );
-    console.log("Form submitted");
-    // After successful login, you can set the isLoggedIn state to true
-  }
 
   const handleRequestOtp = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -434,39 +398,6 @@ export default function Navbar(props: NavbarProps) {
         onError: (error) => {
           console.error("Failed to validate OTP", error);
           setError("Failed to validate OTP");
-        }
-      }
-    );
-  }
-
-  const handleRegisterSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const email = (event.target as HTMLFormElement).email.value;
-    const password = (event.target as HTMLFormElement).password.value;
-    const confirmPassword = (event.target as HTMLFormElement).confirmPassword?.value;
-
-    if (registerPassword !== "" && confirmPassword !== "" && registerPassword !== confirmPassword) {
-      console.error("Passwords do not match");
-      setError("Passwords do not match");
-      return;
-    }
-
-    registerUserMutate(
-      {
-        signal: new AbortController().signal,
-        queryKey: ["registerUser", email, password] as readonly unknown[],
-        client: queryClient,
-        meta: {}
-      },
-      {
-        onSuccess: (data) => {
-          console.log("Registration successful", data);
-          // After successful registration, you can set the isLoggedIn state to true
-          setIsOTPScreen(false); // Hide OTP screen
-        },
-        onError: (error) => {
-          console.error("Registration failed", error);
-          setError("Registration failed");
         }
       }
     );
@@ -670,11 +601,25 @@ export default function Navbar(props: NavbarProps) {
               </div>
             }
           </div>
-          {
-            error && <div className="text-red-500 mt-4">{error}</div>
-          }
+          {(error ||
+            isErrorRequestOTP ||
+            isErrorRegisterUser ||
+            isErrorValidateOTP ||
+            IsLoginUserError) && (
+              <div className="mt-4 p-3 rounded-md bg-red-100 border border-red-400 text-red-700">
+                <p className="font-semibold">Something went wrong:</p>
+                <ul className="list-disc ml-5 text-sm mt-1">
+                  {error && <li>{error}</li>}
+                  {IsLoginUserError && (
+                    <li>{LoginUserError?.message || "Login request failed."}</li>
+                  )}
+                  {isErrorRequestOTP && <li>Failed to send OTP. Please try again.</li>}
+                  {isErrorRegisterUser && <li>Registration failed. Try again later.</li>}
+                  {isErrorValidateOTP && <li>OTP validation failed. Please retry.</li>}
+                </ul>
+              </div>
+            )}
         </dialog>
-
         {/* Sidebar toggle button - visible on small screens only */}
         <div className="sm:hidden">
           <div className="drawer drawer-end sm:hidden">

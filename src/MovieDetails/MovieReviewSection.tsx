@@ -7,6 +7,8 @@ interface MovieReviewSectionProps {
     totalReviews: number,
     reviews: ReviewCardProps[] | undefined
     isLoading: boolean,
+    isError: boolean,
+    error?: any,
 }
 
 export default function MovieReviewSection(props: MovieReviewSectionProps) {
@@ -39,6 +41,14 @@ export default function MovieReviewSection(props: MovieReviewSectionProps) {
                         <div className="skeleton h-8 w-full mb-4"></div>
                     </div>
                 </div>
+            </div>
+        )
+    }
+
+    if (props.isError) {
+        return (
+            <div className="w-full p-8">
+                <p className="text-red-500">Error loading reviews: {props.error?.message || 'Unknown error'}</p>
             </div>
         )
     }

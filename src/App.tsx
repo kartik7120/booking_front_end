@@ -4,7 +4,6 @@ import Index from "./components/MovieTimeSlots/Index"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import MovieDetails from './MovieDetails/MovieDetails'
 import HomePage from './components/HomePage/HomePage'
-import MovieReviewsIndex from "./components/MovieReviews/Index"
 import Navbar from './components/FrontPage/Navbar'
 import { useState } from 'react'
 import SeatSelectionIndex from "./components/SeatSelection/SeatSelectionIndex"

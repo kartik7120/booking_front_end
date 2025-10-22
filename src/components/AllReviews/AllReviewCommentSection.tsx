@@ -58,7 +58,6 @@ export default function AllReviewCommentSection() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        refetch,
     } = useInfiniteQuery({
         queryKey: ["movieReviews", movieID],
         queryFn: ({ pageParam = 0 }) => getMovieReviews(movieID!, pageParam, LIMIT, 0),

@@ -1,8 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react"
-import z, { email, string } from "zod"
+import z from "zod"
 import useStore from "../../zustand/store";
-import { useNavigate } from "react-router";
 
 export interface Customer {
     customer_name?: string;

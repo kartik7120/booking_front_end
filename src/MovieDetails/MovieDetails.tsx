@@ -224,6 +224,10 @@ export default function MovieDetails() {
                     rating={calculateAverageRating(movieReviews?.review_list)}
                     votings={movieReviews?.totalVotes || 0}
                     totalReviews={movieReviews?.totalReviewCount || 0}
+                    error={movieReviewResponseError}
+                    isError={
+                        movieReviewResponseIsError
+                    }
 
                     reviews={
                         movieReviews?.review_list?.reviews?.map((review) => ({

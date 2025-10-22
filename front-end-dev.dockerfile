@@ -1,25 +1,25 @@
-FROM alpine:latest
+FROM node:18-alpine
 
-# Install Node.js
-RUN apk add --update nodejs npm
+# Install build tools for native modules (if needed)
+RUN apk add --no-cache python3 make g++
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files
+# Copy dependency manifests first for better caching
 COPY package*.json ./
 
-# Install the dependencies
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the files
+# Copy the rest of the app
 COPY . .
 
-# Build the app
+# Build the app (TypeScript + Vite)
 RUN npm run build
 
-# Expose the port
+# Expose the port Vite uses in dev mode
 EXPOSE 3000
 
-# Start the app
+# Start the dev server (for production, you'd serve the built files differently)
 CMD ["npm", "run", "dev"]
