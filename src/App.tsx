@@ -12,6 +12,7 @@ import ConfirmOrderContactDetails from './components/ConfirmOrder/ConfirmOrderCo
 import PollingPageIndex from './components/PollingPage/PollingPageIndex'
 import TicketPageIndex from './components/TicketPage/TicketPageIndex'
 import AddReviewIndex from './components/AddReview/AddReviewIndex'
+import AllReviewsIndex from './components/AllReviews/AllReviewsIndex'
 
 const queryClient = new QueryClient()
 
@@ -24,7 +25,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path='movie/:id' element={<MovieDetails />} />
           <Route path="movie/:id/movieTimeSlots" element={<Index />} />
-          <Route path="movie/:id/reviews" element={<MovieReviewsIndex />} />
+          <Route path="movie/:id/reviews" element={<AllReviewsIndex />} />
           <Route path="movie/:id/venue/:venueID/movieTimeSlots/:movieTimeSlotID/seatSelection" element={<SeatSelectionIndex />} />
           <Route path="/confirmOrder/:orderID" element={
             <ConfirmOrderContactDetails />

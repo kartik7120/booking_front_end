@@ -6,12 +6,42 @@ interface MovieReviewSectionProps {
     votings: number,
     totalReviews: number,
     reviews: ReviewCardProps[] | undefined
+    isLoading: boolean,
 }
 
 export default function MovieReviewSection(props: MovieReviewSectionProps) {
 
     const navigate = useNavigate();
     let { id } = useParams<{ id: string }>();
+
+    if (props.isLoading) {
+        return (
+            <div className="w-full p-8">
+                <div className="flex flex-row justify-between items-center flex-wrap">
+                    <div className="flex flex-col self-start gap-y-4">
+                        {/* Left side to mention total reviews, rating of the movie and total votings for the movie before release */}
+                        <div>
+                            {/* View only rating */}
+                            <div className="rating">
+                                {
+                                    Array.from({ length: 5 }, (_, index) => (
+                                        <div className="mask mask-star bg-gray-400" aria-label={(index + 1) + " star"}></div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                        <div className="skeleton bg-green-600 w-32 h-32 p-2"></div>
+                        <div className="skeleton bg-orange-600 w-32 h-32 p-2"></div>
+                    </div>
+                    <div className="flex flex-col items-center gap-y-5 justify-start basis-2/3">
+                        <div className="skeleton h-8 w-full mb-4"></div>
+                        <div className="skeleton h-8 w-full mb-4"></div>
+                        <div className="skeleton h-8 w-full mb-4"></div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
 
     return (

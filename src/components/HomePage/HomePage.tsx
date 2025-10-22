@@ -19,10 +19,11 @@ export default function HomePage() {
 
   const reset = useStore(state => state.clearStore)
 
-  const {
+  let {
     isError: isErrorNowPlayingMovies,
     isLoading: isLoadingNowPlayingMovies,
-    data: nowPlayingMovies
+    data: nowPlayingMovies,
+    error: nowPlayingMoviesError
   } = useQuery<UpcomingMovies[]>({
     queryKey: ['nowPlayingMovies'],
     queryFn: fetchNowPlayingMovies,
@@ -32,7 +33,8 @@ export default function HomePage() {
   const {
     isError: isErrorUpcomingMovies,
     isLoading: isLoadingUpcomingMovies,
-    data: upcomingMoviesData
+    data: upcomingMoviesData,
+    error: upcomingMoviesError
   } = useQuery<UpcomingMovies[]>({
     queryKey: ['upcomingMovies', { date: new Date().toISOString().split('T')[0] }],
     queryFn: getUpcomingMovies,
@@ -40,8 +42,9 @@ export default function HomePage() {
   });
 
   useMemo(() => {
-    if (!nowPlayingMovies || !upcomingMoviesData) return;
-    const sortedMovies = sortMovies([...nowPlayingMovies, ...upcomingMoviesData]);
+    if (!nowPlayingMovies && !upcomingMoviesData) return;
+    
+    const sortedMovies = sortMovies([...(nowPlayingMovies || []), ...(upcomingMoviesData || [])]);
 
     // console.log(`Sorted Movies:`, sortedMovies);
 
@@ -81,14 +84,7 @@ export default function HomePage() {
           CarouselLayoverProps
         }
           imageURLs={
-            // [
-            //   "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-            //   "https://image.tmdb.org/t/p/w1280/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
-            //   "https://image.tmdb.org/t/p/w1280/9GAGg2k5b6d8c4a7e1f3b4f5f5f5.jpg",
-            //   "https://image.tmdb.org/t/p/w1280/8X2k5b6d8c4a7e1f3b4f5f5f5f5.jpg",
-            // ]
             CarouselLayoverProps.map(item => item.poster_url || "https://via.placeholder.com/1280x720")
-            // TODO: map over screen_wide_poster_url if available
           }
           shouldAutoScroll={true}
           scrollInterval={5000}
@@ -132,12 +128,15 @@ export default function HomePage() {
         <h2 className='text-2xl h-2 font-bold my-4 p-4'>Upcoming Movies</h2>
         <div className='flex flex-row items-center flex-wrap gap-4 p-4'>
           {
-            isLoadingUpcomingMovies && <div className="skeleton h-96 w-full max-w-screen" />
+            !upcomingMoviesData && isLoadingUpcomingMovies && <div className="skeleton h-96 w-full max-w-screen" />
           }
           {
             isErrorUpcomingMovies && <div className="flex flex-col items-center justify-center w-full h-96">
               <p className="text-red-500">Error loading upcoming movies</p>
               <p className="text-gray-500">Please try again later.</p>
+              {
+                <p>{"Error fetching upcoming movies "+ upcomingMoviesError.message}</p>
+              }
             </div>
           }
           {

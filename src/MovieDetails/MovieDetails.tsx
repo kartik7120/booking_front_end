@@ -220,9 +220,11 @@ export default function MovieDetails() {
             <div className="divider"></div>
             <div>
                 <MovieReviewSection
+                    isLoading={movieReviewResponseStatus === "pending"}
                     rating={calculateAverageRating(movieReviews?.review_list)}
                     votings={movieReviews?.totalVotes || 0}
                     totalReviews={movieReviews?.totalReviewCount || 0}
+
                     reviews={
                         movieReviews?.review_list?.reviews?.map((review) => ({
                             rating: review.rating,

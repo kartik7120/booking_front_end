@@ -72,6 +72,11 @@ export async function getUpcomingMovies(
     const [, { date }] = queryKey;
 
     const res = await fetch(`http://localhost:8080/getupcomingmovies/${date}`);
+
+    if (res.status === 204) {
+        return [] as UpcomingMovies[];
+    }
+
     const data = await res.json();
 
     console.log('Upcoming Movies:', data);
