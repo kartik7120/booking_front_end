@@ -2,30 +2,30 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export interface Store {
-    idempotencyKey?: string;
-    orderID?: string;
-    movieID?: number;
-    movieTimeSlotID?: number;
-    venueID?: number;
-    contactEmail?: string;
-    contactPhoneNumber?: string;
-    selectedSeatsID?: string[];
-    customersID?: string;
-    setIdempotencyKey: (idempotencyKey: string) => void;
-    setOrderID: (orderID: string) => void;
-    setMovieID: (movieID: number) => void;
-    setMovieTimeSlotID: (movieTimeSlotID: number) => void;
-    setVenueID: (venueID: number) => void;
-    setContactEmail: (contactEmail: string) => void;
-    setContactPhoneNumber: (contactPhoneNumber: string) => void;
-    setSelectedSeatsID: (selectedSeatsID: string[]) => void;
-    setCustomersID: (customersID: string) => void;
-    clearStore: () => void;
+  idempotencyKey?: string;
+  orderID?: string;
+  movieID?: number;
+  movieTimeSlotID?: number;
+  venueID?: number;
+  contactEmail?: string;
+  contactPhoneNumber?: string;
+  selectedSeatsID?: string[];
+  customersID?: string;
+  setIdempotencyKey: (idempotencyKey: string) => void;
+  setOrderID: (orderID: string) => void;
+  setMovieID: (movieID: number) => void;
+  setMovieTimeSlotID: (movieTimeSlotID: number) => void;
+  setVenueID: (venueID: number) => void;
+  setContactEmail: (contactEmail: string) => void;
+  setContactPhoneNumber: (contactPhoneNumber: string) => void;
+  setSelectedSeatsID: (selectedSeatsID: string[]) => void;
+  setCustomersID: (customersID: string) => void;
+  clearStore: () => void;
 }
 
 const useStore = create<Store>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       idempotencyKey: undefined,
       orderID: undefined,
       movieID: undefined,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../../zustand/store";
+import { baseURL } from "../../App";
 
 export default function PollingPageIndex() {
     const [status, setStatus] = useState("pending");
@@ -23,7 +24,7 @@ export default function PollingPageIndex() {
 
                 console.log(`inside try catch block for payment status`)
                 const res = await fetch(
-                    `http://localhost:8080/payment-status`
+                    `${baseURL}/payment-status`
                     , {
                         method: "POST",
                         body: JSON.stringify({

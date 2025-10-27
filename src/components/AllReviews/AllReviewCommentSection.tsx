@@ -2,6 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { Fragment } from "react";
 import ReviewCard from "../ReviewCard";
+import { baseURL } from "../../App";
 
 interface Review {
     reviewID: number;
@@ -34,7 +35,7 @@ async function getMovieReviews(
     limit: number,
     filterBy: number
 ): Promise<ReviewResponse> {
-    const response = await fetch(`http://localhost:8080/getAllMovieReview/${movieID}`, {
+    const response = await fetch(`${baseURL}/getAllMovieReview/${movieID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ offset, limit, filterBy }),

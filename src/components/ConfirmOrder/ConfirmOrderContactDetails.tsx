@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react"
 import z from "zod"
 import useStore from "../../zustand/store";
+import { baseURL } from "../../App";
 
 export interface Customer {
     customer_name?: string;
@@ -22,7 +23,7 @@ export interface CustomerCreationResponse {
 
 export async function CreatePaymentLink(idempotencyKey: string): Promise<{ Error: string, Status: string, payment_link: string, Message: string } | { error: string }> {
 
-    const response = await fetch("http://localhost:8080/createPaymentLink", {
+    const response = await fetch(`${baseURL}/createPaymentLink`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -37,7 +38,7 @@ export async function CreatePaymentLink(idempotencyKey: string): Promise<{ Error
 
 export async function create_customer(customer: Customer): Promise<CustomerCreationResponse> {
 
-    const response = await fetch("http://localhost:8080/createCustomer", {
+    const response = await fetch(`${baseURL}/createCustomer`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

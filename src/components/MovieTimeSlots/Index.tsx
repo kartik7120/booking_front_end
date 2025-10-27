@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import MovieTimeSlotDate from "./MovieTimeSlotDate";
-import React, { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TimeSlot from "./timeSlot";
 import { useLocation, useNavigate } from "react-router";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { TbBrandGoogleMaps } from "react-icons/tb";
+import { baseURL } from "../../App";
 
 export interface MovieTimeSlotRequest {
   start_date: string
@@ -18,7 +19,7 @@ export async function FetchMovieTimeSlot(params: MovieTimeSlotRequest) {
 
   console.log(`params : ${JSON.stringify(params)}`)
 
-  const response = await fetch("http://localhost:8080/getMovieTimeSlots", {
+  const response = await fetch(`${baseURL}/getMovieTimeSlots`, {
     body: JSON.stringify(params),
     method: "POST",
     headers: {
@@ -95,8 +96,8 @@ export default function Index() {
   const [start_date, setStart_date] = useState<string | null>(null)
   const [end_date, setEnd_date] = useState<string | null>(null)
   const [movie_id, setMovie_id] = useState<number | string | null>(null)
-  const [longitude, setLongitude] = useState<number>(0)
-  const [latitude, setLatitude] = useState<number>(0)
+  const [longitude] = useState<number>(0)
+  const [latitude] = useState<number>(0)
   const [selectedDate, setSelectedDate] = useState<string>("2025-04-06")
 
   const navigate = useNavigate();
@@ -270,7 +271,7 @@ export default function Index() {
             ))
           }
           {
-            isSuccess && MovieTimeSlotTypeGuard(data) && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([_, movieTimeSlots], idx) => (
+            isSuccess && MovieTimeSlotTypeGuard(data) && MapVenueIdToTheirMovieTimeSlots(data.venues, data.movie_time_slots).map(([_, movieTimeSlots]) => (
               movieTimeSlots.filter((movieTimeSlot) => movieTimeSlot.date === selectedDate).length === 0 && (
                 <div className="flex flex-row items-center justify-between gap-x-4 p-4 bg-gray-700 rounded-lg shadow-md flex-wrap">
                   <div key={0} className="flex flex-col gap-y-2">

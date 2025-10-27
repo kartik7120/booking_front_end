@@ -1,21 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
-import Navbar from '../FrontPage/Navbar'
 import Carousel from '../Carousel'
 import { CarouselLayoverProps } from '../FrontPage/CarouselLayover';
 import MovieCard from '../MovieCard';
 import Stats from '../FrontPage/Stats';
 import Footer from '../FrontPage/footer';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNowPlayingMovies, getUpcomingMovies, IsTokenValid, Movie, UpcomingMovies } from './getNowPlayingMovies';
+import { fetchNowPlayingMovies, getUpcomingMovies, Movie, UpcomingMovies } from './getNowPlayingMovies';
 import { sortMovies } from '../../utils/util';
-import Cookies from "js-cookie"
 import useStore from '../../zustand/store';
 
 export default function HomePage() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  // const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [CarouselLayoverProps, useStateCarouselLayoverProps] = useState<CarouselLayoverProps[]>([]);
-  const [currentUserEmail, setCurrentUserEmail] = useState("")
+  // const [currentUserEmail, setCurrentUserEmail] = useState("")
 
   const reset = useStore(state => state.clearStore)
 
@@ -43,7 +41,7 @@ export default function HomePage() {
 
   useMemo(() => {
     if (!nowPlayingMovies && !upcomingMoviesData) return;
-    
+
     const sortedMovies = sortMovies([...(nowPlayingMovies || []), ...(upcomingMoviesData || [])]);
 
     // console.log(`Sorted Movies:`, sortedMovies);
@@ -101,6 +99,9 @@ export default function HomePage() {
             isErrorNowPlayingMovies && <div className="flex flex-col items-center justify-center w-full h-96">
               <p className="text-red-500">Error loading now playing movies</p>
               <p className="text-gray-500">Please try again later.</p>
+              {
+                isErrorNowPlayingMovies && <p>{"Error fetching now playing movies " + nowPlayingMoviesError!.message}</p>
+              }
             </div>
           }
           {
@@ -135,7 +136,7 @@ export default function HomePage() {
               <p className="text-red-500">Error loading upcoming movies</p>
               <p className="text-gray-500">Please try again later.</p>
               {
-                <p>{"Error fetching upcoming movies "+ upcomingMoviesError.message}</p>
+                <p>{"Error fetching upcoming movies " + upcomingMoviesError.message}</p>
               }
             </div>
           }

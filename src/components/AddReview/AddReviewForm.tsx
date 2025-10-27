@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useParams } from "react-router";
+import { baseURL } from "../../App";
 
 async function AddReviewHandler({
     reviewTitle,
@@ -18,7 +19,7 @@ async function AddReviewHandler({
         throw new Error("Movie ID is required");
     }
 
-    const response = await fetch(`http://localhost:8080/addReview/${movieID}`, {
+    const response = await fetch(`${baseURL}/addReview/${movieID}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

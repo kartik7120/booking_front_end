@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useCallback } from "react";
 import Seat from "./Seat";
-import { propEffect } from "motion/react";
 
 export interface Seat {
     price: number;

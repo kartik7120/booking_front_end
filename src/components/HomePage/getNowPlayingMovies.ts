@@ -1,4 +1,5 @@
 import { QueryFunctionContext } from "@tanstack/react-query";
+import { baseURL } from "../../App";
 
 export interface Movie {
     id: number;
@@ -38,7 +39,7 @@ export interface UpcomingMovies {
 
 export async function fetchNowPlayingMovies() {
     try {
-        const res = await fetch(`http://localhost:8080/getnowplayingmovies`, {
+        const res = await fetch(`${baseURL}/getnowplayingmovies`, {
             body: JSON.stringify({
                 "longitude": 0,
                 "latitude": 0,
@@ -71,7 +72,7 @@ export async function getUpcomingMovies(
     const queryKey = context.queryKey as readonly [string, { date: string }];
     const [, { date }] = queryKey;
 
-    const res = await fetch(`http://localhost:8080/getupcomingmovies/${date}`);
+    const res = await fetch(`${baseURL}/getupcomingmovies/${date}`);
 
     if (res.status === 204) {
         return [] as UpcomingMovies[];
@@ -95,7 +96,7 @@ export async function IsTokenValid(
     const [token] = queryKey;
 
     try {
-        const res = await fetch(`http://localhost:8080/validateToken`, {
+        const res = await fetch(`${baseURL}/validateToken`, {
             method: 'GET',
             headers: {
                 'Authorization': `${token}`,

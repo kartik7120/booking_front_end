@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
 import Cookies from 'js-cookie'
 import { Outlet } from "react-router"
+import { baseURL } from "../../App"
 
 export interface NavbarProps {
   isLoggedIn: boolean
@@ -26,7 +27,7 @@ async function LoginUser(
 ) {
   const [, email, password] = context.queryKey
 
-  const res = await fetch("http://localhost:8080/loginUser", {
+  const res = await fetch(`${baseURL}/loginUser`, {
     headers: {
       "Content-Type": "application/json"
     },
@@ -46,7 +47,7 @@ async function RequestOTP(
 
   console.log("email id: " + email)
 
-  const res = await fetch("http://localhost:8080/generateOTP", {
+  const res = await fetch(`${baseURL}/generateOTP`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -66,7 +67,7 @@ async function RegisterUser(
 ) {
   const [, email, password] = context.queryKey
 
-  const res = await fetch("http://localhost:8080/registerUser", {
+  const res = await fetch(`${baseURL}/registerUser`, {
     headers: {
       "Content-Type": "application/json"
     },
@@ -85,7 +86,7 @@ async function ValidateOTP(
 ) {
   const [, email, otp] = context.queryKey
 
-  const res = await fetch("http://localhost:8080/validateOTP", {
+  const res = await fetch(`${baseURL}/validateOTP`, {
     headers: {
       "Content-Type": "application/json"
     },
@@ -103,7 +104,7 @@ async function ValidateOTP(
 // ) {
 //   const [, token] = context.queryKey
 
-//   const res = await fetch("http://localhost:8080/validateToken", {
+//   const res = await fetch("${baseURL}/validateToken", {
 //     headers: {
 //       "Context-Type": "application/json",
 //       "Authorization": `Bearer ${token}`
@@ -237,7 +238,7 @@ export default function Navbar(props: NavbarProps) {
     event.preventDefault();
 
     try {
-      const request = await fetch(`http://localhost:8080/checkIfUserExists/${resgiterEmail || email}`)
+      const request = await fetch(`${baseURL}/checkIfUserExists/${resgiterEmail || email}`)
 
       const res = await request.json();
 

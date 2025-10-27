@@ -2,7 +2,6 @@ import { IoTicketOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import './header.css';
-import { Link } from "react-router";
 
 type User = {
   name: string;

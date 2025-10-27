@@ -14,6 +14,9 @@ import AddReviewIndex from './components/AddReview/AddReviewIndex'
 import AllReviewsIndex from './components/AllReviews/AllReviewsIndex'
 
 const queryClient = new QueryClient()
+export const baseURL = import.meta.env.VITE_BROKER_URL;
+
+console.log(`vite broker url = ${baseURL}`)
 
 function App() {
   const [IsLoggedIn, setIsLoggedIn] = useState(false)

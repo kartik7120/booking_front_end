@@ -5,9 +5,10 @@ import VideoPlayer from "../components/VideoPlayer";
 import CastCrewList from "../components/CastCrewList";
 import MovieReviewSection from "./MovieReviewSection";
 import useStore from "./../zustand/store";
+import { baseURL } from "../App";
 
 async function fetchMovieDetails(id: number) {
-    const res = await fetch(`http://localhost:8080/getMovie/${id}`, {
+    const res = await fetch(`${baseURL}/getMovie/${id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -20,7 +21,7 @@ async function fetchMovieDetails(id: number) {
 }
 
 export async function GetIdempotentKey(): Promise<{ idempotent_key: string }> {
-    const response = await fetch("http://localhost:8080/getIdempotentKey");
+    const response = await fetch(`${baseURL}/getIdempotentKey`);
     return response.json();
 }
 
@@ -136,7 +137,7 @@ export default function MovieDetails() {
     } = useQuery<MovieReviewResponse>({
         queryKey: ["movieReviews", id],
         queryFn: async () =>
-            fetch(`http://localhost:8080/getAllMovieReview/${id}`, {
+            fetch(`${baseURL}/getAllMovieReview/${id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

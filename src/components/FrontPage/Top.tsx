@@ -1,8 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Carousel, { CarouselProps } from "../Carousel";
 import { CarouselLayoverProps } from "./CarouselLayover";
 import { useEffect, useState } from "react";
 import Header from "../Header";
+import { baseURL } from "../../App";
 
 export interface TopProps extends CarouselLayoverProps, CarouselProps {
 
@@ -53,7 +54,7 @@ export default function Top(props: TopProps) {
   const { data, error, isLoading, isSuccess } = useQuery<UpcomingMovieResponse[]>({
     queryKey: ['upcomingMovies'],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8080/getupcomingmovies/${formattedDate}`);
+      const res = await fetch(`${baseURL}/getupcomingmovies/${formattedDate}`);
       if (!res.ok) {
         const errorText = await res.text(); // Read the error message as text
         console.error("Server Error:", errorText);
@@ -110,6 +111,7 @@ export default function Top(props: TopProps) {
                   stars: [""]
                 })) || []
               }
+              isLoading={isLoading}
             />
           )
         }

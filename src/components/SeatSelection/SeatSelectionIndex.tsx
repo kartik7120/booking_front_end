@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import SeatSelectionTop from "./SeatSelectionTop";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SeatMap, { Seat, SeatMatrix } from "./SeatMap";
@@ -8,6 +8,7 @@ import { Movie } from "../HomePage/getNowPlayingMovies";
 import { getVenueDetails } from "../SeatDetails/SeatSelection";
 import CurvedTheatreScreen from "../MovieTimeSlots/CurvedTheatreScreen";
 import useStore from "../../zustand/store";
+import { baseURL } from "../../App";
 
 export interface BookedSeats {
   id?: number;
@@ -39,22 +40,6 @@ export interface SeatMatrixType {
   id?: number;
 }
 
-interface MovieTimeSlot {
-  start_time: string;   // Format: "HH:MM:SS"
-  end_time: string;     // Format: "HH:MM:SS"
-  duration: number;     // Duration in minutes
-  date: string;         // Format: "YYYY-MM-DD"
-  movieid: number;
-  venueid: number;
-}
-
-interface VenueDetails {
-  name: string;
-  address: string;
-  rows: number;
-  columns: number;
-}
-
 function isGetBookedSeats(data: unknown): data is BookedSeats[] {
   return (
     Array.isArray(data) &&
@@ -81,7 +66,7 @@ async function fetchGetBookedSeats({
 
     // console.log(`movie time slot id inside fetch function = ${queryKey}`)
 
-    const response = await fetch("http://localhost:8080/GetBookedSeats", {
+    const response = await fetch(`${baseURL}/GetBookedSeats`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -113,7 +98,7 @@ async function GetSeatMatrix({
 
     // console.log(`venue id inside fetch function = ${queryKey}`)
 
-    const response = await fetch("http://localhost:8080/GetSeatMatrix", {
+    const response = await fetch(`${baseURL}/GetSeatMatrix`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -132,15 +117,15 @@ async function GetSeatMatrix({
   }
 }
 
-async function GetVenueDetails(venue_id: number | string) {
-  const response = await fetch(`http://localhost:8080/getVenue/${venue_id}`)
+// async function GetVenueDetails(venue_id: number | string) {
+//   const response = await fetch(`${baseURL}/getVenue/${venue_id}`)
 
-  if (!response.ok) {
-    throw new Error("error fetching get venues details ")
-  }
+//   if (!response.ok) {
+//     throw new Error("error fetching get venues details ")
+//   }
 
-  return response.json()
-}
+//   return response.json()
+// }
 
 async function GetMovieTimeSlotDetails(movie_time_slot_id: string | undefined) {
 
@@ -148,7 +133,7 @@ async function GetMovieTimeSlotDetails(movie_time_slot_id: string | undefined) {
     throw new Error("movie time slot id cannot be undefined")
   }
 
-  const response = await fetch(`http://localhost:8080/getMovieTimeSlot/${movie_time_slot_id}`)
+  const response = await fetch(`${baseURL}/getMovieTimeSlot/${movie_time_slot_id}`)
 
   // if (!response.ok) {
   //   throw new Error("error requesting movie time slot details")
@@ -190,7 +175,7 @@ export async function CreateOrder({
   seatMatrixIDs
 }: CreateOrderRequestParams): Promise<{ error: string } | { order_id: string }> {
 
-  const response = await fetch("http://localhost:8080/createOrder", {
+  const response = await fetch(`${baseURL}/createOrder`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -209,7 +194,6 @@ export async function CreateOrder({
 
 export default function Index() {
   const params = useParams();
-  const { state } = useLocation();
   const queryClient = useQueryClient();
 
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
@@ -223,7 +207,6 @@ export default function Index() {
   const setMovieTimeSlotInStore = useStore((state) => state.setMovieTimeSlotID)
   const setVenueInStore = useStore((state) => state.setVenueID)
   const addSelectedSeatsToStore = useStore((state) => state.setSelectedSeatsID)
-  const seatMatrixIdsInStore = useStore((state) => state.selectedSeatsID)
   const setOrderID = useStore((state) => state.setOrderID)
 
   console.log(`idempotent key in seat selection index: ${idempotentKey}`)
@@ -256,7 +239,6 @@ export default function Index() {
   const {
     data: movieTimeSlotDetails,
     isLoading: isLoadingMovieTimeSlot,
-    isSuccess: isSuccessMovieTimeSlot,
   } = useQuery({
     queryKey: ["movie_time_slot_details", params.movieTimeSlotID],
     queryFn: () => GetMovieTimeSlotDetails(params.movieTimeSlotID),
@@ -266,7 +248,6 @@ export default function Index() {
   const {
     data: venueDetails,
     isLoading: isLoadingVenueDetails,
-    isSuccess: isSuccessVenueDetails,
   } = useQuery({
     queryKey: ['venue', params.venueID],
     queryFn: () => getVenueDetails(params.venueID),

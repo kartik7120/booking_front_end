@@ -1,10 +1,7 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MovieTimeSlotResponse } from "../MovieTimeSlots/Index";
 import { Movie } from "../HomePage/getNowPlayingMovies";
 import { SeatMatrix } from "../SeatSelection/SeatMap";
-import { useLocation, useParams } from "react-router";
-import SeatSelectionTop from "../SeatSelection/SeatSelectionTop";
-import { useState } from "react";
+import { baseURL } from "../../App";
 
 export enum VenueType {
     MOVIE = 0,
@@ -35,7 +32,7 @@ export async function getVenueDetails(venueID: string | undefined) {
     if (venueID == undefined) {
         throw new Error("venueID undefined")
     }
-    const response = await fetch(`http://localhost:8080/getVenue/${venueID}`)
+    const response = await fetch(`${baseURL}/getVenue/${venueID}`)
 
     return response.json()
 }
@@ -46,7 +43,7 @@ export async function getMovieTimeSlot(movieTimeSlotID: string | undefined) {
         throw new Error("movie time slot is undefined")
     }
 
-    const response = await fetch(`http://localhost:8080/getMovieTimeSlot/${movieTimeSlotID}`)
+    const response = await fetch(`${baseURL}/getMovieTimeSlot/${movieTimeSlotID}`)
 
     return response.json()
 }
