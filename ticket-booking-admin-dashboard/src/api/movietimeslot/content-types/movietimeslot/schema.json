@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "movietimeslots",
+  "displayname": "Movie Time Slot",
+  "info": {
+    "singularName": "movietimeslot",
+    "pluralName": "movietimeslots",
+    "displayName": "movietimeslot"
+  },
+  "options": {
+    "comment": ""
+  },
+  "attributes": {
+    "starttime": {
+      "type": "datetime",
+      "required": true
+    },
+    "endtime": {
+      "type": "datetime",
+      "required": true
+    },
+    "duration": {
+      "type": "integer",
+      "required": true
+    },
+    "movieformat": {
+      "type": "enumeration",
+      "enum": [
+        "TWO_D",
+        "THREE_D",
+        "IMAX",
+        "FOUR_D"
+      ],
+      "required": true
+    },
+    "movieid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::movie.movie"
+    },
+    "venueid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::venue.venue"
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "is_synced": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

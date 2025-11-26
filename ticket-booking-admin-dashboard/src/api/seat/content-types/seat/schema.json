@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "seats",
+  "displayName": "Seat",
+  "info": {
+    "singularName": "seat",
+    "pluralName": "seats",
+    "displayName": "seat"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "seatNumber": {
+      "type": "string"
+    },
+    "row": {
+      "type": "integer"
+    },
+    "column": {
+      "type": "integer"
+    },
+    "price": {
+      "type": "integer"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "XL",
+        "LOWER",
+        "UPPER"
+      ]
+    },
+    "venueid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::venue.venue"
+    },
+    "seatid": {
+      "type": "uid"
+    },
+    "is_synced": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

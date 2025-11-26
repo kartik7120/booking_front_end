@@ -1,0 +1,111 @@
+{
+  "kind": "collectionType",
+  "collectionName": "movies",
+  "info": {
+    "singularName": "movie",
+    "pluralName": "movies",
+    "displayName": "Movie"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "releaseDate": {
+      "type": "date",
+      "required": true
+    },
+    "duration": {
+      "type": "biginteger",
+      "required": true
+    },
+    "language": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "Action",
+        "Comedy",
+        "Drama",
+        "Horror",
+        "Romance",
+        "Sci-Fi",
+        "Documentary"
+      ],
+      "default": "Drama"
+    },
+    "posterURL": {
+      "type": "string",
+      "required": true
+    },
+    "trailerURL": {
+      "type": "string"
+    },
+    "MovieResolution": {
+      "type": "enumeration",
+      "enum": [
+        "IMAX",
+        "THREE_D",
+        "TWO_D"
+      ],
+      "default": "TWO_D",
+      "required": true
+    },
+    "ranking": {
+      "type": "integer",
+      "default": 0
+    },
+    "votes": {
+      "type": "integer",
+      "default": 0
+    },
+    "screenWidePoster": {
+      "type": "string",
+      "required": false
+    },
+    "logoImageURL": {
+      "type": "string"
+    },
+    "casts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cast.cast",
+      "mappedBy": "movieid"
+    },
+    "venues": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::venue.venue",
+      "mappedBy": "movies"
+    },
+    "languages": {
+      "type": "enumeration",
+      "enum": [
+        "English",
+        "Spanish",
+        "French",
+        "German",
+        "Mandarin",
+        "Hindi",
+        "Japanese",
+        "Korean",
+        "Italian",
+        "Russian"
+      ],
+      "default": "English",
+      "required": true
+    },
+    "is_synced": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

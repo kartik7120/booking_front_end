@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "displayName": "Cast",
+  "collectionName": "casts",
+  "info": {
+    "singularName": "cast",
+    "pluralName": "casts",
+    "displayName": "cast"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "actor",
+        "director",
+        "producer",
+        "writer",
+        "cinematographer",
+        "editor",
+        "composer"
+      ],
+      "required": true
+    },
+    "character_name": {
+      "type": "string"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "movieid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::movie.movie"
+    },
+    "is_synced": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

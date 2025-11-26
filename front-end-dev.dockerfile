@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 ARG VITE_BROKER_URL
-ENV VITE_BROKER_URL=$VITE_BROKER_URL
+ENV VITE_BROKER_URL=http://localhost:8080
 COPY . .
 RUN npm run build
 

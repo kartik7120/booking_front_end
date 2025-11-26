@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "venues",
+  "info": {
+    "singularName": "venue",
+    "pluralName": "venues",
+    "displayName": "venue"
+  },
+  "options": {
+    "comment": ""
+  },
+  "attributes": {
+    "venueID": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "is_synced": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
