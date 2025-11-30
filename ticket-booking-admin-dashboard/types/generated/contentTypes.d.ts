@@ -579,6 +579,7 @@ export interface ApiCastCast extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    cast_id: Schema.Attribute.String;
     character_name: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -591,6 +592,7 @@ export interface ApiCastCast extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String & Schema.Attribute.Required;
     photo_url: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    starpi_cast_uid: Schema.Attribute.String;
     type: Schema.Attribute.Enumeration<
       [
         'actor',

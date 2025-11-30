@@ -1,6 +1,5 @@
 {
   "kind": "collectionType",
-  "displayName": "Cast",
   "collectionName": "casts",
   "info": {
     "singularName": "cast",
@@ -18,6 +17,7 @@
     },
     "type": {
       "type": "enumeration",
+      "required": true,
       "enum": [
         "actor",
         "director",
@@ -26,8 +26,7 @@
         "cinematographer",
         "editor",
         "composer"
-      ],
-      "required": true
+      ]
     },
     "character_name": {
       "type": "string"
@@ -43,6 +42,13 @@
     "is_synced": {
       "type": "boolean",
       "default": false
+    },
+    "starpi_cast_uid": {
+      "type": "string",
+      "required": false
+    },
+    "cast_id": {
+      "type": "string"
     }
   }
 }
