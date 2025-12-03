@@ -34,11 +34,6 @@
     "photo_url": {
       "type": "string"
     },
-    "movieid": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::movie.movie"
-    },
     "is_synced": {
       "type": "boolean",
       "default": false
@@ -49,6 +44,9 @@
     },
     "cast_id": {
       "type": "string"
+    },
+    "movieid": {
+      "type": "integer"
     }
   }
 }

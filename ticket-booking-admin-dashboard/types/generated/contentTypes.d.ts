@@ -588,7 +588,7 @@ export interface ApiCastCast extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::cast.cast'> &
       Schema.Attribute.Private;
-    movieid: Schema.Attribute.Relation<'manyToOne', 'api::movie.movie'>;
+    movieid: Schema.Attribute.Integer;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     photo_url: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
