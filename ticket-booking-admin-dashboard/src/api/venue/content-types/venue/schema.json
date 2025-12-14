@@ -11,13 +11,24 @@
   },
   "attributes": {
     "venueID": {
-      "type": "string",
-      "required": true,
+      "type": "integer",
       "unique": true
     },
     "is_synced": {
       "type": "boolean",
       "default": false
+    },
+    "movies": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::movie.movie",
+      "inversedBy": "venues"
+    },
+    "timeslots": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::movietimeslot.movietimeslot",
+      "mappedBy": "venueid"
     }
   }
 }

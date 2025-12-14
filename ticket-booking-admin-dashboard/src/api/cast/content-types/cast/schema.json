@@ -43,7 +43,7 @@
       "required": false
     },
     "cast_id": {
-      "type": "string"
+      "type": "integer"
     },
     "movieid": {
       "type": "integer"

@@ -80,6 +80,12 @@
       "target": "api::cast.cast",
       "mappedBy": "movieid"
     },
+    "timeslots": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::movietimeslot.movietimeslot",
+      "mappedBy": "movie"
+    },
     "venues": {
       "type": "relation",
       "relation": "manyToMany",
@@ -106,6 +112,9 @@
     "is_synced": {
       "type": "boolean",
       "default": false
+    },
+    "movieid": {
+      "type": "integer"
     }
   }
 }

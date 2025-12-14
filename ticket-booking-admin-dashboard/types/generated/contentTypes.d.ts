@@ -579,7 +579,7 @@ export interface ApiCastCast extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    cast_id: Schema.Attribute.String;
+    cast_id: Schema.Attribute.Integer;
     character_name: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -714,6 +714,7 @@ export interface ApiMovieMovie extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::movie.movie'> &
       Schema.Attribute.Private;
     logoImageURL: Schema.Attribute.String;
+    movieid: Schema.Attribute.Integer;
     MovieResolution: Schema.Attribute.Enumeration<
       ['IMAX', 'THREE_D', 'TWO_D']
     > &
@@ -724,6 +725,10 @@ export interface ApiMovieMovie extends Struct.CollectionTypeSchema {
     ranking: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     releaseDate: Schema.Attribute.Date & Schema.Attribute.Required;
     screenWidePoster: Schema.Attribute.String;
+    timeslots: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::movietimeslot.movietimeslot'
+    >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     trailerURL: Schema.Attribute.String;
     type: Schema.Attribute.Enumeration<
@@ -756,7 +761,7 @@ export interface ApiMovietimeslotMovietimeslot
   };
   options: {
     comment: '';
-    draftAndPublish: false;
+    draftAndPublish: true;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -772,17 +777,22 @@ export interface ApiMovietimeslotMovietimeslot
       'api::movietimeslot.movietimeslot'
     > &
       Schema.Attribute.Private;
+    movie: Schema.Attribute.Relation<'manyToOne', 'api::movie.movie'> &
+      Schema.Attribute.Required;
+    movie_time_slot_id: Schema.Attribute.Integer & Schema.Attribute.Unique;
     movieformat: Schema.Attribute.Enumeration<
       ['TWO_D', 'THREE_D', 'IMAX', 'FOUR_D']
     > &
       Schema.Attribute.Required;
-    movieid: Schema.Attribute.Relation<'manyToOne', 'api::movie.movie'>;
     publishedAt: Schema.Attribute.DateTime;
+    starpi_movie_time_slot_uid: Schema.Attribute.String &
+      Schema.Attribute.Unique;
     starttime: Schema.Attribute.DateTime & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    venueid: Schema.Attribute.Relation<'manyToOne', 'api::venue.venue'>;
+    venue: Schema.Attribute.Relation<'manyToOne', 'api::venue.venue'> &
+      Schema.Attribute.Required;
   };
 }
 
@@ -837,13 +847,16 @@ export interface ApiVenueVenue extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::venue.venue'> &
       Schema.Attribute.Private;
+    movies: Schema.Attribute.Relation<'manyToMany', 'api::movie.movie'>;
     publishedAt: Schema.Attribute.DateTime;
+    timeslots: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::movietimeslot.movietimeslot'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    venueID: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    venueID: Schema.Attribute.Integer & Schema.Attribute.Unique;
   };
 }
 

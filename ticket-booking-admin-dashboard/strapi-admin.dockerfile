@@ -1,25 +1,26 @@
-FROM node:25-alpine
+FROM node:24
 
 WORKDIR /app
 
-# Install dependencies
+# Copy dependency files
+COPY package.json ./
 
-COPY package.json yarn.lock ./
+# Install system dependencies for better-sqlite3
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install node modules
 RUN yarn install
 
-# Copy the rest of the application code
-
+# Copy project
 COPY . .
 
-# Build the Strapi admin panel
-
+# Build admin panel
 RUN yarn build
 
-# Expose the Strapi admin panel port
-
 EXPOSE 1337
-
-# Start the Strapi admin panel
 
 CMD ["yarn", "start"]

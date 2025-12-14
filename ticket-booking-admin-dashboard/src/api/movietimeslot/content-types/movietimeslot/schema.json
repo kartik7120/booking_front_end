@@ -8,7 +8,8 @@
     "displayName": "movietimeslot"
   },
   "options": {
-    "comment": ""
+    "comment": "",
+    "draftAndPublish": true
   },
   "attributes": {
     "starttime": {
@@ -33,15 +34,19 @@
       ],
       "required": true
     },
-    "movieid": {
+    "movie": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::movie.movie"
+      "target": "api::movie.movie",
+      "inversedBy": "timeslots",
+      "required": true
     },
-    "venueid": {
+    "venue": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::venue.venue"
+      "target": "api::venue.venue",
+      "inversedBy": "timeslots",
+      "required": true
     },
     "date": {
       "type": "date",
@@ -50,6 +55,14 @@
     "is_synced": {
       "type": "boolean",
       "default": false
+    },
+    "starpi_movie_time_slot_uid": {
+      "type": "string",
+      "unique": true
+    },
+    "movie_time_slot_id": {
+      "type": "integer",
+      "unique": true
     }
   }
 }
