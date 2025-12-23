@@ -349,7 +349,7 @@ export default function Index() {
       <div className="flex flex-row items-center justify-center">
         <CurvedTheatreScreen />
       </div>
-      <div>
+      <div className="flex flex-row items-center justify-center">
         {isLoadingBookedSeats || isLoadingSeatMatrix ? (
           <div className="text-center text-gray-500 animate-pulse">Loading seat map...</div>
         ) : (

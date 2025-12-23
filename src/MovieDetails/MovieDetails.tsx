@@ -43,6 +43,7 @@ interface MovieDetailsResponse {
     votes: number;
     id: number;
     logoImageURL: string;
+    screen_wide_poster_url: string
 }
 
 interface MovieReviewResponse {
@@ -208,7 +209,7 @@ export default function MovieDetails() {
                 logoImageURL={""}
                 rating={"0"}
                 movie_title={movieDetails.title}
-                posterURL={movieDetails.poster_url}
+                posterURL={movieDetails.screen_wide_poster_url}
                 releaseYear={movieDetails.release_date}
                 summary={movieDetails.description}
             />

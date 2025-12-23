@@ -60,7 +60,7 @@ export default function Carousel({
                         <img
                             src={url}
                             alt={`Slide ${idx + 1}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain bg-black"
                             loading="lazy"
                         />
                     </div>

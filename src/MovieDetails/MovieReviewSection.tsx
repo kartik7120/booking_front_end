@@ -32,8 +32,8 @@ export default function MovieReviewSection(props: MovieReviewSectionProps) {
                                 }
                             </div>
                         </div>
-                        <div className="skeleton bg-green-600 w-32 h-32 p-2"></div>
-                        <div className="skeleton bg-orange-600 w-32 h-32 p-2"></div>
+                        <div className="skeleton bg-[#155DFC] w-32 h-32 p-2"></div>
+                        <div className="skeleton bg-[#1E2939] w-32 h-32 p-2"></div>
                     </div>
                     <div className="flex flex-col items-center gap-y-5 justify-start basis-2/3">
                         <div className="skeleton h-8 w-full mb-4"></div>
@@ -65,7 +65,7 @@ export default function MovieReviewSection(props: MovieReviewSectionProps) {
                         <div className="rating">
                             {
                                 Array.from({ length: props.rating }, (_, index) => (
-                                    <div className="mask mask-star bg-yellow-500" aria-label={(index + 1) + " star"}></div>
+                                    <div className="mask mask-star bg-[#1E2939]" aria-label={(index + 1) + " star"}></div>
                                 ))
                             }
                             {
@@ -75,11 +75,11 @@ export default function MovieReviewSection(props: MovieReviewSectionProps) {
                             }
                         </div>
                     </div>
-                    <div className="flex flex-col items-center justify-evenly gap-y-3 bg-green-600 w-32 h-32 p-2">
+                    <div className="flex flex-col items-center justify-evenly gap-y-3 bg-[#155DFC] w-32 h-32 p-2">
                         <p className="text-xl font-bold">{props.votings}</p>
                         <p className="text-xl font-bold">Votings</p>
                     </div>
-                    <div className="flex flex-col items-center justify-evenly gap-y-3 bg-orange-600 w-32 h-32 p-2">
+                    <div className="flex flex-col items-center justify-evenly gap-y-3 bg-[#1E2939] w-32 h-32 p-2">
                         <p className="text-xl font-bold">{props.totalReviews}</p>
                         <p className="text-xl font-bold">Reviews</p>
                     </div>

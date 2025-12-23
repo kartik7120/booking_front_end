@@ -1,11 +1,9 @@
-import { FiSearch } from "react-icons/fi"
-import CinemagicIcon from "./CinemagicIcon"
-import { CiMenuBurger } from "react-icons/ci"
 import React, { useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
 import Cookies from 'js-cookie'
 import { Outlet } from "react-router"
 import { baseURL } from "../../App"
+import 'flowbite';
 
 export interface NavbarProps {
   isLoggedIn: boolean
@@ -99,26 +97,6 @@ async function ValidateOTP(
   return res.json()
 }
 
-// async function ValidateToken(
-//   context: QueryFunctionContext<readonly unknown[]>
-// ) {
-//   const [, token] = context.queryKey
-
-//   const res = await fetch("${baseURL}/validateToken", {
-//     headers: {
-//       "Context-Type": "application/json",
-//       "Authorization": `Bearer ${token}`
-//     },
-//     method: "GET"
-//   })
-
-//   if (!res.ok) {
-//     throw new Error("Token validation failed")
-//   }
-
-//   return res.json()
-// }
-
 /**
  * When the register button is clicked, redirect to the register popover card
  * When the user registers, an OTP form will be shown
@@ -134,12 +112,14 @@ export default function Navbar(props: NavbarProps) {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isOTPScreen, setIsOTPScreen] = useState(false);
+  const [_, setIsOTPScreen] = useState(false);
   const [otp, setOtp] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [resgiterEmail, setResgiterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+  type AuthStep = "login" | "register" | "otp";
+  const [authStep, setAuthStep] = useState<AuthStep>("login");
 
   useEffect(() => {
     // Read the cookies to check if the user is logged in
@@ -190,14 +170,17 @@ export default function Navbar(props: NavbarProps) {
   const {
     mutate: requestOtpMutate,
     isError: isErrorRequestOTP,
+    isPending: requestOTPIsPending,
+    error: errorRequestOTP
   } = useMutation({
     mutationFn: RequestOTP,
   })
 
   const {
     mutate: registerUserMutate,
-    isPending: registerUserIsPending,
+    // isPending: registerUserIsPending,
     isError: isErrorRegisterUser,
+    error: errorRegistering
   } = useMutation({
     mutationFn: RegisterUser,
   })
@@ -205,15 +188,18 @@ export default function Navbar(props: NavbarProps) {
   const {
     mutate: validateOtpMutate,
     isError: isErrorValidateOTP,
+    isPending: validateOtpPending,
+    error: errorOtpValidate
   } = useMutation({
     mutationFn: ValidateOTP,
   })
 
-  const handleLoginClick = () => {
-    // Handle login click
-    const loginModal = document.getElementById('my_modal_3');
-    if (loginModal instanceof HTMLDialogElement) {
-      loginModal.showModal();
+  const handleCloseModal = () => {
+
+    const modal = document.getElementById("authentication-modal")
+
+    if (modal instanceof HTMLDialogElement) {
+      modal.close()
     }
   }
 
@@ -236,7 +222,6 @@ export default function Navbar(props: NavbarProps) {
 
   const handleRequestOtp = async (event: React.FormEvent) => {
     event.preventDefault();
-
     try {
       const request = await fetch(`${baseURL}/checkIfUserExists/${resgiterEmail || email}`)
 
@@ -282,6 +267,7 @@ export default function Navbar(props: NavbarProps) {
 
     console.log('email in handleRequestOtp function: ' + resgiterEmail)
 
+    setAuthStep("otp")
     if (email !== "" && password !== "") {
       requestOtpMutate(
         {
@@ -360,12 +346,7 @@ export default function Navbar(props: NavbarProps) {
 
                     props.setIsLoggedIn(true)
 
-                    const loginModal = document.getElementById('my_modal_3');
-                    if (loginModal instanceof HTMLDialogElement) {
-                      if (loginModal?.open) {
-                        loginModal.close()
-                      }
-                    }
+                    handleCloseModal()
                   },
                   onError: (error) => {
                     console.error("Registration failed", error);
@@ -416,243 +397,235 @@ export default function Navbar(props: NavbarProps) {
 
   return (
     <>
-      <div className="flex items-center justify-between m-7">
-        {/* Logo */}
-        <CinemagicIcon />
-
-        {/* Desktop nav items */}
-        <div className="flex flex-row justify-between gap-4 max-sm:hidden">
-          <button className="btn btn-ghost"><FiSearch /></button>
-          <button className="btn btn-ghost">Movies</button>
-          <button className="btn btn-ghost">TV Shows</button>
-          {
-            props.isLoggedIn ? (
-              <div className="dropdown dropdown-left">
-                <div tabIndex={0} role="button" className="btn m-1 rounded-full">
-                  <div className="avatar avatar-placeholder">
-                    <div className="bg-neutral text-neutral-content w-full rounded-full">
-                      P
-                    </div>
-
-                  </div>
-                </div>
-                <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                  <li><button className="btn btn-soft">Profile</button></li>
-                  <li><button className="btn btn-soft">My Bookings</button></li>
-                  <li><button className="btn btn-soft btn-error" onClick={logout}>Log out</button></li>
-                </ul>
-              </div>
-            ) : (
-              <button className="btn btn-warning" onClick={handleLoginClick}>Login / Signup</button>
-            )
-          }
-        </div>
-
-        <dialog id="my_modal_3" className="modal">
-          <div className="modal-box">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-            </form>
-            {/* {
-            isErrorRequestOTP && <div className="flex flex-col items-center justify-center w-full h-96">
-              <p className="text-red-500">Error sending OTP</p>
-              <p className="text-gray-500">Please try again later. {error}</p>
+      <div>
+        <nav className="bg-neutral-primary fixed w-full z-20 top-0 start-0 border-b border-default dark">
+          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+              <img src="https://flowbite.com/docs/images/logo.svg" className="h-7" alt="Flowbite Logo" />
+              <span className="self-center text-xl text-heading font-semibold whitespace-nowrap">Cinemagic</span>
+            </a>
+            <div className="inline-flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+              {props.isLoggedIn == false && <button type="button" className="text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-3 py-2 focus:outline-none cursor-pointer text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none" data-modal-target="authentication-modal" data-modal-toggle="authentication-modal">
+                Login / Register
+              </button>}
+              {
+                props.isLoggedIn && <button type="button" onClick={logout} className="text-white bg-danger box-border border border-transparent hover:bg-danger-strong focus:ring-4 focus:ring-danger-medium shadow-xs font-medium leading-5 rounded-full text-sm px-4 py-2.5 focus:outline-none">Logout</button>
+              }
+              <button data-collapse-toggle="navbar-cta" type="button" className="inline-flex items-center p-2 w-9 h-9 justify-center text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary" aria-controls="navbar-cta" aria-expanded="false">
+                <span className="sr-only">Open main menu</span>
+                <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14" /></svg>
+              </button>
             </div>
-          }
-          {
-            isErrorRegisterUser && <div className="flex flex-col items-center justify-center w-full h-96">
-              <p className="text-red-500">Error registering user</p>
-              <p className="text-gray-500">Please try again later.</p>
+            <div className="items-center justify-end hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
+              <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-default rounded-base bg-neutral-secondary-soft md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-neutral-primary">
+                <li>
+                  <a href="#" className="block py-2 px-3 text-white bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0" aria-current="page">Home</a>
+                </li>
+                <li>
+                  <a href="#" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Movies</a>
+                </li>
+                <li>
+                  <a href="#" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Services</a>
+                </li>
+                <li>
+                  <a href="#" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Contact</a>
+                </li>
+              </ul>
             </div>
-          }
-          {
-            isErrorValidateOTP && <div className="flex flex-col items-center justify-center w-full h-96">
-              <p className="text-red-500">Error validating OTP</p>
-              <p className="text-gray-500">Please try again later.</p>
-            </div>
-          } */}
-            {
-              // OTP screen logic
-              isOTPScreen ? (registerUserIsPending ? (
-                <div className="flex flex-col items-center gap-y-2">
-                  <span className="loading loading-spinner loading-xl"></span>
-                  <p className="text-xl">
-                    Registering you
-                  </p>
-                </div>
-              ) :
-                (
-                  <div>
-                    <h3 className="font-bold text-lg">Enter OTP</h3>
-                    <p className="py-4">An OTP has been sent to your email. Please enter it below.</p>
-                    <div className="form-control w-full max-w-xs">
-                      {/* <label className="label">
-                    <span className="label-text">OTP</span>
-                  </label> */}
-                      <input
-                        type="text"
-                        placeholder="Enter OTP"
-                        className="input input-bordered w-full max-w-xs"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-control mt-6">
-                      <button type="submit" className="btn btn-primary" onClick={
-                        handleSubmitOtp
-                      } disabled={!otp.trim().length && otp.length === 6}>Verify OTP</button>
-                    </div>
-                  </div>
-                )
-              ) : null
-            }
-            {/* name of each tab group should be unique */}
-            {
-              !isOTPScreen && <div className="tabs tabs-box">
-                <input type="radio" name="my_tabs_6" className="tab" aria-label="Login" />
-                <div className="tab-content bg-base-100 border-base-300 p-6">
-                  <form onSubmit={
-                    handleRequestOtp
-                  }>
-                    <h3 className="font-bold text-lg">Login</h3>
-                    <div className="form-control w-full max-w-xs">
-                      <label className="label">
-                        <span className="label-text">Email</span>
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="input input-bordered w-full max-w-xs"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-control w-full max-w-xs mt-4">
-                      <label className="label">
-                        <span className="label-text">Password</span>
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="Enter your password"
-                        className="input input-bordered w-full max-w-xs"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-control mt-6">
-                      <button type="submit" className="btn btn-primary">Login</button>
-                    </div>
-                  </form>
-                </div>
-
-                <input type="radio" name="my_tabs_6" className="tab" aria-label="Register" defaultChecked />
-                <div className="tab-content bg-base-100 border-base-300 p-6">
-                  <form onSubmit={
-                    handleRequestOtp
-                  }>
-                    <h3 className="font-bold text-lg">Register</h3>
-                    <div className="form-control w-full max-w-xs">
-                      <label className="label">
-                        <span className="label-text">Email</span>
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="input input-bordered w-full max-w-xs"
-                        value={resgiterEmail}
-                        onChange={(e) => setResgiterEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-control w-full max-w-xs mt-4">
-                      <label className="label">
-                        <span className="label-text">Password</span>
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="Enter your password"
-                        className="input input-bordered w-full max-w-xs"
-                        value={registerPassword}
-                        onChange={(e) => setRegisterPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-control w-full max-w-xs mt-4">
-                      <label className="label">
-                        <span className="label-text">Confirm Password</span>
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="Re-enter your password"
-                        className="input input-bordered w-full max-w-xs"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-control mt-6">
-                      <button type="submit" className="btn btn-primary">Register</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            }
           </div>
-          {(error ||
-            isErrorRequestOTP ||
-            isErrorRegisterUser ||
-            isErrorValidateOTP ||
-            IsLoginUserError) && (
-              <div className="mt-4 p-3 rounded-md bg-red-100 border border-red-400 text-red-700">
-                <p className="font-semibold">Something went wrong:</p>
-                <ul className="list-disc ml-5 text-sm mt-1">
-                  {error && <li>{error}</li>}
-                  {IsLoginUserError && (
-                    <li>{LoginUserError?.message || "Login request failed."}</li>
-                  )}
-                  {isErrorRequestOTP && <li>Failed to send OTP. Please try again.</li>}
-                  {isErrorRegisterUser && <li>Registration failed. Try again later.</li>}
-                  {isErrorValidateOTP && <li>OTP validation failed. Please retry.</li>}
-                </ul>
+        </nav>
+      </div>
+      {/* Flow bite tailwind modal register modal */}
+      <div
+        id="authentication-modal"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="hidden dark overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+      >
+        <div className="relative p-4 w-full max-w-md max-h-full">
+          <div className="relative bg-neutral-primary-soft border border-default rounded-base shadow-sm p-4 md:p-6">
+
+            {/* HEADER */}
+            <div className="flex items-center justify-between border-b border-default pb-4 md:pb-5">
+              <h3 className="text-lg font-medium text-heading">
+                {authStep === "login" && "Login"}
+                {authStep === "register" && "Create Account"}
+                {authStep === "otp" && "Verify OTP"}
+              </h3>
+
+              <button onClick={() => {
+                setAuthStep("login");
+                setIsOTPScreen(false);
+                setError("");
+              }} type="button" className="text-body bg-transparent cursor-pointer hover:bg-neutral-tertiary hover:text-heading rounded-base text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" /></svg>
+                <span className="sr-only">Close modal</span>
+              </button>
+            </div>
+
+            {/* ================= LOGIN ================= */}
+            {authStep === "login" && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRequestOtp(e);
+                }}
+                className="pt-4 md:pt-6"
+              >
+                <div className="mb-4">
+                  <label htmlFor="email" className="block mb-2.5 text-sm font-medium text-heading">Your email</label>
+                  <input
+                    className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                    placeholder="example@company.com"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="my-6">
+                  <label htmlFor="password" className="block mb-2.5 text-sm font-medium text-heading">Your password</label>
+                  <input
+                    type="password"
+                    className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="•••••••••"
+                    value={password}
+                    id="password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+
+                <button type="submit" className="text-white cursor-pointer bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none w-full mb-3">
+                  Request OTP
+                </button>
+
+                <p className="text-sm text-text-muted text-center">
+                  Not registered?{" "}
+                  <button
+                    type="button"
+                    className="text-brand hover:underline"
+                    onClick={() => setAuthStep("register")}
+                  >
+                    Create account
+                  </button>
+                </p>
+              </form>
+            )}
+
+            {/* ================= REGISTER ================= */}
+            {authStep === "register" && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRequestOtp(e);
+                }}
+                className="pt-4 md:pt-6"
+              >
+                <div className="mb-4">
+                  <label htmlFor="registeremail" className="block mb-2.5 text-sm font-medium text-heading">Your email</label>
+                  <input
+                    className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                    placeholder="example@company.com"
+                    id="registeremail"
+                    value={resgiterEmail}
+                    onChange={(e) => setResgiterEmail(e.target.value)}
+                  />
+                </div>
+                <div className="my-6">
+                  <label htmlFor="registerpassword" className="block mb-2.5 text-sm font-medium text-heading">Your password</label>
+                  <input
+                    type="password"
+                    className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                    placeholder="•••••••••"
+                    id="registerpassword"
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                  />
+                </div>
+                <div className="my-6">
+                  <label htmlFor="confirmregisterpassword" className="block mb-2.5 text-sm font-medium text-heading">Your password</label>
+                  <input
+                    type="password"
+                    className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                    placeholder="Confirm Password"
+                    id="confirmregisterpassword"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+
+                <button type="submit" className="text-white cursor-pointer bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none w-full mb-3">
+                  {requestOTPIsPending ? "Sending OTP..." : "Request OTP"}
+                </button>
+
+                <p className="text-sm text-text-muted text-center mt-2">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    className="text-brand hover:underline"
+                    onClick={() => setAuthStep("login")}
+                  >
+                    Login
+                  </button>
+                </p>
+              </form>
+            )}
+
+            {/* ================= OTP ================= */}
+            {authStep === "otp" && (
+              <form
+                onSubmit={handleSubmitOtp}
+                className="space-y-4"
+              >
+                <p className="text-sm text-text-muted">
+                  Enter the OTP sent to your email
+                </p>
+
+                <input
+                  className="w-full p-2 rounded-lg bg-surface-soft border border-border text-text-heading"
+                  placeholder="6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+
+                <button type="submit" className="w-full bg-brand hover:bg-brand-strong text-white py-2 rounded-lg">
+                  {validateOtpPending ? "Verifying..." : "Verify OTP"}
+                </button>
+              </form>
+            )}
+
+            {/* ================= ERRORS ================= */}
+            {error && (
+              <div className="mt-4 p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30">
+                {error}
               </div>
             )}
-        </dialog>
-        {/* Sidebar toggle button - visible on small screens only */}
-        <div className="sm:hidden">
-          <div className="drawer drawer-end sm:hidden">
-            <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-            <div className="drawer-content">
-              <label htmlFor="my-drawer-4" className="drawer-button btn btn-ghost">
-                <CiMenuBurger size={30} />
-              </label>
-            </div>
-            <div className="drawer-side z-50">
-              <label htmlFor="my-drawer-4" className="drawer-overlay"></label>
-
-              {/* Sidebar */}
-              <div className="relative w-80 min-h-full bg-base-200 p-4">
-                {/* Close Button */}
-                <label
-                  htmlFor="my-drawer-4"
-                  className="btn btn-sm btn-circle absolute right-4 top-4"
-                >
-                  ✕
-                </label>
-                <ul className="menu mt-12 text-base-content">
-                  <li><a>Movies</a></li>
-                  <li><a>TV Shows</a></li>
-                  {props.isLoggedIn ? (
-                    <li><a>Profile</a></li>
-                  ) : (
-                    <li><a>Login / Signup</a></li>
-                  )}
-                </ul>
-              </div>
-            </div>
+            {
+              IsLoginUserError && (
+                <div className="mt-4 p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30">
+                  {LoginUserError.message}
+                </div>
+              )
+            }
+            {
+              isErrorRequestOTP && (
+                <div className="mt-4 p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30">
+                  {errorRequestOTP.message}
+                </div>
+              )
+            }
+            {
+              isErrorRegisterUser && (
+                <div className="mt-4 p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30">
+                  {errorRegistering.message}
+                </div>
+              )
+            }
+            {
+              isErrorValidateOTP && (
+                <div className="mt-4 p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30">
+                  {errorOtpValidate.message}
+                </div>
+              )
+            }
           </div>
         </div>
       </div>

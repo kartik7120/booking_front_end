@@ -691,9 +691,8 @@ export interface ApiMovieMovie extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
-    duration: Schema.Attribute.BigInteger & Schema.Attribute.Required;
+    duration: Schema.Attribute.Integer & Schema.Attribute.Required;
     is_synced: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    language: Schema.Attribute.String;
     languages: Schema.Attribute.Enumeration<
       [
         'English',
@@ -725,24 +724,14 @@ export interface ApiMovieMovie extends Struct.CollectionTypeSchema {
     ranking: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     releaseDate: Schema.Attribute.Date & Schema.Attribute.Required;
     screenWidePoster: Schema.Attribute.String;
+    starpi_movie_uid: Schema.Attribute.String;
     timeslots: Schema.Attribute.Relation<
       'oneToMany',
       'api::movietimeslot.movietimeslot'
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     trailerURL: Schema.Attribute.String;
-    type: Schema.Attribute.Enumeration<
-      [
-        'Action',
-        'Comedy',
-        'Drama',
-        'Horror',
-        'Romance',
-        'Sci-Fi',
-        'Documentary',
-      ]
-    > &
-      Schema.Attribute.DefaultTo<'Drama'>;
+    type: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -824,7 +813,7 @@ export interface ApiSeatSeat extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    venueid: Schema.Attribute.Relation<'manyToOne', 'api::venue.venue'>;
+    venue: Schema.Attribute.Relation<'manyToOne', 'api::venue.venue'>;
   };
 }
 
@@ -840,23 +829,37 @@ export interface ApiVenueVenue extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    address: Schema.Attribute.String;
+    cinemaname: Schema.Attribute.String;
+    columns: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     is_synced: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    languagessupported: Schema.Attribute.JSON;
+    latitude: Schema.Attribute.Integer;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::venue.venue'> &
       Schema.Attribute.Private;
+    longitude: Schema.Attribute.Integer;
+    movieformatsupported: Schema.Attribute.JSON;
     movies: Schema.Attribute.Relation<'manyToMany', 'api::movie.movie'>;
+    name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    rows: Schema.Attribute.Integer;
+    screen_number: Schema.Attribute.Integer;
+    seats: Schema.Attribute.Relation<'oneToMany', 'api::seat.seat'>;
     timeslots: Schema.Attribute.Relation<
       'oneToMany',
       'api::movietimeslot.movietimeslot'
     >;
+    type: Schema.Attribute.Enumeration<
+      ['cinema', 'theatre', 'stadium', 'concert_hall', 'other']
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    venueID: Schema.Attribute.Integer & Schema.Attribute.Unique;
+    venueid: Schema.Attribute.Integer;
   };
 }
 

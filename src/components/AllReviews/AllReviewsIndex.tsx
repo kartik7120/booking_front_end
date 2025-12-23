@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import AllReviewsHeader from './AllReviewsHeader';
 import AllReviewCommentSection from './AllReviewCommentSection';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || `${process.env.BROKER_URL}`;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 async function GetMovieDetails(movieID: string) {
     const response = await fetch(`${BASE_URL}/getMovie/${movieID}`, {

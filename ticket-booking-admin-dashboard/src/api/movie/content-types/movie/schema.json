@@ -23,24 +23,12 @@
       "required": true
     },
     "duration": {
-      "type": "biginteger",
+      "type": "integer",
       "required": true
     },
-    "language": {
-      "type": "string"
-    },
     "type": {
-      "type": "enumeration",
-      "enum": [
-        "Action",
-        "Comedy",
-        "Drama",
-        "Horror",
-        "Romance",
-        "Sci-Fi",
-        "Documentary"
-      ],
-      "default": "Drama"
+      "type": "json",
+      "default": []
     },
     "posterURL": {
       "type": "string",
@@ -115,6 +103,9 @@
     },
     "movieid": {
       "type": "integer"
+    },
+    "starpi_movie_uid": {
+      "type": "string"
     }
   }
 }

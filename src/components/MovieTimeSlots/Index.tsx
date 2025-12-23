@@ -201,6 +201,18 @@ export default function Index() {
         </div>
       </div>
       <div className="divider"></div>
+      <div className="flex flex-col justify-between items-center">
+        {
+          isSuccess && MovieTimeSlotTypeGuard(data) && data.movie_time_slots.length === 0 && <div className="font-thin text-heading text-base text-center">
+            No movie time slots found
+          </div>
+        }
+        {
+          isSuccess && MovieTimeSlotTypeGuard(data) && data.venues.length === 0 && <div className="font-thin text-heading text-base text-center">
+            No venues found
+          </div>
+        }
+      </div>
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-row items-center gap-x-3">
           {

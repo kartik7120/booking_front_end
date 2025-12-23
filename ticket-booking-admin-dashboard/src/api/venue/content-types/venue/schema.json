@@ -10,9 +10,8 @@
     "comment": ""
   },
   "attributes": {
-    "venueID": {
-      "type": "integer",
-      "unique": true
+    "venueid": {
+      "type": "integer"
     },
     "is_synced": {
       "type": "boolean",
@@ -29,6 +28,52 @@
       "relation": "oneToMany",
       "target": "api::movietimeslot.movietimeslot",
       "mappedBy": "venueid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "cinema",
+        "theatre",
+        "stadium",
+        "concert_hall",
+        "other"
+      ]
+    },
+    "address": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "integer"
+    },
+    "columns": {
+      "type": "integer"
+    },
+    "screen_number": {
+      "type": "integer"
+    },
+    "longitude": {
+      "type": "integer"
+    },
+    "latitude": {
+      "type": "integer"
+    },
+    "movieformatsupported": {
+      "type": "json"
+    },
+    "languagessupported": {
+      "type": "json"
+    },
+    "cinemaname": {
+      "type": "string"
+    },
+    "seats": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::seat.seat",
+      "mappedBy": "venue"
     }
   }
 }

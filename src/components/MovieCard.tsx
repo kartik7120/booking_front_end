@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router";
 
 export interface MovieCardProps {
-    rating: number; // out of 5
-    imageURL: string;
-    movie_id: number;
-    movie_name: string;
-    votes: number;
-    comingSoon: boolean;
+  rating: number; // out of 5
+  imageURL: string;
+  movie_id: number;
+  movie_name: string;
+  votes: number;
+  comingSoon: boolean;
 }
 
 export default function MovieCard(props: MovieCardProps) {
@@ -20,43 +20,45 @@ export default function MovieCard(props: MovieCardProps) {
 
 
   return (
-    <div
-      className="card bg-base-100 w-48 sm:w-56 md:w-64 lg:w-72 h-[28rem] sm:h-[30rem] md:h-[32rem] lg:h-[34rem] shadow-sm hover:border hover:border-white cursor-pointer active:border active:border-purple-700 flex flex-col"
-      onClick={handleOnClick}
-    >
-      <figure className="flex-shrink-0">
-        <img
-          src={props.imageURL}
-          className="w-full h-64 sm:h-72 md:h-80 lg:h-96 object-cover"
-          alt={`${props.movie_name} card poster`}
-        />
-      </figure>
+    <div>
+      <div
+        className="card bg-base-100 w-48 sm:w-56 md:w-64 lg:w-72 h-[28rem] sm:h-[30rem] md:h-[32rem] lg:h-[34rem] shadow-sm hover:border hover:border-white cursor-pointer active:border active:border-purple-700 flex flex-col"
+        onClick={handleOnClick}
+      >
+        <figure className="flex-shrink-0">
+          <img
+            src={props.imageURL}
+            className="w-full h-64 sm:h-72 md:h-80 lg:h-96 object-cover"
+            alt={`${props.movie_name} card poster`}
+          />
+        </figure>
 
-      <div className="card-body p-2 sm:p-4 flex flex-col justify-between flex-grow">
-        <h2 className="card-title text-lg sm:text-xl md:text-2xl lg:text-3xl line-clamp-2">
-          {props.movie_name}
-        </h2>
+        <div className="card-body p-2 sm:p-4 flex flex-col justify-between flex-grow">
+          <h2 className="card-title text-lg sm:text-xl md:text-2xl lg:text-3xl line-clamp-2">
+            {props.movie_name}
+          </h2>
 
-        <div className="flex flex-row items-center justify-between mt-auto">
-          {!props.comingSoon && (
-            <div className="flex flex-row gap-x-2 items-center">
-              <div className="rating">
-                <div
-                  className="mask mask-star bg-orange-400"
-                  aria-label="1 star"
-                  aria-current="true"
-                ></div>
+          <div className="flex flex-row items-center justify-between mt-auto">
+            {!props.comingSoon && (
+              <div className="flex flex-row gap-x-2 items-center">
+                <div className="rating">
+                  <div
+                    className="mask mask-star bg-orange-400"
+                    aria-label="1 star"
+                    aria-current="true"
+                  ></div>
+                </div>
+                <p className="text-xs sm:text-sm md:text-base">{`${props.rating}/5`}</p>
               </div>
-              <p className="text-xs sm:text-sm md:text-base">{`${props.rating}/5`}</p>
+            )}
+            <div>
+              <p className="text-xs sm:text-sm md:text-base">
+                {props.votes !== undefined && props.votes >= 1000
+                  ? `${(props.votes / 1000).toFixed(1)}k`
+                  : `${props.votes}`}{" "}
+                votes
+              </p>
             </div>
-          )}
-          <div>
-            <p className="text-xs sm:text-sm md:text-base">
-              {props.votes !== undefined && props.votes >= 1000
-                ? `${(props.votes / 1000).toFixed(1)}k`
-                : `${props.votes}`}{" "}
-              votes
-            </p>
           </div>
         </div>
       </div>

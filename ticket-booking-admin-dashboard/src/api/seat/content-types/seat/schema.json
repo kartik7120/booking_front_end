@@ -32,10 +32,11 @@
         "UPPER"
       ]
     },
-    "venueid": {
+    "venue": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::venue.venue"
+      "target": "api::venue.venue",
+      "inversedBy": "seats"
     },
     "seatid": {
       "type": "uid"
