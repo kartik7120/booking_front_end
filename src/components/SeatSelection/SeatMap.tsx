@@ -1,16 +1,25 @@
 import { useEffect, useMemo, useCallback } from "react";
 import Seat from "./Seat";
 
-export interface Seat {
+/* =========================
+   Types
+========================= */
+
+export interface SeatType {
     price: number;
     row: number;
     column: number;
     type: "TWO_D" | "THREE_D" | "FOUR_D" | "VIP";
     isBooked: boolean;
-    id: number;
+    id: number;              // seatMatrixID
+    bookedSeatId?: number;   // ✅ booked_seats.id
     isSelected?: boolean;
     seatNumber: string;
     onClick: () => void;
+}
+
+export interface SeatMatrix {
+    [rowKey: string]: SeatType[];
 }
 
 export interface SeatMapProps {
@@ -23,165 +32,172 @@ export interface SeatMapProps {
             row: number;
             column: number;
             type: "TWO_D" | "THREE_D" | "FOUR_D" | "VIP";
-            id: number;
+            id: number; // seatMatrixID
         }[];
         bookedSeats: {
-            id: number;
+            id: number; // bookedSeatID
             seat_number: string;
-            movieTimeSlotID: number;
             seatMatrixID: number;
             is_booked: boolean;
         }[];
     };
-    setSelectSeatState: React.Dispatch<React.SetStateAction<Seat[]>>;
-    selectedSeats: Seat[];
-    setRowColumnMatrix: React.Dispatch<React.SetStateAction<SeatMatrix>>;
+
+    selectedSeats: SeatType[];
+    setSelectSeatState: React.Dispatch<React.SetStateAction<SeatType[]>>;
     rowColumnMatrix: SeatMatrix;
+    setRowColumnMatrix: React.Dispatch<React.SetStateAction<SeatMatrix>>;
 }
 
-export interface SeatMatrix {
-    [key: string]: Seat[];
-}
+/* =========================
+   Component
+========================= */
 
-export default function SeatMap(props: SeatMapProps) {
-    const columns = useMemo(
-        () => Array.from({ length: props.seats.totalRows }, (_, i) => String.fromCharCode(65 + i)),
-        [props.seats.totalRows]
+export default function SeatMap({
+    seats,
+    selectedSeats,
+    setSelectSeatState,
+    rowColumnMatrix,
+    setRowColumnMatrix,
+}: SeatMapProps) {
+
+    /* =========================
+       Helpers
+    ========================= */
+
+    const selectedSeatNumbers = useMemo(
+        () => new Set(selectedSeats.map(s => s.seatNumber)),
+        [selectedSeats]
     );
 
-    console.log(`props.seats: ${JSON.stringify(props.seats)}`)
-
-    const selectedSeatSet = useMemo(
-        () => new Set(props.selectedSeats.map(s => s.seatNumber)),
-        [props.selectedSeats]
+    const rowLabels = useMemo(
+        () => Array.from({ length: seats.totalRows }, (_, i) => String.fromCharCode(65 + i)),
+        [seats.totalRows]
     );
 
-    const handleSeatClick = useCallback(
-        (seat: Seat) => {
-            props.setSelectSeatState(prev => {
-                const isSelected = selectedSeatSet.has(seat.seatNumber);
-                return isSelected
-                    ? prev.filter(s => s.seatNumber !== seat.seatNumber)
-                    : [...prev, { ...seat, isSelected: true, onClick: () => { } }];
-            });
-        },
-        [props.setSelectSeatState, selectedSeatSet]
-    );
+    /* =========================
+       Seat click handler
+    ========================= */
 
-    const seatMatrix = useMemo(() => {
-        const selectedSeatSet = new Set(props.selectedSeats.map(s => s.seatNumber));
+    const handleSeatClick = useCallback((seat: SeatType) => {
+        setSelectSeatState(prev => {
+            const alreadySelected = prev.some(s => s.seatNumber === seat.seatNumber);
+
+            if (alreadySelected) {
+                return prev.filter(s => s.seatNumber !== seat.seatNumber);
+            }
+
+            return [...prev, { ...seat, isSelected: true }];
+        });
+    }, [setSelectSeatState]);
+
+    /* =========================
+       Build Seat Matrix
+    ========================= */
+
+    const computedSeatMatrix = useMemo<SeatMatrix>(() => {
         const matrix: SeatMatrix = {};
 
-        for (let row = 0; row < props.seats.totalRows; row++) {
-            const rowKey = String.fromCharCode(65 + row);
+        for (let r = 0; r < seats.totalRows; r++) {
+            const rowKey = String.fromCharCode(65 + r);
             matrix[rowKey] = [];
 
-            for (let col = 0; col < props.seats.totalColumns; col++) {
+            for (let c = 0; c < seats.totalColumns; c++) {
+                const seatNumber = `${rowKey}${c + 1}`;
 
-                const seatNumber = `${rowKey}${col + 1}`;
-                console.log(`seat number created on frontend : ${seatNumber}`)
-                const seat = props.seats.seatMap.find(s => s.seat_number === seatNumber);
+                const seat = seats.seatMap.find(s => s.seat_number === seatNumber);
+                const bookedSeat = seats.bookedSeats.find(
+                    b => b.seat_number === seatNumber && b.is_booked
+                );
 
-                console.log(`does seat ${seatNumber} exists : `, seat)
-
-                if (seat) {
-
-                    console.log(`booked seats: ${JSON.stringify(props.seats.bookedSeats)}`)
-                    const isBooked = props.seats.bookedSeats.some(
-                        booked => booked.seat_number === seat.seat_number && booked.is_booked === true
-                    );
-
+                if (!seat) {
                     matrix[rowKey].push({
-                        price: seat.price,
-                        row: seat.row,
-                        column: seat.column,
-                        type: seat.type,
-                        isBooked,
-                        id: seat.id,
-                        isSelected: selectedSeatSet.has(seat.seat_number),
-                        seatNumber: seat.seat_number,
-                        onClick: () => handleSeatClick({
+                        price: -1,
+                        row: r,
+                        column: c,
+                        type: "TWO_D",
+                        isBooked: false,
+                        id: -1,
+                        seatNumber,
+                        onClick: () => { },
+                    });
+                    continue;
+                }
+
+                matrix[rowKey].push({
+                    price: seat.price,
+                    row: seat.row,
+                    column: seat.column,
+                    type: seat.type,
+                    id: seat.id,                    // seatMatrixID
+                    bookedSeatId: bookedSeat?.id,   // ✅ booked seat ID
+                    isBooked: Boolean(bookedSeat),
+                    isSelected: selectedSeatNumbers.has(seatNumber),
+                    seatNumber,
+                    onClick: () =>
+                        handleSeatClick({
                             price: seat.price,
                             row: seat.row,
                             column: seat.column,
                             type: seat.type,
-                            isBooked,
                             id: seat.id,
-                            seatNumber: seat.seat_number,
-                            onClick: () => { }
-                        })
-                    });
-                } else {
-                    matrix[rowKey].push({
-                        price: -1,
-                        row,
-                        column: col,
-                        type: "TWO_D",
-                        isBooked: false,
-                        id: -1,
-                        isSelected: false,
-                        seatNumber,
-                        onClick: () => { }
-                    });
-                }
+                            bookedSeatId: bookedSeat?.id,
+                            isBooked: Boolean(bookedSeat),
+                            seatNumber,
+                            onClick: () => { },
+                        }),
+                });
             }
         }
 
         return matrix;
-    }, [props.seats, props.selectedSeats, handleSeatClick]);
+    }, [seats, selectedSeatNumbers, handleSeatClick]);
 
+    /* =========================
+       Sync to parent state
+    ========================= */
 
     useEffect(() => {
+        setRowColumnMatrix(computedSeatMatrix);
+    }, [computedSeatMatrix, setRowColumnMatrix]);
 
-        console.log(`row column matrix : ${JSON.stringify(props.rowColumnMatrix)}`)
-
-        if (JSON.stringify(props.rowColumnMatrix) !== JSON.stringify(seatMatrix)) {
-            props.setRowColumnMatrix(seatMatrix);
-        }
-    }, [seatMatrix]);
-
-    console.log(`row and column matrix : ${JSON.stringify(props.rowColumnMatrix)}`)
+    /* =========================
+       Render
+    ========================= */
 
     return (
-        <div className="w-full">
-            <div className="flex flex-row items-start gap-x-5 gap-y-5">
-                <div className="flex flex-col items-center justify-center gap-y-5 text-gray-400">
-                    {columns.map((column, index) => (
-                        <div key={index} className="w-8 h-8 flex items-center justify-center">
-                            {column}
+        <div className="w-full overflow-x-auto">
+            <div className="flex gap-x-5">
+
+                {/* Row Labels */}
+                <div className="flex flex-col gap-y-5 text-gray-400">
+                    {rowLabels.map(label => (
+                        <div key={label} className="w-8 h-8 flex items-center justify-center">
+                            {label}
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-col items-center gap-y-4">
-                    {
-                        Object.entries(props.rowColumnMatrix).map(([rowKey, seats]) => (
-                            <div key={rowKey} className="flex flex-row items-center gap-x-6">
-                                {seats.map(seat =>
-                                    seat.price === -1 ? (
-                                        <div key={seat.seatNumber} className="w-8 h-8 flex items-center justify-center text-gray-400" />
-                                    ) : (
-                                        <Seat
-                                            key={seat.id}
-                                            price={seat.price}
-                                            row={seat.row}
-                                            column={seat.column}
-                                            type={seat.type}
-                                            isBooked={seat.isBooked}
-                                            id={seat.id}
-                                            isSelected={
-                                                props.selectedSeats.some(selectedSeat => selectedSeat.seatNumber === seat.seatNumber)
-                                            } // Assuming isSelected is managed elsewhere
-                                            seatNumber={seat.seatNumber}
-                                            onClick={
-                                                seat.onClick // Use the onClick function defined in the seat object
-                                            }
-                                        />
-                                    )
-                                )}
-                            </div>
-                        ))
-                    }
+
+                {/* Seats */}
+                <div className="flex flex-col gap-y-4">
+                    {Object.entries(rowColumnMatrix).map(([rowKey, rowSeats]) => (
+                        <div key={rowKey} className="flex gap-x-6">
+                            {rowSeats.map(seat =>
+                                seat.price === -1 ? (
+                                    <div key={seat.seatNumber} className="w-8 h-8" />
+                                ) : (
+                                    <Seat
+                                        key={seat.seatNumber}
+                                        {...seat}
+                                        isSelected={selectedSeats.some(
+                                            s => s.seatNumber === seat.seatNumber
+                                        )}
+                                    />
+                                )
+                            )}
+                        </div>
+                    ))}
                 </div>
+
             </div>
         </div>
     );

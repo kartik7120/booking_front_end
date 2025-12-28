@@ -19,6 +19,8 @@ export default function PollingPageIndex() {
 
         console.log("useEffect triggered")
 
+        let count: number = 0;
+
         const interval = setInterval(async () => {
             try {
 
@@ -46,10 +48,13 @@ export default function PollingPageIndex() {
                     setTimeout(() => {
                         navigate(`/ticket/${data.ticketID}`);
                     }, 2000);
-                } else {
-                    setStatus("failed");
-                    setMessage("Payment Failed ❌ Please try again.");
-                    clearInterval(interval);
+                } else if (data.paymentSuccess === false) {
+                    if (count > 5) {
+                        setStatus("failed");
+                        setMessage("Payment Failed ❌ Please try again.");
+                        clearInterval(interval);
+                    }
+                    count++
                 }
             } catch (err) {
                 console.error("polling error:", err);

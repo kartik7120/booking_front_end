@@ -1,115 +1,77 @@
-import { useQuery } from "@tanstack/react-query";
-import Ticket, { TicketProps } from "./Ticket";
-import { useLocation, useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query"
+import { useLocation, useParams } from "react-router"
+import Ticket, { TicketProps } from "./Ticket"
 
 async function getTicketDetails(ticket_id: string): Promise<TicketProps> {
-  const response = await fetch(`http://localhost:8080/getTicketDetails/${ticket_id}`);
+  const response = await fetch(
+    `http://localhost:8080/getTicketDetails/${ticket_id}`
+  )
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch ticket details: ${response.statusText}`);
+    throw new Error(`Failed to fetch ticket details`)
   }
-  return response.json();
+
+  return response.json()
 }
 
 function TicketSkeleton() {
   return (
-    <div
-      style={{
-        backgroundColor: "#1f2937",
-        border: "2px solid #4b5563",
-        color: "#ffffff",
-        maxWidth: "400px",
-        margin: "0 auto",
-        padding: "16px",
-        borderRadius: "12px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-      }}
-    >
+    <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 p-4 text-white shadow-lg">
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          border: "2px solid #4b5563",
-          borderRadius: "12px",
-          padding: "16px",
-        }}
-      >
-        <div style={{ width: "96px", height: "144px", backgroundColor: "#374151", borderRadius: "8px" }} />
-        <div style={{ marginLeft: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-          <div style={{ width: "150px", height: "16px", backgroundColor: "#374151", borderRadius: "4px" }} />
-          <div style={{ width: "100px", height: "14px", backgroundColor: "#374151", borderRadius: "4px" }} />
-          <div style={{ width: "180px", height: "14px", backgroundColor: "#374151", borderRadius: "4px" }} />
-          <div style={{ width: "120px", height: "14px", backgroundColor: "#374151", borderRadius: "4px" }} />
-          <div style={{ width: "140px", height: "14px", backgroundColor: "#374151", borderRadius: "4px" }} />
+      <div className="flex gap-4 rounded-xl border border-gray-700 p-4">
+        <div className="h-36 w-24 rounded-lg bg-gray-700 animate-pulse" />
+
+        <div className="flex flex-col gap-3 flex-1">
+          <div className="h-4 w-3/4 rounded bg-gray-700 animate-pulse" />
+          <div className="h-3 w-1/2 rounded bg-gray-700 animate-pulse" />
+          <div className="h-3 w-full rounded bg-gray-700 animate-pulse" />
+          <div className="h-3 w-2/3 rounded bg-gray-700 animate-pulse" />
+          <div className="h-3 w-3/4 rounded bg-gray-700 animate-pulse" />
         </div>
       </div>
 
       {/* Perforation */}
-      <div style={{ width: "100%", border: "1px dashed #4b5563" }}></div>
+      <div className="my-4 border-t border-dashed border-gray-600" />
 
-      {/* QR + Screen Info */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          alignItems: "center",
-          backgroundColor: "#374151",
-          padding: "16px",
-          borderRadius: "12px",
-        }}
-      >
-        <div style={{ width: "100px", height: "100px", backgroundColor: "#1f2937", borderRadius: "8px" }} />
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ width: "80px", height: "16px", backgroundColor: "#1f2937", borderRadius: "4px" }} />
-          <div style={{ width: "120px", height: "14px", backgroundColor: "#1f2937", borderRadius: "4px" }} />
+      {/* QR Section */}
+      <div className="flex items-center justify-between rounded-xl bg-gray-800 p-4">
+        <div className="h-24 w-24 rounded-md bg-gray-700 animate-pulse" />
+
+        <div className="flex flex-col gap-2">
+          <div className="h-4 w-24 rounded bg-gray-700 animate-pulse" />
+          <div className="h-3 w-32 rounded bg-gray-700 animate-pulse" />
         </div>
       </div>
 
-      {/* Instructions placeholder */}
-      <div style={{ width: "100%", height: "40px", backgroundColor: "#374151", borderRadius: "8px" }} />
+      {/* Instructions */}
+      <div className="mt-4 h-10 rounded bg-gray-700 animate-pulse" />
     </div>
-  );
+  )
 }
 
 export default function TicketPageIndex() {
-  const params = useParams();
-  const { pathname } = useLocation();
+  const params = useParams()
+  const { pathname } = useLocation()
 
   const { isLoading, isError, error, data } = useQuery<TicketProps>({
     queryKey: ["ticket_details", params.ticketID],
     queryFn: () => getTicketDetails(params.ticketID as string),
     enabled: !!params.ticketID,
-  });
-
-  if (isLoading) {
-    return <TicketSkeleton />;
-  }
-
-  if (isError) {
-    return (
-      <div
-        style={{
-          backgroundColor: "#1f2937",
-          border: "2px solid #4b5563",
-          maxWidth: "400px",
-          margin: "0 auto",
-          padding: "16px",
-          borderRadius: "12px",
-          textAlign: "center",
-          color: "red",
-        }}
-      >
-        Failed to load ticket: {(error as Error).message}
-      </div>
-    );
-  }
+  })
 
   return (
-    <div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-800 p-4">
+      {isLoading && <TicketSkeleton />}
+
+      {isError && (
+        <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 p-6 text-center text-red-500">
+          Failed to load ticket
+          <p className="mt-2 text-sm text-gray-400">
+            {(error as Error).message}
+          </p>
+        </div>
+      )}
+
       {data && (
         <Ticket
           bookingID={data.bookingID}
@@ -127,5 +89,5 @@ export default function TicketPageIndex() {
         />
       )}
     </div>
-  );
+  )
 }

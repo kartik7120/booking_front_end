@@ -1,117 +1,137 @@
-import { useRef } from "react";
+import { useRef } from "react"
 
 export interface TicketProps {
-    imageURL: string;      // Poster image URL
-    movieTitle: string;
-    cinemaName: string;
-    showTime: string;
-    seatNumbers: string[];
-    bookingID: string;
-    qrCodeURL: string;     // QR code image URL
-    language: string;
-    format: string;        // e.g., "2D", "3D", "IMAX"
-    date: string;          // e.g., "2023-10-15"
-    venueName: string;
-    screenNumber: string;
+    imageURL: string
+    movieTitle: string
+    cinemaName: string
+    showTime: string
+    seatNumbers: string[]
+    bookingID: string
+    qrCodeURL: string
+    language: string
+    format: string
+    date: string
+    venueName: string
+    screenNumber: string
 }
 
 export default function Ticket(props: TicketProps) {
-    const ticketRef = useRef<HTMLDivElement>(null);
+    const ticketRef = useRef<HTMLDivElement>(null)
 
     function handlePrint() {
-        if (!ticketRef.current) return;
+        if (!ticketRef.current) return
 
-        const element = ticketRef.current;
-        const newWindow = window.open("", "_blank");
-        if (!newWindow) return;
+        const printWindow = window.open("", "_blank")
+        if (!printWindow) return
 
-        // Create a container div in the new window
-        const container = newWindow.document.createElement("div");
-        container.innerHTML = element.innerHTML;
+        printWindow.document.open()
+        printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Movie Ticket</title>
 
-        // Apply styles to the new window
-        const style = newWindow.document.createElement("style");
-        style.textContent = `
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #1f2937;
-      color: #ffffff;
-      margin: 0;
-      padding: 20px;
-    }
-    .ticket-container {
-      max-width: 400px;
-      border: 2px solid #4b5563;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 0 auto;
-    }
-    .ticket-header {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-evenly;
-      border: 2px solid #4b5563;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .poster { width: 96px; height: 144px; object-fit: cover; }
-    .ticket-info { display: flex; flex-direction: column; gap: 12px; margin-left: 16px; }
-    .perforation { width: 100%; border: 1px dashed #4b5563; margin-bottom: 12px; }
-    .qr-section { display: flex; flex-direction: row; justify-content: space-evenly; align-items: center; background-color: #374151; padding: 16px; border-radius: 12px; margin-bottom: 12px; }
-    .qr-section img { width: 100px; height: 100px; }
-    .screen-info { display: flex; flex-direction: column; gap: 8px; }
-    .instructions { font-size: 14px; }
-    .no-print {
-        display: none;
-    }
-  `;
+        <!-- Tailwind CDN (needed for same layout) -->
+        <script src="https://cdn.tailwindcss.com"></script>
 
-        newWindow.document.head.appendChild(style);
-        newWindow.document.body.appendChild(container);
-        newWindow.document.body.classList.add("ticket-container");
-        newWindow.focus();
-        newWindow.print();
+        <style>
+          body {
+            background: #111827;
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+          }
+
+          /* Hide print button */
+          .no-print {
+            display: none !important;
+          }
+
+          /* Force ticket width */
+          .ticket-print {
+            max-width: 400px;
+            width: 100%;
+          }
+
+          /* FIX IMAGE SIZES */
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+
+          /* Poster image */
+          .poster {
+            width: 96px !important;
+            height: 144px !important;
+            object-fit: cover !important;
+          }
+
+          /* QR image */
+          .qr {
+            width: 96px !important;
+            height: 96px !important;
+          }
+
+          @media print {
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .ticket-print {
+              border: none;
+              box-shadow: none;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="ticket-print">
+          ${ticketRef.current.innerHTML}
+        </div>
+      </body>
+    </html>
+  `)
+
+        printWindow.document.close()
+        printWindow.focus()
+
+        // Give Tailwind time to load
+        setTimeout(() => {
+            printWindow.print()
+            printWindow.close()
+        }, 500)
     }
+
     return (
         <div
             ref={ticketRef}
-            style={{
-                backgroundColor: "#1f2937",
-                border: "2px solid #4b5563",
-                color: "#ffffff",
-                maxWidth: "400px",
-                margin: "0 auto",
-                padding: "16px",
-                borderRadius: "12px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-            }}
+            className="relative mx-auto max-w-md overflow-hidden rounded-2xl border border-gray-700 bg-gray-900 text-white shadow-lg"
         >
-            {/* Ticket Header */}
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    border: "2px solid #4b5563",
-                    borderRadius: "12px",
-                    padding: "16px",
-                }}
-            >
-                <div style={{ width: "96px", height: "144px", flexShrink: 0 }}>
-                    <img
-                        src={props.imageURL}
-                        alt={`${props.movieTitle} Poster`}
-                        crossOrigin="anonymous"
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                </div>
-                <div style={{ marginLeft: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                    <p>{props.movieTitle}</p>
-                    <p>{props.date} | {props.format}</p>
-                    <p>{props.cinemaName} - {props.venueName}</p>
+
+            {/* Ticket side cutouts */}
+            {/* <div className="absolute left-0 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-gray-800" />
+      <div className="absolute right-0 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-gray-800" /> */}
+
+            {/* Header */}
+            <div className="flex gap-4 p-4">
+                <img
+                    src={props.imageURL}
+                    alt={props.movieTitle}
+                    crossOrigin="anonymous"
+                    className="poster h-36 w-24 rounded-lg object-cover"
+                />
+
+                <div className="flex flex-col gap-1 text-sm">
+                    <h2 className="text-lg font-bold">{props.movieTitle}</h2>
+                    <p className="text-gray-300">
+                        {props.date} • {props.format}
+                    </p>
+                    <p>
+                        {props.cinemaName} – {props.venueName}
+                    </p>
                     <p>Showtime: {props.showTime}</p>
                     <p>Seats: {props.seatNumbers.join(", ")}</p>
                     <p>Language: {props.language}</p>
@@ -119,54 +139,43 @@ export default function Ticket(props: TicketProps) {
             </div>
 
             {/* Perforation line */}
-            <div style={{ width: "100%", border: "1px dashed #4b5563" }}></div>
+            <div className="border-t border-dashed border-gray-600 mx-4 my-2" />
 
-            {/* QR + Screen Info */}
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                    backgroundColor: "#374151",
-                    padding: "16px",
-                    borderRadius: "12px",
-                }}
-            >
-                <div>
-                    <img src={props.qrCodeURL} alt="QR Code" crossOrigin="anonymous" style={{ width: "100px", height: "100px" }} />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <p style={{ fontWeight: "bold", fontSize: "24px" }}>Screen {props.screenNumber}</p>
-                    <p>Booking ID: {props.bookingID}</p>
+            {/* QR Section */}
+            <div className="mx-4 my-4 flex items-center justify-between rounded-xl bg-gray-800 p-4">
+                <img
+                    src={props.qrCodeURL}
+                    alt="QR Code"
+                    crossOrigin="anonymous"
+                    className="qr h-24 w-24 rounded-md"
+                />
+
+                <div className="text-right">
+                    <p className="text-2xl font-bold">
+                        Screen {props.screenNumber}
+                    </p>
+                    <p className="text-xs text-gray-400">Booking ID</p>
+                    <p className="font-mono text-sm">
+                        {props.bookingID}
+                    </p>
                 </div>
             </div>
 
             {/* Instructions */}
-            <div>
-                <p style={{ fontSize: "14px" }}>
-                    Please arrive at least 15 minutes before the showtime. Enjoy your movie! You will receive an email confirmation with your booking details shortly.
-                </p>
-            </div>
+            <p className="px-4 pb-4 text-xs text-gray-300">
+                Please arrive at least 15 minutes before the showtime.
+                Enjoy your movie! 🎬
+            </p>
 
-            {/* Print button */}
-            <div>
+            {/* Print Button */}
+            <div className="px-4 pb-4">
                 <button
-                    className="no-print"
                     onClick={handlePrint}
-                    style={{
-                        backgroundColor: "#dc2626",
-                        color: "#ffffff",
-                        fontWeight: "bold",
-                        padding: "12px",
-                        width: "100%",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                    }}
+                    className="no-print w-full rounded-lg bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500/50"
                 >
                     Print Ticket
                 </button>
             </div>
         </div>
-    );
+    )
 }

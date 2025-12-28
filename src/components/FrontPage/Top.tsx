@@ -23,7 +23,8 @@ interface UpcomingMovieResponse {
     name: string,
     character_name: string,
     photourl: string
-  }[]
+  }[],
+  screen_wide_poster_url: string
 }
 
 export default function Top(props: TopProps) {
@@ -108,7 +109,10 @@ export default function Top(props: TopProps) {
                   releaseYear: new Date(movie.release_date.toString().split(" ")[0]).getFullYear(),
                   summary: movie.summary,
                   duration: movie.duration,
-                  stars: [""]
+                  stars: [""],
+                  movie_id: movie.id,
+                  poster_url: movie.poster_url,
+                  screen_wide_poster_url: movie.screen_wide_poster_url
                 })) || []
               }
               isLoading={isLoading}

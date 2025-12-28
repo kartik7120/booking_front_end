@@ -65,7 +65,8 @@ export default function HomePage() {
         photourl: crew.photourl
       })),
       poster_url: movie.poster_url,
-      screen_wide_poster_url: movie.screen_wide_poster_url
+      screen_wide_poster_url: movie.screen_wide_poster_url,
+      movie_id: movie.id
     })));
   }, [nowPlayingMovies, upcomingMoviesData]);
 

@@ -396,9 +396,9 @@ export default function Navbar(props: NavbarProps) {
 
 
   return (
-    <>
+    <div>
       <div>
-        <nav className="bg-neutral-primary fixed w-full z-20 top-0 start-0 border-b border-default dark">
+        <nav className="dark fixed w-full z-20 top-0 start-0 border-b border-default">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
               <img src="https://flowbite.com/docs/images/logo.svg" className="h-7" alt="Flowbite Logo" />
@@ -630,7 +630,9 @@ export default function Navbar(props: NavbarProps) {
         </div>
       </div>
       {/* Render Outlet */}
-      <Outlet />
-    </>
+      <main className="pt-[72px]">
+        <Outlet />
+      </main>
+    </div>
   )
 }

@@ -2,6 +2,7 @@ import Title from "../../stories/Title"
 import { SlCalender } from "react-icons/sl";
 import { FaRegClock } from "react-icons/fa6";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 export interface CarouselLayoverProps {
   title?: string,
@@ -17,12 +18,15 @@ export interface CarouselLayoverProps {
   duration?: number // in milliseconds
   poster_url?: string
   screen_wide_poster_url?: string
+  movie_id: number,
 }
 
 export default function CarouselLayover(props: CarouselLayoverProps) {
   const ratings = new Array();
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,8 +84,8 @@ export default function CarouselLayover(props: CarouselLayoverProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button className="btn btn-error">Book tickets</button>
-            <button className="btn btn-soft btn-error">Review</button>
+            <button className="btn btn-error" onClick={() => navigate(`movie/${props.movie_id}`)}>Book tickets</button>
+            <button className="btn btn-soft btn-error" onClick={() => navigate(`movie/${props.movie_id}/reviews`)}>Review</button>
             <button className="btn btn-soft btn-error">More</button>
           </div>
         </div>

@@ -31,8 +31,8 @@ export const Primary: Story = {
                 // Add more seats as needed
             ],
             bookedSeats: [
-                { id: 1, seat_number: "A1", movieTimeSlotID: 1, seatMatrixID: 1, is_booked: true },
-                { id: 2, seat_number: "A2", movieTimeSlotID: 1, seatMatrixID: 2, is_booked: true },
+                { id: 1, seat_number: "A1", seatMatrixID: 1, is_booked: true },
+                { id: 2, seat_number: "A2", seatMatrixID: 2, is_booked: true },
 
                 // Add more booked seats as needed
             ]

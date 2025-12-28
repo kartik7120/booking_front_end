@@ -13,7 +13,7 @@ export interface SeatProps {
 export default function Seat(props: SeatProps) {
     const { seatNumber, isBooked, isSelected, onClick } = props;
 
-    console.log(`Seat number: ${seatNumber}, is_booked: ${isBooked}`);
+    // console.log(`Seat number: ${seatNumber}, is_booked: ${isBooked}`);
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (isBooked) return; // 🚫 prevent action if seat is booked

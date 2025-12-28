@@ -49,7 +49,8 @@ export const Primary: Story = {
                         "character_name": "Director",
                         "photourl": "https://example.com/matt_reeves.jpg"
                     }
-                ]
+                ],
+                movie_id: 61
             },
             {
                 title: "Interstellar",
@@ -78,8 +79,11 @@ export const Primary: Story = {
                         "name": "Denis Villeneuve",
                         "character_name": "Director",
                         "photourl": "https://example.com/denis_villeneuve.jpg"
-                    }
-                ]
+                    },
+
+                ],
+                movie_id: 61
+
             }
         ],
     }
@@ -122,7 +126,8 @@ export const ScrollAuto: Story = {
                         "character_name": "Director",
                         "photourl": "https://example.com/matt_reeves.jpg"
                     }
-                ]
+                ],
+                movie_id: 61
             }
         ]
     }
