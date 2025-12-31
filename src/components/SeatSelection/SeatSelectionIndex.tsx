@@ -342,7 +342,7 @@ export default function Index() {
   }
 
   return (
-    <div className="m-6 flex flex-col justify-between gap-y-6 h-full">
+    <div className="m-6 flex-1 flex flex-col justify-between gap-y-6">
       {/* SeatSelectionTop */}
       <div>
         {isLoadingVenueDetails || isLoadingMovieTimeSlot ? (

@@ -165,7 +165,7 @@ export default function SeatMap({
     ========================= */
 
     return (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto select-none">
             <div className="flex gap-x-5">
 
                 {/* Row Labels */}

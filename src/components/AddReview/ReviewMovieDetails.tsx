@@ -1,65 +1,80 @@
-import Title from '../../stories/Title';
-
 export interface ReviewMovieDetailsProps {
-    movieTitle?: string;
-    moviePosterUrl?: string;
-    movieReleaseDate?: string;
-    movieTitlePosterURL?: string;
-    movieRating?: number;
-    userRating?: number;
+  movieTitle?: string;
+  moviePosterUrl?: string;
+  movieReleaseDate?: string;
+  movieTitlePosterURL?: string;
+  movieRating?: number;
+  userRating?: number;
 }
 
-export default function ReviewMovieDetails(props: ReviewMovieDetailsProps) {
-    return (
-        <div>
-            <div className='bg-gray-600 flex flex-row justify-evenly items-center border border-gray-400 p-4 mb-4 rounded-lg'>
+export default function ReviewMovieDetails({
+  movieTitle,
+  moviePosterUrl,
+  movieReleaseDate,
+  movieTitlePosterURL,
+  movieRating,
+  userRating,
+}: ReviewMovieDetailsProps) {
+  return (
+    <div className="max-w-5xl mx-auto rounded-2xl border border-default bg-neutral-primary-soft shadow-sm overflow-hidden">
+      <div className="flex flex-col sm:flex-row gap-6 p-6">
 
-                <div className='p-3 mb-3 d-flex gap-3'>
-                    <img src={props.moviePosterUrl} alt={props.movieTitle} style={{ width: '150px', height: '225px' }} />
-                </div>
-
-                <div className='d-flex flex-column justify-content-center'>
-
-                    {
-                        props.movieTitlePosterURL && <img src={props.movieTitlePosterURL} alt={props.movieTitle} style={{ width: '200px', height: '100px' }} className='object-contain' />
-                    }
-
-                    {!props.movieTitlePosterURL && props.movieTitle && <Title title={props.movieTitle} />}
-
-                    <p className="text-white mt-2 text-2xl font-semibold">
-                        Release Date: {props.movieReleaseDate}
-                    </p>
-
-                    <div className='flex flex-row items-center gap-4 mt-2'>
-
-                        <p className="text-white text-2xl font-semibold">
-                            Average Rating: {props.movieRating}
-                        </p>
-
-                    </div>
-
-                    <div className='flex flex-row items-center gap-4 mt-2'>
-
-                        <p className="text-white text-2xl font-semibold">
-                            Your rating: {props.userRating || "Not rated yet"}
-                        </p>
-
-                        {/* {
-                        props.userRating && <div className="rating">
-
-                            {
-                                [...Array(Math.round(props.userRating))].map((_, index) => (
-                                    <div key={index} className="mask mask-star bg-yellow-400" aria-label={`${index + 1} star`}></div>
-                                ))
-                            }
-                        </div>
-                    } */}
-
-                    </div>
-                </div>
-
-            </div>
-
+        {/* Poster */}
+        <div className="flex-shrink-0 flex justify-center sm:justify-start">
+          <img
+            src={moviePosterUrl}
+            alt={movieTitle}
+            className="h-[225px] w-[150px] rounded-lg object-cover shadow-md"
+          />
         </div>
-    )
+
+        {/* Details */}
+        <div className="flex flex-col justify-center gap-3">
+
+          {/* Movie Title / Logo */}
+          {movieTitlePosterURL ? (
+            <img
+              src={movieTitlePosterURL}
+              alt={movieTitle}
+              className="h-[80px] max-w-[260px] object-contain"
+            />
+          ) : (
+            movieTitle && (
+              <h1 className="text-3xl font-bold text-heading">
+                {movieTitle}
+              </h1>
+            )
+          )}
+
+          {/* Release Date */}
+          {movieReleaseDate && (
+            <p className="text-sm text-text-muted">
+              Release date:{" "}
+              <span className="font-medium text-heading">
+                {movieReleaseDate}
+              </span>
+            </p>
+          )}
+
+          {/* Ratings */}
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+
+            {/* Average Rating */}
+            {movieRating !== undefined && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 px-3 py-1 text-sm font-medium text-yellow-400">
+                ★ {movieRating.toFixed(1)} / 5
+              </span>
+            )}
+
+            {/* User Rating */}
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
+              {userRating
+                ? `Your rating: ${userRating}/5`
+                : "You haven’t rated yet"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

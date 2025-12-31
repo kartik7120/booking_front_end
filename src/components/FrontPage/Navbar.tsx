@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { QueryFunctionContext, useMutation, useQueryClient } from "@tanstack/react-query"
 import Cookies from 'js-cookie'
-import { Outlet } from "react-router"
+import { Link, Outlet } from "react-router"
 import { baseURL } from "../../App"
 import 'flowbite';
 
@@ -422,7 +422,13 @@ export default function Navbar(props: NavbarProps) {
                   <a href="#" className="block py-2 px-3 text-white bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0" aria-current="page">Home</a>
                 </li>
                 <li>
-                  <a href="#" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Movies</a>
+                  <Link className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent" to={
+                    {
+                      pathname: "/getticket",
+                    }
+                  }>
+                    Ticket
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Services</a>
@@ -630,7 +636,7 @@ export default function Navbar(props: NavbarProps) {
         </div>
       </div>
       {/* Render Outlet */}
-      <main className="pt-[72px]">
+      <main className="pt-[72px] min-h-screen flex flex-col dark">
         <Outlet />
       </main>
     </div>

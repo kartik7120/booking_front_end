@@ -12,6 +12,7 @@ import PollingPageIndex from './components/PollingPage/PollingPageIndex'
 import TicketPageIndex from './components/TicketPage/TicketPageIndex'
 import AddReviewIndex from './components/AddReview/AddReviewIndex'
 import AllReviewsIndex from './components/AllReviews/AllReviewsIndex'
+import SearchTicket from './components/SearchTicket/SearchTicket'
 
 const queryClient = new QueryClient()
 export const baseURL = import.meta.env.VITE_BROKER_URL;
@@ -35,6 +36,7 @@ function App() {
           <Route path="/confirmingBooking" element={<PollingPageIndex />} />
           <Route path="/ticket/:ticketID" element={<TicketPageIndex />} />
           <Route path="movie/:id/add-review" element={<AddReviewIndex />} />
+          <Route path="/getticket" element={<SearchTicket />} />
         </Route>
       </Routes>
     </QueryClientProvider>

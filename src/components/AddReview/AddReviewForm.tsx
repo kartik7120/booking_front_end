@@ -56,149 +56,188 @@ interface AddReviewParams {
 }
 
 export default function AddReviewForm() {
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewBody, setReviewBody] = useState("");
+  const [rating, setRating] = useState(0);
+  const [containsSpoiler, setContainsSpoiler] = useState(false);
+  const [format, setFormat] = useState("");
+  const [language, setLanguage] = useState("");
 
-    const [reviewTitle, setReviewTitle] = useState("");
-    const [reviewBody, setReviewBody] = useState("");
-    const [rating, setRating] = useState(0);
-    const [containsSpoiler, setContainsSpoiler] = useState(false);
-    const [format, setFormat] = useState("");
-    const [language, setLanguage] = useState("");
+  const remainingChars = 300 - reviewBody.length;
+  const { id: movieID } = useParams();
 
-    const remainingChars = 300 - reviewBody.length;
+  const {
+    mutate: submitReview,
+    isPending,
+    isError,
+    error,
+  } = useMutation({
+    mutationFn: (newReview: AddReviewParams) => AddReviewHandler(newReview),
+  });
 
-    const params = useParams();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewTitle || rating === 0) {
+      alert("Please add a title and rating.");
+      return;
+    }
+    if (!movieID) return alert("Movie ID is missing.");
 
-    const movieID = params.id;
+    submitReview({
+      reviewTitle,
+      reviewBody,
+      rating,
+      containsSpoiler,
+      format,
+      language,
+      movieID,
+      userID: -1,
+      reviewerName: "John Doe",
+    });
+  };
 
-    const {
-        mutate: submitReview,
-        isPending,
-        isError,
-        error,
-    } = useMutation({
-        mutationFn: (newReview: AddReviewParams) => AddReviewHandler(newReview),
-        onSuccess: (data) => {
-            console.log("Review submitted successfully:", data);
-            // Optionally reset form fields here
-        },
-        onError: (error: any) => {
-            console.error("Error submitting review:", error.message);
-        },
-    })
+  return (
+    <div className="max-w-2xl mx-auto rounded-2xl border border-default bg-neutral-primary-soft shadow-sm p-6 sm:p-8">
+      <form onSubmit={handleSubmit} className="space-y-6">
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!reviewTitle || rating === 0) return alert("Please add a title and rating.");
-
-        if (!movieID) return alert("Movie ID is missing.");
-
-        console.log({ reviewTitle, reviewBody, rating, containsSpoiler, format, language });
-
-        submitReview({
-            reviewTitle,
-            reviewBody,
-            rating,
-            containsSpoiler,
-            format,
-            language,
-            movieID,
-            userID: -1, // Replace with actual user ID from auth context or state
-            reviewerName: "John Doe" // Replace with actual user name from auth context or state
-        });
-    };
-
-    return (
-        <div className="border-2 border-gray-600 rounded-2xl p-8 shadow-md max-w-2xl mx-auto text-white">
-            <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Enter review title"
-                    className="input input-bordered focus:ring-2 focus:ring-yellow-400"
-                    value={reviewTitle}
-                    onChange={(e) => setReviewTitle(e.target.value)}
-                />
-
-                <div>
-                    <label className="text-xl font-semibold">Your Rating</label>
-                    <div className="flex gap-2 mt-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <span
-                                key={star}
-                                onClick={() => setRating(star)}
-                                className={`cursor-pointer text-3xl ${star <= rating ? "text-yellow-400" : "text-gray-400"
-                                    }`}
-                            >
-                                ★
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                <fieldset className="fieldset">
-                    <legend className="fieldset-legend text-2xl">Review body</legend>
-                    <textarea
-                        className="textarea textarea-lg h-32 focus:ring-2 focus:ring-yellow-400"
-                        placeholder="Tell us what you loved or didn’t like..."
-                        value={reviewBody}
-                        onChange={(e) => setReviewBody(e.target.value)}
-                        maxLength={300}
-                    />
-                    <div className="text-sm text-gray-400 text-right">{remainingChars} characters left</div>
-                </fieldset>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <select className="select select-bordered w-full" onChange={(e) => setFormat(e.target.value)}>
-                        <option value="">Select format</option>
-                        <option value="2D">2D</option>
-                        <option value="3D">3D</option>
-                        <option value="IMAX">IMAX</option>
-                        <option value="4DX">4DX</option>
-                    </select>
-
-                    <select className="select select-bordered w-full" onChange={(e) => setLanguage(e.target.value)}>
-                        <option value="">Select language</option>
-                        <option value="English">English</option>
-                        <option value="Hindi">Hindi</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Telugu">Telugu</option>
-                    </select>
-                </div>
-
-                <label className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        checked={containsSpoiler}
-                        onChange={(e) => setContainsSpoiler(e.target.checked)}
-                    />
-                    Contains spoilers
-                </label>
-
-                <div className="flex justify-between">
-                    <button type="submit" className="btn btn-primary">
-                        Submit Review
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-outline"
-                        onClick={() => {
-                            setReviewTitle("");
-                            setReviewBody("");
-                            setRating(0);
-                            setContainsSpoiler(false);
-                            setFormat("");
-                            setLanguage("");
-                        }}
-                    >
-                        Clear
-                    </button>
-                </div>
-            </form>
-            {
-                isPending && <p className="text-blue-500 mt-4">Submitting your review...</p>
-            }
-            {
-                isError && <p className="text-red-500 mt-4">Error: {error || "An error occurred while submitting your review."}</p>
-            }
+        {/* Review Title */}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-heading">
+            Review title
+          </label>
+          <input
+            type="text"
+            className="block w-full rounded-base border border-default bg-neutral-secondary-medium p-2.5 text-heading focus:border-brand focus:ring-brand"
+            placeholder="Enter review title"
+            value={reviewTitle}
+            onChange={(e) => setReviewTitle(e.target.value)}
+          />
         </div>
-    );
+
+        {/* Rating */}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-heading">
+            Your rating
+          </label>
+          <div className="flex items-center gap-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                type="button"
+                key={star}
+                onClick={() => setRating(star)}
+                className={`text-3xl transition ${
+                  star <= rating ? "text-yellow-400" : "text-neutral-500"
+                }`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Review Body */}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-heading">
+            Review body
+          </label>
+          <textarea
+            rows={5}
+            maxLength={300}
+            className="block w-full rounded-base border border-default bg-neutral-secondary-medium p-2.5 text-heading focus:border-brand focus:ring-brand"
+            placeholder="Tell us what you liked or didn’t like..."
+            value={reviewBody}
+            onChange={(e) => setReviewBody(e.target.value)}
+          />
+          <p className="mt-1 text-right text-sm text-text-muted">
+            {remainingChars} characters left
+          </p>
+        </div>
+
+        {/* Format & Language */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-heading">
+              Format
+            </label>
+            <select
+              className="block w-full rounded-base border border-default bg-neutral-secondary-medium p-2.5 text-heading focus:border-brand focus:ring-brand"
+              value={format}
+              onChange={(e) => setFormat(e.target.value)}
+            >
+              <option value="">Select format</option>
+              <option value="2D">2D</option>
+              <option value="3D">3D</option>
+              <option value="IMAX">IMAX</option>
+              <option value="4DX">4DX</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-heading">
+              Language
+            </label>
+            <select
+              className="block w-full rounded-base border border-default bg-neutral-secondary-medium p-2.5 text-heading focus:border-brand focus:ring-brand"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              <option value="">Select language</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Telugu">Telugu</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Spoiler */}
+        <div className="flex items-center gap-2">
+          <input
+            id="spoiler"
+            type="checkbox"
+            checked={containsSpoiler}
+            onChange={(e) => setContainsSpoiler(e.target.checked)}
+            className="h-4 w-4 rounded border-default text-brand focus:ring-brand"
+          />
+          <label htmlFor="spoiler" className="text-sm text-heading">
+            Contains spoilers
+          </label>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setReviewTitle("");
+              setReviewBody("");
+              setRating(0);
+              setContainsSpoiler(false);
+              setFormat("");
+              setLanguage("");
+            }}
+            className="rounded-base border border-default px-4 py-2 text-sm font-medium text-heading hover:bg-neutral-tertiary"
+          >
+            Clear
+          </button>
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className="rounded-base bg-brand px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium"
+          >
+            {isPending ? "Submitting..." : "Submit review"}
+          </button>
+        </div>
+
+        {/* Status */}
+        {isError && (
+          <div className="rounded-base border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+            {error?.message || "Failed to submit review"}
+          </div>
+        )}
+      </form>
+    </div>
+  );
 }
+
