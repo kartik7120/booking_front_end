@@ -98,7 +98,6 @@ export default function MovieDetails() {
         queryFn: () => fetchMovieDetails(Number(id)),
         enabled: !!id,
         refetchOnWindowFocus: false,
-        retry: true,
         retryDelay: 1000,
         staleTime: 1000 * 60 * 5,
     });
