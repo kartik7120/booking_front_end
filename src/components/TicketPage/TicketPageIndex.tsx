@@ -4,7 +4,8 @@ import Ticket, { TicketProps } from "./Ticket"
 
 async function getTicketDetails(ticket_id: string): Promise<TicketProps> {
   const response = await fetch(
-    `http://localhost:8080/getTicketDetails/${ticket_id}`
+    // `http://localhost:8080/getTicketDetails/${ticket_id}`
+    `${import.meta.env.VITE_BROKER_URL}/getTicketDetails/${ticket_id}`
   )
 
   if (!response.ok) {
