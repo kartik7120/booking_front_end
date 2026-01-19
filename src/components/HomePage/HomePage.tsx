@@ -79,11 +79,13 @@ export default function HomePage() {
     <div className='dark'>
       {/* <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> */}
       <div className='m-2'>
-        <Carousel isLoading={!(CarouselLayoverProps && CarouselLayoverProps.length > 0)} CarouselLayoverProps={
-          CarouselLayoverProps
-        }
+        <Carousel
+          isLoading={!CarouselLayoverProps || CarouselLayoverProps.length === 0}
+          CarouselLayoverProps={CarouselLayoverProps ?? []}
           imageURLs={
-            CarouselLayoverProps.map(item => item.screen_wide_poster_url || "https://via.placeholder.com/1280x720")
+            (CarouselLayoverProps ?? []).map(
+              item => item.screen_wide_poster_url ? item.screen_wide_poster_url : "https://via.placeholder.com/1280x720"
+            )
           }
           shouldAutoScroll={true}
           scrollInterval={5000}

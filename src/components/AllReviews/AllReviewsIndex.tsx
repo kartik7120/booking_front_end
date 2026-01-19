@@ -2,11 +2,10 @@ import { useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import AllReviewsHeader from './AllReviewsHeader';
 import AllReviewCommentSection from './AllReviewCommentSection';
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { baseURL } from '../../App';
 
 async function GetMovieDetails(movieID: string) {
-    const response = await fetch(`${BASE_URL}/getMovie/${movieID}`, {
+    const response = await fetch(`${baseURL}/getMovie/${movieID}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
