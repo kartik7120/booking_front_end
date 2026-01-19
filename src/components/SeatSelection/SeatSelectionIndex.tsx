@@ -361,8 +361,10 @@ export default function Index() {
       <div className="flex flex-col items-center justify-center w-full">
 
         {/* Theatre Screen */}
-        <div className="flex justify-center mb-6">
-          <CurvedTheatreScreen />
+        <div className="flex justify-center mb-8 w-full">
+          <div className="w-1/3 min-w-[320px] max-w-[600px]">
+            <CurvedTheatreScreen />
+          </div>
         </div>
 
         {/* Seat Map */}
