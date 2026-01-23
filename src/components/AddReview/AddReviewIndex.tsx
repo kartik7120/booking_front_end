@@ -2,12 +2,10 @@ import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import ReviewMovieDetails from "./ReviewMovieDetails";
 import AddReviewForm from "./AddReviewForm";
-
-// ✅ Better: Move API URL to environment variable
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { baseURL } from "../../App";
 
 async function GetMovieDetails(movieID: string) {
-    const response = await fetch(`${BASE_URL}/getMovie/${movieID}`, {
+    const response = await fetch(`${baseURL}/getMovie/${movieID}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
